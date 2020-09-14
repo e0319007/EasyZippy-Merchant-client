@@ -31,7 +31,7 @@ function Profile() {
                                 <CardHeader>
                                     <div className="form-row">
                                     <CardTitle className="col-md-10" tag="h5">Edit Profile</CardTitle>
-                                    <Button className="btn-round" color="warning">Change Password</Button>
+                                    <Button className="btn-round" color="info">Change Password</Button>
                                     </div>
                                 </CardHeader>
                                 <CardBody>
@@ -56,7 +56,7 @@ function Profile() {
                                         </FormGroup>
                                         <Row>
                                         <div className="update ml-auto mr-auto">
-                                            <Button className="btn-round" color="warning" type="submit">Update Profile</Button>
+                                            <Button className="btn-round" color="info" type="submit">Update Profile</Button>
                                         </div>
                                         </Row>
                                     </form>
