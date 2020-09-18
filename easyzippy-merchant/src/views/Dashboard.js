@@ -1,24 +1,8 @@
-/*!
-
-=========================================================
-* Paper Dashboard React - v1.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/paper-dashboard-react
-* Copyright 2020 Creative Tim (https://www.creative-tim.com)
-
-* Licensed under MIT (https://github.com/creativetimofficial/paper-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React from "react";
+import { useHistory } from 'react-router-dom';
 // react plugin used to create charts
 import { Line } from "react-chartjs-2";
+import Cookies from 'js-cookie';
 // reactstrap components
 import {
   Card,
@@ -28,6 +12,7 @@ import {
   CardTitle,
   Row,
   Col,
+  Button
 } from "reactstrap";
 // core components
 import {
@@ -35,6 +20,17 @@ import {
 } from "variables/charts.js";
 
 function Dashboard() {
+
+  const history = useHistory()
+
+  const logout = () => {
+    Cookies.remove('authToken')
+    Cookies.remove('merchantUser')
+    localStorage.removeItem('currentMerchant')
+    history.push('/login')
+    document.location.reload()
+  }
+
   return (
     <>
       <div className="content">
@@ -45,13 +41,13 @@ function Dashboard() {
                 <Row>
                   <Col md="4" xs="5">
                     <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-shop text-warning" />
+                      <i className="nc-icon nc-single-02 text-warning" />
                     </div>
                   </Col>
                   <Col md="8" xs="7">
                     <div className="numbers">
-                      <p className="card-category">Products</p>
-                      <CardTitle tag="p">88</CardTitle>
+                      <p className="card-category">Customers</p>
+                      <CardTitle tag="p">836</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -65,20 +61,45 @@ function Dashboard() {
               </CardFooter>
             </Card>
           </Col>
-          
           <Col lg="3" md="6" sm="6">
             <Card className="card-stats">
               <CardBody>
                 <Row>
                   <Col md="4" xs="5">
                     <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-paper text-danger" />
+                      <i className="nc-icon nc-shop text-success" />
                     </div>
                   </Col>
                   <Col md="8" xs="7">
                     <div className="numbers">
-                      <p className="card-category">Orders</p>
-                      <CardTitle tag="p">78</CardTitle>
+                      <p className="card-category">Merchants</p>
+                      <CardTitle tag="p">52</CardTitle>
+                      <p />
+                    </div>
+                  </Col>
+                </Row>
+              </CardBody>
+              <CardFooter>
+                <hr />
+                <div className="stats">
+                  <i className="far fa-calendar" />Since Last Month
+                </div>
+              </CardFooter>
+            </Card>
+          </Col>
+          <Col lg="3" md="6" sm="6">
+            <Card className="card-stats">
+              <CardBody>
+                <Row>
+                  <Col md="4" xs="5">
+                    <div className="icon-big text-center icon-warning">
+                      <i className="nc-icon nc-bookmark-2 text-danger" />
+                    </div>
+                  </Col>
+                  <Col md="8" xs="7">
+                    <div className="numbers">
+                      <p className="card-category">Bookings</p>
+                      <CardTitle tag="p">433</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -104,7 +125,7 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Revenue</p>
-                      <CardTitle tag="p">$982</CardTitle>
+                      <CardTitle tag="p">$2,135</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -136,7 +157,7 @@ function Dashboard() {
             </Card>
           </Col>
         </Row>
-
+        <Button onClick={logout} color="secondary" style={{float: "right"}}>Logout</Button>
       </div>
     </>
   )
