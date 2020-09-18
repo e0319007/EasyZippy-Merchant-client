@@ -28,7 +28,7 @@ function FileUpload() {
 
     const [file, setFile] = useState('');
     const [filename, setFilename] = useState('Choose File');
-    const [uploadedFile, setUploadedFile] = useState({});
+    // const [uploadedFile, setUploadedFile] = useState({});
 
     // FILE UPLOAD
     const onChange = e => {
@@ -37,13 +37,19 @@ function FileUpload() {
     };
     
     const fileUpload = e => {
-        e.preventDefault()
-        const formData = new FormData();
-        formData.append('file', file);
 
-        axios.post(`http://localhost:5000/merchant/${merchantid}/uploadTenancyAgreement`, {
-            tenancyAgreement: formData
-        }).then(() => {
+        console.log("in file upload method")
+        console.log("filename: " + filename)
+        console.log("file: " + file)
+
+        e.preventDefault()
+        let formData = new FormData();
+
+        formData.append('file', file);
+        console.log('****' +formData.has('file'))
+
+        axios.post(`http://localhost:5000/merchant/${merchantid}/uploadTenancyAgreement`, formData,
+        ).then(() => {
             console.log("file upload axios call went through")
             isError(false)
             isSuccessful(true)
@@ -96,14 +102,14 @@ function FileUpload() {
                 { err &&<Alert color="danger">{error}</Alert> }
                 { successful &&<Alert color="success">{successMsg}</Alert> }
             </Form>
-            {uploadedFile ? (
+            {/* {uploadedFile ? (
                 <div className='row mt-5'>
                 <div className='col-md-6 m-auto'>
                     <h3 className='text-center'>{uploadedFile.fileName}</h3>
                     <img style={{ width: '100%' }} src={uploadedFile.filePath} alt='' />
                 </div>
                 </div>
-            ) : null}
+            ) : null} */}
         </div>
     )
 
