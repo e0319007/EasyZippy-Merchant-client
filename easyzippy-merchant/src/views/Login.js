@@ -9,7 +9,8 @@ import {
     Input,
     Alert,
     Button,
-    Navbar
+    Navbar,
+    NavLink
 } from "reactstrap";
 
 const API_SERVER = "http://localhost:5000/merchant"
@@ -28,11 +29,23 @@ function Login() {
         // console.log("inside on change email")
         const email = e.target.value;
         setEmail(email)
+        if (email.trim().length == 0) {
+            setError("Email is a required field")
+            isError(true)
+        } else {
+            isError(false)
+        }
     }
 
     const onChangePassword = e => {
         const password = e.target.value;
         setPassword(password)
+        if (password.trim().length == 0) {
+            setError("Password is a required field")
+            isError(true)
+        } else {
+            isError(false)
+        }
     }
 
     const merchant = {
@@ -41,14 +54,21 @@ function Login() {
         email: ''
     }
 
-    const postLogin = () =>  {
-        console.log("in login function")
+    const redirect = () => {
+        history.push('/apply')
+    }
 
-        history.push('/admin/dashboard')
+    const forgotPassword = () => {
+        history.push('/forgotPassword')
+    }
+
+    const postLogin = e =>  {
+        console.log("in login function")
+        e.preventDefault()
 
         if (email.length === 0 || password.length === 0) {
             isError(true)
-            setError("Email or password field cannot be empty")
+            setError("Email field is required")
             return;
         }
         axios.post(API_SERVER + '/login', {
@@ -57,6 +77,7 @@ function Login() {
         })
         .then(response => {
             console.log("axios call went through")
+            isError(false)
             history.push('/admin/dashboard')
             document.location.reload()
             console.log(response.data.token)
@@ -72,9 +93,13 @@ function Login() {
             localStorage.setItem('currentMerchant', JSON.stringify(merchant))
 
         }).catch(function (error) {
-            console.log(error.response.data)
             isError(true)
-            setError("Your email or password is incorrect!")
+            if (error.response.data === "Merchant is not approved") {
+                setError("Account not activated")
+            } else {
+                setError(error.response.data)
+            }
+            console.log(error.response.data)
             // check below line again,, ideally dont want to refresh, want to show error caught from backend
             history.push('/login') 
             //add customised alerts according to errors
@@ -99,7 +124,7 @@ function Login() {
             <form style={{...padding(65, 77, 0, 77)}}>
                 <FormGroup>
                     <p className="h3" style={{textAlign: 'center'}}>
-                        Welcome to Ez2Keep Merchant Application!
+                        Welcome to Ez2Keep Merchant Application
                     </p>
                 </FormGroup>
                 <FormGroup>
@@ -130,9 +155,12 @@ function Login() {
                     Log In
                 </Button>
                 <FormGroup> 
-                    <Link to="/apply">Don't have an account? Click here to apply.</Link>
+                    <Link onClick={redirect}>● Don't have an account? Click here to apply.</Link>
                 </FormGroup>
-                { !valid && err &&<Alert color="danger">{error}</Alert> }
+                <FormGroup> 
+                    <Link onClick={forgotPassword}>● Forgot Password?</Link>
+                </FormGroup>
+                { err &&<Alert color="danger">{error}</Alert> }
             </form>
         </div>
     );

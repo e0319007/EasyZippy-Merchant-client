@@ -5,7 +5,7 @@
   "homepage": "https://demos.creative-tim.com/#/dashboard",
   "dependencies": {
     "axios": "^0.20.0",
-    "bootstrap": "4.5.0",
+    "bootstrap": "^4.5.0",
     "chart.js": "2.9.3",
     "history": "4.10.1",
     "js-cookie": "^2.2.1",
