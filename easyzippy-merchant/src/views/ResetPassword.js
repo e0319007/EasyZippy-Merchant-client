@@ -57,6 +57,7 @@ function ResetPassword() {
 
             localStorage.removeItem('emailToken')
             localStorage.removeItem('email')
+            history.push('/login')
         }).catch(function (error) {
             console.log(error.response.data)
             isError(true)
@@ -119,9 +120,9 @@ function ResetPassword() {
                         </Button>
                     </div>
                 </Row>
-                <FormGroup> 
+                {/* <FormGroup> 
                     <Link onClick={redirect}>● Return to login page to sign in.</Link>
-                </FormGroup>
+                </FormGroup> */}
                 { err &&<Alert color="danger">{error}</Alert> }
                 { successful &&<Alert color="success">{successMsg}</Alert>}
             </Form>

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, {useState} from 'react';
 import Cookies from 'js-cookie';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 
 import {
     Form,
@@ -62,6 +62,10 @@ function FileUpload() {
 
     }
 
+    const redirect = () => {
+        history.push('/login')
+    }
+
     return (
         <div style={{backgroundColor:'#f4f3ef', height:'100vh'}}>
             <Navbar expand="lg" color="dark">
@@ -99,17 +103,12 @@ function FileUpload() {
                 value='Upload'
                 className='btn btn-primary btn-block mt-4'
                 />
+                <FormGroup> 
+                    <Link onClick={redirect}>● Return to login page to sign in.</Link>
+                </FormGroup>
                 { err &&<Alert color="danger">{error}</Alert> }
                 { successful &&<Alert color="success">{successMsg}</Alert> }
             </Form>
-            {/* {uploadedFile ? (
-                <div className='row mt-5'>
-                <div className='col-md-6 m-auto'>
-                    <h3 className='text-center'>{uploadedFile.fileName}</h3>
-                    <img style={{ width: '100%' }} src={uploadedFile.filePath} alt='' />
-                </div>
-                </div>
-            ) : null} */}
         </div>
     )
 
