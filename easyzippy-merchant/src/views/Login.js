@@ -13,8 +13,6 @@ import {
     NavLink
 } from "reactstrap";
 
-const API_SERVER = "http://localhost:5000/merchant"
-
 function Login() {
 
     const history = useHistory()
@@ -71,7 +69,7 @@ function Login() {
             setError("Email field is required")
             return;
         }
-        axios.post(API_SERVER + '/login', {
+        axios.post('/merchant/login', {
             email: email,
             password: password
         })

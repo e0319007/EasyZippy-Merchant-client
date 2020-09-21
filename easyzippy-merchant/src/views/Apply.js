@@ -14,8 +14,6 @@ import {
     Col,
 } from "reactstrap";
 
-const API_SERVER = "http://localhost:5000/merchant"
-
 function Apply() {
 
     const history = useHistory()
@@ -96,7 +94,7 @@ function Apply() {
         }
 
         // register merchant
-        axios.post(API_SERVER, {
+        axios.post("/merchant", {
             name: name,
             mobileNumber: mobileNumber,
             email: email,

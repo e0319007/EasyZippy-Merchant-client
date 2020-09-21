@@ -13,8 +13,6 @@ import {
     Alert
 } from "reactstrap";
 
-const API_SERVER = "http://localhost:5000/merchant"
-
 function ResetPassword() {
 
     const history = useHistory()
@@ -45,7 +43,7 @@ function ResetPassword() {
         console.log("inside update password")
         e.preventDefault()
 
-        axios.post(API_SERVER + "/resetPassword", {
+        axios.post("/merchant/resetPassword", {
             token: emailToken,
             email: email,
             newPassword: password,

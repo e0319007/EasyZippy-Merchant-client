@@ -14,8 +14,6 @@ import {
     Alert
 } from "reactstrap";
 
-const API_SERVER = "http://localhost:5000/merchant"
-
 function FileUpload() {
 
     const history = useHistory()
@@ -48,7 +46,7 @@ function FileUpload() {
         formData.append('file', file);
         console.log('****' +formData.has('file'))
 
-        axios.post(`http://localhost:5000/merchant/${merchantid}/uploadTenancyAgreement`, formData,
+        axios.post(`/merchant/${merchantid}/uploadTenancyAgreement`, formData,
         ).then(() => {
             console.log("file upload axios call went through")
             isError(false)

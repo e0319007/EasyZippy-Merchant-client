@@ -20,8 +20,6 @@ import {
     ModalFooter
 } from "reactstrap";
 
-const API_SERVER = "http://localhost:5000/merchant"
-
 function Profile() {
 
     const merchant = JSON.parse(localStorage.getItem('currentMerchant'))
@@ -76,7 +74,7 @@ function Profile() {
         e.preventDefault()
         console.log("in update profile")
 
-        axios.put(`http://localhost:5000/merchant/${merchantid}`, {
+        axios.put(`/merchant/${merchantid}`, {
             name: name,
             email: email,
             mobileNumber: mobileNumber
@@ -125,7 +123,7 @@ function Profile() {
         e.preventDefault()
         console.log("inside update password")
 
-        axios.put(`http://localhost:5000/merchant/${merchantid}/changePassword`, {
+        axios.put(`/merchant/${merchantid}/changePassword`, {
             currentPassword: currentPw,
             newPassword: newPw
         },
