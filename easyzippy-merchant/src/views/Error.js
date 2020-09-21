@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { BrowserRouter as Router, useHistory } from "react-router-dom";
 import AdminLayout from "../layouts/Admin.js";
-import Login from "../views/Login.js"
+import Login from "./User/Login.js"
 
 import {
     Navbar

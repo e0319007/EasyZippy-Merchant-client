@@ -9,8 +9,7 @@ import {
     Input,
     Alert,
     Button,
-    Navbar,
-    NavLink
+    Navbar
 } from "reactstrap";
 
 function Login() {
@@ -21,7 +20,6 @@ function Login() {
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [err, isError] = useState(false)
-    const [valid, isValid] = useState(true)
 
     const onChangeEmail = e => {
         // console.log("inside on change email")

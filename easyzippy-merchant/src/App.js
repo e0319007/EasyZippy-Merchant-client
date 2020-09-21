@@ -8,13 +8,13 @@ import "assets/demo/demo.css";
 import "perfect-scrollbar/css/perfect-scrollbar.css";
 
 import AdminLayout from "./layouts/Admin.js";
-import Login from "./views/Login.js"
+import Login from "./views/User/Login.js"
 import Error from "./views/Error.js"
-import Apply from "./views/Apply.js"
-import FileUpload from "./views/FileUpload.js";
-import ForgotPassword from "./views/ForgotPassword.js";
-import CheckValidToken from "./views/CheckValidToken.js";
-import ResetPassword from "./views/ResetPassword.js";
+import Apply from "./views/User/Apply/Apply.js"
+import FileUpload from "./views/User/Apply/FileUpload.js";
+import ForgotPassword from "./views/User/ForgotPassword.js";
+import CheckValidToken from "./views/User/CheckValidToken.js";
+import ResetPassword from "./views/User/ResetPassword.js";
 
 const hist = createBrowserHistory();
 
