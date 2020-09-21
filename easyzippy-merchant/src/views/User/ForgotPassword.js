@@ -45,7 +45,7 @@ function ForgotPassword() {
             return;
         }
 
-        axios.post(API_SERVER + "/forgotPassword", {
+        axios.post("/merchant/forgotPassword", {
             email: email
         }).then(() => {
             console.log("axios call went through")
@@ -66,7 +66,7 @@ function ForgotPassword() {
                 <div className="navbar-brand">
                     &nbsp;&nbsp;
                     <img 
-                        src={require("../easyzippylogo.jpg")}
+                        src={require("../../easyzippylogo.jpg")}
                         width="30"
                         height="30"
                     />

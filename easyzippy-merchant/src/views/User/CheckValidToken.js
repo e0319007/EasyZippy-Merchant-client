@@ -13,8 +13,6 @@ import {
     Alert
 } from "reactstrap";
 
-const API_SERVER = "http://localhost:5000/merchant"
-
 function CheckValidToken() {
     const history = useHistory()
 
@@ -46,7 +44,7 @@ const checkTokenValidity = e => {
         return;
     }
 
-    axios.post(API_SERVER + "/resetPassword/checkValidToken", {
+    axios.post("/merchant/resetPassword/checkValidToken", {
         token: emailToken,
         email: email
     }).then (() => {
@@ -67,7 +65,7 @@ const checkTokenValidity = e => {
                 <div className="navbar-brand">
                     &nbsp;&nbsp;
                     <img 
-                        src={require("../easyzippylogo.jpg")}
+                        src={require("../../easyzippylogo.jpg")}
                         width="30"
                         height="30"
                     />

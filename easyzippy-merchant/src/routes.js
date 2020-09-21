@@ -18,20 +18,14 @@
 */
 
 import Dashboard from "views/Dashboard.js";
-import Notifications from "views/Notifications.js";
-import Icons from "views/Icons.js";
-import Typography from "views/Typography.js";
-import TableList from "views/Tables.js";
-import Maps from "views/Map.js";
-import UserPage from "views/User.js";
-import Profile from "views/Profile";
-import Advertisements from "views/Advertisements";
-import Promotions from "views/Promotions";
-import Bookings from "views/Bookings";
-import Announcements from "views/Announcements";
-import Products from "views/Products";
-import Credits from "views/Credits";
-import Orders from "views/Orders";
+import Profile from "views/User/Profile";
+import Advertisements from "views/Advertisement/Advertisements";
+import Promotions from "views/Promotion/Promotions";
+import Bookings from "views/Booking/Bookings";
+import Announcements from "views/Announcement/Announcements";
+import Products from "views/Product/Products";
+import Credits from "views/Payment/Credits";
+import Orders from "views/Order/Orders";
 
 var routes = [
   {
