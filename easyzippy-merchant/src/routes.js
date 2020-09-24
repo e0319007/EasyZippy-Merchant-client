@@ -22,7 +22,6 @@ import Profile from "views/User/Profile";
 import Advertisements from "views/Advertisement/Advertisements";
 import Promotions from "views/Promotion/Promotions";
 import Bookings from "views/Booking/Bookings";
-import Announcements from "views/Announcement/Announcements";
 import Products from "views/Product/Products";
 import Credits from "views/Payment/Credits";
 import Orders from "views/Order/Orders";
@@ -35,48 +34,6 @@ var routes = [
     component: Dashboard,
     layout: "/admin",
   },
-  /*{
-    path: "/icons",
-    name: "Icons",
-    icon: "nc-icon nc-diamond",
-    component: Icons,
-    layout: "/admin",
-  },
-  {
-    path: "/maps",
-    name: "Maps",
-    icon: "nc-icon nc-pin-3",
-    component: Maps,
-    layout: "/admin",
-  },
-  {
-    path: "/notifications",
-    name: "Notifications",
-    icon: "nc-icon nc-bell-55",
-    component: Notifications,
-    layout: "/admin",
-  },
-  {
-    path: "/user-page",
-    name: "User Profile",
-    icon: "nc-icon nc-single-02",
-    component: UserPage,
-    layout: "/admin",
-  },
-  {
-    path: "/tables",
-    name: "Table List",
-    icon: "nc-icon nc-tile-56",
-    component: TableList,
-    layout: "/admin",
-  },
-  {
-    path: "/typography",
-    name: "Typography",
-    icon: "nc-icon nc-caps-small",
-    component: Typography,
-    layout: "/admin",
-  },*/
   {
     path: "/profile",
     name: "Profile",
@@ -125,13 +82,6 @@ var routes = [
     icon: "nc-icon nc-image",
     component: Advertisements,
     layout: "/admin"
-  },
-  {
-    path: "/announcements",
-    name: "Announcements",
-    icon: "nc-icon nc-chat-33",
-    component: Announcements,
-    layout: "/admin"
-  },
+  }
 ];
 export default routes;
