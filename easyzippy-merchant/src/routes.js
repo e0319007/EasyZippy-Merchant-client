@@ -8,6 +8,7 @@ import Credits from "views/Payment/Credits";
 import Orders from "views/Order/Orders";
 import TestProducts from "views/Product/TestProducts"
 import ListProduct from "views/Product/ListProduct";
+import ProductDetails from "./views/Product/ProductDetails";
 
 var routes = [
   {
@@ -43,6 +44,14 @@ var routes = [
     name: "List A Product",
     icon: "nc-icon nc-shop",
     component: ListProduct,
+    layout: "/admin",
+    invisible: true
+  },
+  {
+    path: "/productDetails",
+    name: "Product Details",
+    icon: "nc-icon nc-shop",
+    component: ProductDetails,
     layout: "/admin",
     invisible: true
   },
