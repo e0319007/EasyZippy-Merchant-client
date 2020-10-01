@@ -1,8 +1,5 @@
 import React from "react";
-import { useHistory } from 'react-router-dom';
-// react plugin used to create charts
 import { Line } from "react-chartjs-2";
-import Cookies from 'js-cookie';
 // reactstrap components
 import {
   Card,
@@ -11,8 +8,7 @@ import {
   CardFooter,
   CardTitle,
   Row,
-  Col,
-  Button
+  Col
 } from "reactstrap";
 // core components
 import {
@@ -20,9 +16,6 @@ import {
 } from "variables/charts.js";
 
 function Dashboard() {
-
-  const history = useHistory()
-
   return (
     <>
       <div className="content">
