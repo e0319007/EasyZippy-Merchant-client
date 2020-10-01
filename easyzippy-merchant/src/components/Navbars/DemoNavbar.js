@@ -16,10 +16,11 @@ import {
   DropdownMenu,
   DropdownItem,
   Container,
-  NavLink
+  NavLink, CardText, CardBody
 } from "reactstrap";
 
 import routes from "routes.js";
+import { Card } from "@material-ui/core";
 
 class Header extends React.Component {
   constructor(props) {
@@ -331,9 +332,10 @@ class Header extends React.Component {
                   <DropdownItem header>Announcements</DropdownItem>
                   {this.state.announcements.map(announcement => 
                     <div key={announcement.id}>
-                      <DropdownItem>
+                      <DropdownItem style={{width:'40rem'}}>
                         <div>
                           <p style={{fontWeight:'bold', color:'grey'}}>{announcement.title}</p>
+                          {/* <p style={{fontWeight:'bold'}}>{announcement.title}</p> */}
                           <br></br>
                           <small>{this.formatDate(announcement.sentTime)}</small>
                           <br></br>

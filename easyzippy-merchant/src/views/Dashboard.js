@@ -46,7 +46,6 @@ function Dashboard() {
                 </Row>
               </CardBody>
               <CardFooter>
-                <hr />
               </CardFooter>
             </Card>
           </Col>
@@ -69,7 +68,6 @@ function Dashboard() {
                 </Row>
               </CardBody>
               <CardFooter>
-                <hr />
               </CardFooter>
             </Card>
           </Col>
@@ -92,7 +90,6 @@ function Dashboard() {
                 </Row>
               </CardBody>
               <CardFooter>
-                <hr />
               </CardFooter>
             </Card>
           </Col>
@@ -115,7 +112,6 @@ function Dashboard() {
                 </Row>
               </CardBody>
               <CardFooter>
-                <hr />
               </CardFooter>
             </Card>
           </Col>

@@ -7,6 +7,7 @@ import Products from "views/Product/Products";
 import Credits from "views/Payment/Credits";
 import Orders from "views/Order/Orders";
 import TestProducts from "views/Product/TestProducts"
+import ListProduct from "views/Product/ListProduct";
 
 var routes = [
   {
@@ -36,6 +37,14 @@ var routes = [
     icon: "nc-icon nc-shop",
     component: Products,
     layout: "/admin"
+  },
+  {
+    path: "/listProduct",
+    name: "List A Product",
+    icon: "nc-icon nc-shop",
+    component: ListProduct,
+    layout: "/admin",
+    invisible: true
   },
   {
     path: "/testProducts",
