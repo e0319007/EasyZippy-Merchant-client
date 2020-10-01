@@ -307,16 +307,16 @@ class Header extends React.Component {
                   <DropdownItem header>Notifications</DropdownItem>
                   {this.state.notifications.map(notification => 
                     <div key={notification.id}>
-                      <DropdownItem>                          
+                      <DropdownItem style={{backgroundColor: 'transparent'}}>                          
                           <p style={{fontWeight:'bold', color:'grey'}}>{notification.title}</p> 
                           <br></br>
-                          <small>{this.formatDate(notification.sentTime)}</small>
+                          <small style={{color:'grey'}}>{this.formatDate(notification.sentTime)}</small>
                           <br></br>
                           <p className="text-muted">{notification.description}</p>
                       </DropdownItem>
                       <DropdownItem divider/>
                     </div>
-                    )}
+                    ).reverse()}
                 </DropdownMenu>
               </Dropdown>
 
@@ -331,18 +331,18 @@ class Header extends React.Component {
                   <DropdownItem header>Announcements</DropdownItem>
                   {this.state.announcements.map(announcement => 
                     <div key={announcement.id}>
-                      <DropdownItem>
+                      <DropdownItem style={{backgroundColor: 'transparent'}}> 
                         <div>
                           <p style={{fontWeight:'bold', color:'grey'}}>{announcement.title}</p>
                           <br></br>
-                          <small>{this.formatDate(announcement.sentTime)}</small>
+                          <small style={{color:'grey'}}>{this.formatDate(announcement.sentTime)}</small>
                           <br></br>
                           <p className="text-muted">{announcement.description}</p>
                         </div>
                       </DropdownItem>
                       <DropdownItem divider/>
                     </div>
-                    )}
+                    ).reverse()}
                 </DropdownMenu>
               </Dropdown>
               <NavItem style={{paddingTop:"4px"}}>
