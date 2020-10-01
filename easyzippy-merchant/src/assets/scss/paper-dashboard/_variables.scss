@@ -83,6 +83,9 @@ $warning-states-color:       darken($warning-color, 10%) !default;
 $danger-color:               #ef8157 !default;
 $danger-states-color:        darken($danger-color, 8%) !default;
 
+$dark-color:                 #00008B !default;
+$dark-states-color:          darken($danger-color, 8%) !default;
+
 $link-disabled-color:        #666666 !default;
 
 $purple-color:               #c178c1 !default;
@@ -97,6 +100,7 @@ $success-color-opacity:      rgba(24, 206, 15, .3) !default;
 $info-color-opacity:         rgba(44, 168, 255, .3) !default;
 $warning-color-opacity:      rgba(255, 178, 54, .3) !default;
 $danger-color-opacity:       rgba(255, 54, 54, .3) !default;
+$dark-color-opacity:       rgba(19, 7, 128, 0.3) !default;
 
 $new-blue:            #1DC7EA;
 $new-purple:          #9368E9;
@@ -328,6 +332,7 @@ $info-navbar:                   rgba(#5BCAFF, .98);
 $success-navbar:                rgba(#4CD964, .98);
 $warning-navbar:                rgba(#FF9500, .98);
 $danger-navbar:                 rgba(#FF4C40, .98);
+$dark-navbar:                   rgba(#00008B, .98);
 
 $topbar-x:             topbar-x !default;
 $topbar-back:          topbar-back !default;

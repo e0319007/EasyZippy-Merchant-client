@@ -41,13 +41,13 @@ function Dashboard() {
                 <Row>
                   <Col md="4" xs="5">
                     <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-single-02 text-warning" />
+                      <i className="nc-icon nc-shop text-warning" />
                     </div>
                   </Col>
                   <Col md="8" xs="7">
                     <div className="numbers">
-                      <p className="card-category">Customers</p>
-                      <CardTitle tag="p">836</CardTitle>
+                      <p className="card-category">Products</p>
+                      <CardTitle tag="p">50</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -55,9 +55,6 @@ function Dashboard() {
               </CardBody>
               <CardFooter>
                 <hr />
-                <div className="stats">
-                  <i className="far fa-calendar" />Since Last Month
-                </div>
               </CardFooter>
             </Card>
           </Col>
@@ -67,12 +64,12 @@ function Dashboard() {
                 <Row>
                   <Col md="4" xs="5">
                     <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-shop text-success" />
+                      <i className="nc-icon nc-paper text-success" />
                     </div>
                   </Col>
                   <Col md="8" xs="7">
                     <div className="numbers">
-                      <p className="card-category">Merchants</p>
+                      <p className="card-category">Orders</p>
                       <CardTitle tag="p">52</CardTitle>
                       <p />
                     </div>
@@ -81,9 +78,6 @@ function Dashboard() {
               </CardBody>
               <CardFooter>
                 <hr />
-                <div className="stats">
-                  <i className="far fa-calendar" />Since Last Month
-                </div>
               </CardFooter>
             </Card>
           </Col>
@@ -93,13 +87,13 @@ function Dashboard() {
                 <Row>
                   <Col md="4" xs="5">
                     <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-bookmark-2 text-danger" />
+                      <i className="nc-icon nc-image text-danger" />
                     </div>
                   </Col>
                   <Col md="8" xs="7">
                     <div className="numbers">
-                      <p className="card-category">Bookings</p>
-                      <CardTitle tag="p">433</CardTitle>
+                      <p className="card-category">Advertisements</p>
+                      <CardTitle tag="p">5</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -107,9 +101,6 @@ function Dashboard() {
               </CardBody>
               <CardFooter>
                 <hr />
-                <div className="stats">
-                  <i className="far fa-calendar" />Since Last Month
-                </div>
               </CardFooter>
             </Card>
           </Col>
@@ -133,9 +124,6 @@ function Dashboard() {
               </CardBody>
               <CardFooter>
                 <hr />
-                <div className="stats">
-                  <i className="far fa-calendar" />Since Last Month
-                </div>
               </CardFooter>
             </Card>
           </Col>
