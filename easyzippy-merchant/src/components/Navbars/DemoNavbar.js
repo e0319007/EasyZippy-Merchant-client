@@ -180,28 +180,6 @@ class Header extends React.Component {
           >
             <Nav navbar>
 
-              {/* ANNOUNCEMENTS */}
-              <Dropdown nav isOpen={this.state.annDropdownOpen} toggle={(e) => this.annDropdownToggle(e)}>
-                <DropdownToggle caret nav className="dropdown-toggle-split">
-                  <i className="nc-icon nc-send" />
-                </DropdownToggle>
-                <DropdownMenu right className="pre-scrollable">
-                  <DropdownItem header>Announcements</DropdownItem>
-                  {this.state.announcements.map(announcement => 
-                    <div key={announcement.id}>
-                      <DropdownItem>
-                        <div>
-                          <p>{announcement.title}</p>
-                          <br></br>
-                          <p className="text-muted">{announcement.description}</p>
-                        </div>
-                      </DropdownItem>
-                      <DropdownItem divider/>
-                    </div>
-                    )}
-                </DropdownMenu>
-              </Dropdown>
-
               {/* NOTIFICATIONS */}
               <Dropdown nav isOpen={this.state.dropdownOpen} toggle={(e) => this.dropdownToggle(e)}>
                 <DropdownToggle caret nav className="dropdown-toggle-split">
@@ -223,6 +201,29 @@ class Header extends React.Component {
                     )}
                 </DropdownMenu>
               </Dropdown>
+
+              {/* ANNOUNCEMENTS */}
+              <Dropdown nav isOpen={this.state.annDropdownOpen} toggle={(e) => this.annDropdownToggle(e)}>
+                <DropdownToggle caret nav className="dropdown-toggle-split">
+                  <i className="nc-icon nc-chat-33" />
+                </DropdownToggle>
+                <DropdownMenu right className="pre-scrollable">
+                  <DropdownItem header>Announcements</DropdownItem>
+                  {this.state.announcements.map(announcement => 
+                    <div key={announcement.id}>
+                      <DropdownItem>
+                        <div>
+                          <p>{announcement.title}</p>
+                          <br></br>
+                          <p className="text-muted">{announcement.description}</p>
+                        </div>
+                      </DropdownItem>
+                      <DropdownItem divider/>
+                    </div>
+                    )}
+                </DropdownMenu>
+              </Dropdown>
+
               <NavItem>
                 <Link to="#pablo" className="nav-link btn-rotate">
                   <i className="nc-icon nc-settings-gear-65" />
