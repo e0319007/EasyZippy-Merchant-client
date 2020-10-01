@@ -37,6 +37,7 @@ class Header extends React.Component {
     this.toggle = this.toggle.bind(this);
     this.dropdownToggle = this.dropdownToggle.bind(this);
     this.annDropdownToggle = this.annDropdownToggle.bind(this);
+    this.formatDate = this.formatDate.bind(this);
     this.sidebarToggle = React.createRef();
     // this.handleNotifVisibility = this.handleNotifVisibility.bind(this);
 
@@ -220,6 +221,30 @@ class Header extends React.Component {
 
   }
 
+  // to use when viewing 
+  formatDate(d) {
+    if (d === undefined){
+        d = (new Date()).toISOString()
+        console.log(undefined)
+    }
+    let currDate = new Date(d);
+    console.log("currDate: " + currDate)
+    let year = currDate.getFullYear();
+    let month = currDate.getMonth() + 1;
+    let dt = currDate.getDate();
+    let time = currDate.toLocaleTimeString('en-SG')
+
+    if (dt < 10) {
+        dt = '0' + dt;
+    }
+    if (month < 10) {
+        month = '0' + month;
+    }
+
+    return dt + "/" + month + "/" + year + " " + time ;
+  }
+
+
   render() {
     return (
       <Navbar
@@ -275,9 +300,10 @@ class Header extends React.Component {
                   <DropdownItem header>Notifications</DropdownItem>
                   {this.state.notifications.map(notification => 
                     <div key={notification.id}>
-                      <DropdownItem>
-                          <p>{notification.title}</p> 
-                          <p>{notification.sentTime}</p>
+                      <DropdownItem>                          
+                          <p style={{fontWeight:'bold', color:'grey'}}>{notification.title}</p> 
+                          <br></br>
+                          <small>{this.formatDate(notification.sentTime)}</small>
                           <br></br>
                           <p className="text-muted">{notification.description}</p>
                       </DropdownItem>
@@ -298,7 +324,9 @@ class Header extends React.Component {
                     <div key={announcement.id}>
                       <DropdownItem>
                         <div>
-                          <p>{announcement.title}</p>
+                          <p style={{fontWeight:'bold', color:'grey'}}>{announcement.title}</p>
+                          <br></br>
+                          <small>{this.formatDate(announcement.sentTime)}</small>
                           <br></br>
                           <p className="text-muted">{announcement.description}</p>
                         </div>
@@ -323,29 +351,6 @@ class Header extends React.Component {
       </Navbar>
     );
   }
-}
-
-// to use when viewing 
-function formatDate(d) {
-  if (d === undefined){
-      d = (new Date()).toISOString()
-      console.log(undefined)
-  }
-  let currDate = new Date(d);
-  console.log("currDate: " + currDate)
-  let year = currDate.getFullYear();
-  let month = currDate.getMonth() + 1;
-  let dt = currDate.getDate();
-  let time = currDate.toLocaleTimeString('en-SG')
-
-  if (dt < 10) {
-      dt = '0' + dt;
-  }
-  if (month < 10) {
-      month = '0' + month;
-  }
-
-  return dt + "/" + month + "/" + year + " " + time ;
 }
 
 export default Header;
