@@ -23,14 +23,6 @@ function Dashboard() {
 
   const history = useHistory()
 
-  const logout = () => {
-    Cookies.remove('authToken')
-    Cookies.remove('merchantUser')
-    localStorage.removeItem('currentMerchant')
-    history.push('/login')
-    document.location.reload()
-  }
-
   return (
     <>
       <div className="content">
@@ -157,7 +149,6 @@ function Dashboard() {
             </Card>
           </Col>
         </Row>
-        <Button onClick={logout} color="secondary" style={{float: "right"}}>Logout</Button>
       </div>
     </>
   )
