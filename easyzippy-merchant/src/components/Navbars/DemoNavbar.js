@@ -1,5 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import Badge from '@material-ui/core/Badge';
+import { makeStyles } from '@material-ui/core/styles';
 import {
   Collapse,
   Navbar,
@@ -11,7 +15,7 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
-  Container,
+  Container
 } from "reactstrap";
 
 import routes from "routes.js";
@@ -22,12 +26,22 @@ class Header extends React.Component {
     this.state = {
       isOpen: false,
       dropdownOpen: false,
+      annDropdownOpen: false, //announcement drop down
       color: "transparent",
+      merchantId: parseInt(Cookies.get('merchantUser')),
+      authToken: JSON.parse(Cookies.get('authToken')),
+      notifications: [],
+      announcements: [],
+      notifBadgeVisible: false
     };
     this.toggle = this.toggle.bind(this);
     this.dropdownToggle = this.dropdownToggle.bind(this);
+    this.annDropdownToggle = this.annDropdownToggle.bind(this);
     this.sidebarToggle = React.createRef();
+    // this.handleNotifVisibility = this.handleNotifVisibility.bind(this);
+
   }
+
   toggle() {
     if (this.state.isOpen) {
       this.setState({
@@ -43,10 +57,44 @@ class Header extends React.Component {
     });
   }
   dropdownToggle(e) {
+    //once dropdown, then mark all notifications as read 
+    console.log("inside notifications dropdown toggle")
+    let n = this.state.notifications;
+    console.log("0" + n[0].read)
+    for (var i in n) {
+      console.log("n index read: " + n[i].read)
+      if (n[i].read === false) {
+        n[i].read = true
+        axios.put(`/readNotification/${n[i].id}`, {
+          read: true
+        },
+        {
+          headers: {
+            AuthToken: this.state.authToken
+          }
+        }).then(res => {
+          console.log("notifications set to read // axios went through")
+        }).catch (function (err){
+          console.log(err.response.data)
+        })
+      } else { //true
+        continue;
+      }
+    }
+
     this.setState({
       dropdownOpen: !this.state.dropdownOpen,
+      notifications: n,
+      notifBadgeVisible: false
     });
   }
+
+  annDropdownToggle(e) {
+    this.setState({
+      annDropdownOpen: !this.state.annDropdownOpen,
+    });
+  }
+
   getBrand() {
     let brandName = "Dashboard";
     routes.map((prop, key) => {
@@ -75,8 +123,51 @@ class Header extends React.Component {
   }
   componentDidMount() {
     window.addEventListener("resize", this.updateColor.bind(this));
+    console.log("mounted")
+    console.log(parseInt(Cookies.get('merchantUser')))
+    console.log(JSON.parse(Cookies.get('authToken')))
+
+    // GET NOTIFICATIONS
+    axios.get(`/notification/merchant/${parseInt(Cookies.get('merchantUser'))}`, 
+    {
+      headers: {
+        AuthToken: this.state.authToken
+      }
+    }).then((res) => {
+      const notifs = res.data
+      console.log("mount notifs length: " + notifs.length)
+      this.setState({notifications: notifs})
+      let n = this.state.notifications;
+      for(var i in n) {
+        console.log(n[i].read)
+        if (n[i].read === false) {
+          this.setState({
+            notifBadgeVisible: true
+          })
+        }
+        break;
+      }
+    }).catch (function(error){
+      console.log(error.response.data)
+    })
+
+    // GET ANNOUNCEMENTS
+    axios.get("/announcements", 
+    {
+        headers: {
+            AuthToken: this.state.authToken
+        }
+    }).then(res => {
+      const anncemts = res.data
+      this.setState({announcements: anncemts})
+    }).catch (function(error){
+      console.log(error.response.data)
+    })
+
   }
+
   componentDidUpdate(e) {
+    console.log("update")
     if (
       window.innerWidth < 993 &&
       e.history.location.pathname !== e.location.pathname &&
@@ -86,9 +177,51 @@ class Header extends React.Component {
       this.sidebarToggle.current.classList.toggle("toggled");
     }
   }
+
+  componentWillReceiveProps(e) {
+    console.log("component will receive props")
+    //if this isn't the first render, then keep updating when re-render
+    if (this.state.notifications.length != 0) {
+      axios.get(`/notification/merchant/${parseInt(Cookies.get('merchantUser'))}`, 
+      {
+        headers: {
+          AuthToken: this.state.authToken
+        }
+      }).then((res) => {
+        const notifs = res.data
+        console.log("notifs length: " + notifs.length)
+        console.log("state notifs: " + this.state.notifications.length)
+        //checking if there are new notifications
+        if (notifs.length > this.state.notifications.length) {
+          this.setState({
+            notifBadgeVisible: true
+          })
+        }
+        this.setState({notifications: notifs})
+      }).catch (function(error){
+        console.log(error.response.data)
+      })
+    }
+
+    //just to keep fetching in case got new i suppose
+    if (this.state.announcements.length != 0) {
+      axios.get("/announcements", 
+      {
+          headers: {
+              AuthToken: this.state.authToken
+          }
+      }).then(res => {
+        const anncemts = res.data
+        this.setState({announcements: anncemts})
+      }).catch (function(error){
+        console.log(error.response.data)
+      })
+    }
+
+  }
+
   render() {
     return (
-      // add or remove classes depending if we are on full-screen-maps page or not
       <Navbar
         color={
           this.props.location.pathname.indexOf("full-screen-maps") !== -1
@@ -129,42 +262,53 @@ class Header extends React.Component {
             navbar
             className="justify-content-end"
           >
-            {/* <form>
-              <InputGroup className="no-border">
-                <Input placeholder="Search..." />
-                <InputGroupAddon addonType="append">
-                  <InputGroupText>
-                    <i className="nc-icon nc-zoom-split" />
-                  </InputGroupText>
-                </InputGroupAddon>
-              </InputGroup>
-            </form> */}
             <Nav navbar>
-              {/* <NavItem>
-                <Link to="#pablo" className="nav-link btn-magnify">
-                  <i className="nc-icon nc-layout-11" />
-                  <p>
-                    <span className="d-lg-none d-md-block">Stats</span>
-                  </p>
-                </Link>
-              </NavItem> */}
-              <Dropdown
-                nav
-                isOpen={this.state.dropdownOpen}
-                toggle={(e) => this.dropdownToggle(e)}
-              >
-                <DropdownToggle caret nav>
-                  <i className="nc-icon nc-bell-55" />
-                  <p>
-                    <span className="d-lg-none d-md-block">Some Actions</span>
-                  </p>
+
+              {/* NOTIFICATIONS */}
+              <Dropdown nav isOpen={this.state.dropdownOpen} toggle={(e) => this.dropdownToggle(e)}>
+                <DropdownToggle caret nav className="dropdown-toggle-split">
+                <Badge color="secondary" variant="dot" overlap="circle" invisible={!this.state.notifBadgeVisible}>
+                  <i className="nc-icon nc-bell-55"/>
+                </Badge>  
                 </DropdownToggle>
-                <DropdownMenu right>
-                  <DropdownItem tag="a">Action</DropdownItem>
-                  <DropdownItem tag="a">Another Action</DropdownItem>
-                  <DropdownItem tag="a">Something else here</DropdownItem>
+                <DropdownMenu right className="pre-scrollable">
+                  <DropdownItem header>Notifications</DropdownItem>
+                  {this.state.notifications.map(notification => 
+                    <div key={notification.id}>
+                      <DropdownItem>
+                          <p>{notification.title}</p> 
+                          <p>{notification.sentTime}</p>
+                          <br></br>
+                          <p className="text-muted">{notification.description}</p>
+                      </DropdownItem>
+                      <DropdownItem divider/>
+                    </div>
+                    )}
                 </DropdownMenu>
               </Dropdown>
+
+              {/* ANNOUNCEMENTS */}
+              <Dropdown nav isOpen={this.state.annDropdownOpen} toggle={(e) => this.annDropdownToggle(e)}>
+                <DropdownToggle caret nav className="dropdown-toggle-split">
+                  <i className="nc-icon nc-chat-33" />
+                </DropdownToggle>
+                <DropdownMenu right className="pre-scrollable">
+                  <DropdownItem header>Announcements</DropdownItem>
+                  {this.state.announcements.map(announcement => 
+                    <div key={announcement.id}>
+                      <DropdownItem>
+                        <div>
+                          <p>{announcement.title}</p>
+                          <br></br>
+                          <p className="text-muted">{announcement.description}</p>
+                        </div>
+                      </DropdownItem>
+                      <DropdownItem divider/>
+                    </div>
+                    )}
+                </DropdownMenu>
+              </Dropdown>
+
               <NavItem>
                 <Link to="#pablo" className="nav-link btn-rotate">
                   <i className="nc-icon nc-settings-gear-65" />
@@ -179,6 +323,29 @@ class Header extends React.Component {
       </Navbar>
     );
   }
+}
+
+// to use when viewing 
+function formatDate(d) {
+  if (d === undefined){
+      d = (new Date()).toISOString()
+      console.log(undefined)
+  }
+  let currDate = new Date(d);
+  console.log("currDate: " + currDate)
+  let year = currDate.getFullYear();
+  let month = currDate.getMonth() + 1;
+  let dt = currDate.getDate();
+  let time = currDate.toLocaleTimeString('en-SG')
+
+  if (dt < 10) {
+      dt = '0' + dt;
+  }
+  if (month < 10) {
+      month = '0' + month;
+  }
+
+  return dt + "/" + month + "/" + year + " " + time ;
 }
 
 export default Header;
