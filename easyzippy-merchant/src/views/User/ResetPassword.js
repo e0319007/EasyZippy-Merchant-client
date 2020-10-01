@@ -31,6 +31,15 @@ function ResetPassword() {
 
     const onChangePassword = e => {
         const password = e.target.value;
+
+        var reg = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})")
+        if (reg.test(password)) { //if valid
+            isError(false)
+        } else {
+            setError("Password is not strong enough (Have at least 1 Uppercase, 1 Lowercase, 1 Number and 1 Special Character)")
+            isError(true)
+        }
+
         setPassword(password.trim())
     }
 
@@ -42,6 +51,13 @@ function ResetPassword() {
     const resetPassword = e => {
         console.log("inside update password")
         e.preventDefault()
+
+        if (password !== password2) {
+            setError("Passwords do not match")
+            isError(true)
+            isSuccessful(false)
+            return;
+        }
 
         axios.post("/merchant/resetPassword", {
             token: emailToken,

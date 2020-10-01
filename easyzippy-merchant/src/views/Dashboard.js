@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import Cookies from 'js-cookie';
 import { Line } from "react-chartjs-2";
 // reactstrap components
 import {
@@ -16,6 +18,9 @@ import {
 } from "variables/charts.js";
 
 function Dashboard() {
+
+  
+
   return (
     <>
       <div className="content">
