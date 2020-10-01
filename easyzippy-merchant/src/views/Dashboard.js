@@ -19,7 +19,25 @@ import {
 
 function Dashboard() {
 
-  
+  const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
+
+  const [productsLength, setProductsLength] = useState('')
+
+  useEffect(() => {
+
+    //GET PRODUCTS
+    axios.get('/products', {
+      headers: {
+        AuthToken: authToken
+      }
+    }).then(res => {
+      console.log("successfully retrieve products")
+      setProductsLength(res.data.length)
+    }).catch( function(error) {
+      console.log(error.response)
+    })
+
+  },[])
 
   return (
     <>
@@ -37,7 +55,7 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Products</p>
-                      <CardTitle tag="p">50</CardTitle>
+                      <CardTitle tag="p">{productsLength}</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -59,7 +77,7 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Orders</p>
-                      <CardTitle tag="p">52</CardTitle>
+                      <CardTitle tag="p">-</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -80,8 +98,8 @@ function Dashboard() {
                   </Col>
                   <Col md="8" xs="7">
                     <div className="numbers">
-                      <p className="card-category">Advertisements</p>
-                      <CardTitle tag="p">5</CardTitle>
+                      <p className="card-category">Ads</p>
+                      <CardTitle tag="p">-</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -103,7 +121,7 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Revenue</p>
-                      <CardTitle tag="p">$2,135</CardTitle>
+                      <CardTitle tag="p">-</CardTitle>
                       <p />
                     </div>
                   </Col>
