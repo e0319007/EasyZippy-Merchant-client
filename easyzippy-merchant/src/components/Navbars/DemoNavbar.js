@@ -1,5 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import {
   Collapse,
   Navbar,
@@ -11,7 +13,7 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
-  Container,
+  Container
 } from "reactstrap";
 
 import routes from "routes.js";
@@ -22,12 +24,19 @@ class Header extends React.Component {
     this.state = {
       isOpen: false,
       dropdownOpen: false,
+      annDropdownOpen: false, //announcement drop down
       color: "transparent",
+      merchantId: parseInt(Cookies.get('merchantUser')),
+      authToken: JSON.parse(Cookies.get('authToken')),
+      notifications: [],
+      announcements: []
     };
     this.toggle = this.toggle.bind(this);
     this.dropdownToggle = this.dropdownToggle.bind(this);
+    this.annDropdownToggle = this.annDropdownToggle.bind(this);
     this.sidebarToggle = React.createRef();
   }
+
   toggle() {
     if (this.state.isOpen) {
       this.setState({
@@ -47,6 +56,12 @@ class Header extends React.Component {
       dropdownOpen: !this.state.dropdownOpen,
     });
   }
+  annDropdownToggle(e) {
+    this.setState({
+      annDropdownOpen: !this.state.annDropdownOpen,
+    });
+  }
+
   getBrand() {
     let brandName = "Dashboard";
     routes.map((prop, key) => {
@@ -75,7 +90,40 @@ class Header extends React.Component {
   }
   componentDidMount() {
     window.addEventListener("resize", this.updateColor.bind(this));
+
+    console.log(parseInt(Cookies.get('merchantUser')))
+    console.log(JSON.parse(Cookies.get('authToken')))
+
+    let authToken = JSON.parse(Cookies.get('authToken'))
+
+    // GET NOTIFICATIONS
+    axios.get(`/notification/merchant/${parseInt(Cookies.get('merchantUser'))}`, 
+    {
+      headers: {
+        AuthToken: authToken
+      }
+    }).then((res) => {
+      const notifs = res.data
+      this.setState({notifications: notifs})
+    }).catch (function(error){
+      console.log(error.response.data)
+    })
+
+    // GET ANNOUNCEMENTS
+    axios.get("/announcements", 
+    {
+        headers: {
+            AuthToken: authToken
+        }
+    }).then(res => {
+      const anncemts = res.data
+      this.setState({announcements: anncemts})
+    }).catch (function(error){
+      console.log(error.response.data)
+    })
+
   }
+
   componentDidUpdate(e) {
     if (
       window.innerWidth < 993 &&
@@ -86,9 +134,10 @@ class Header extends React.Component {
       this.sidebarToggle.current.classList.toggle("toggled");
     }
   }
+
+
   render() {
     return (
-      // add or remove classes depending if we are on full-screen-maps page or not
       <Navbar
         color={
           this.props.location.pathname.indexOf("full-screen-maps") !== -1
@@ -129,40 +178,49 @@ class Header extends React.Component {
             navbar
             className="justify-content-end"
           >
-            {/* <form>
-              <InputGroup className="no-border">
-                <Input placeholder="Search..." />
-                <InputGroupAddon addonType="append">
-                  <InputGroupText>
-                    <i className="nc-icon nc-zoom-split" />
-                  </InputGroupText>
-                </InputGroupAddon>
-              </InputGroup>
-            </form> */}
             <Nav navbar>
-              {/* <NavItem>
-                <Link to="#pablo" className="nav-link btn-magnify">
-                  <i className="nc-icon nc-layout-11" />
-                  <p>
-                    <span className="d-lg-none d-md-block">Stats</span>
-                  </p>
-                </Link>
-              </NavItem> */}
-              <Dropdown
-                nav
-                isOpen={this.state.dropdownOpen}
-                toggle={(e) => this.dropdownToggle(e)}
-              >
-                <DropdownToggle caret nav>
-                  <i className="nc-icon nc-bell-55" />
-                  <p>
-                    <span className="d-lg-none d-md-block">Some Actions</span>
-                  </p>
+
+              {/* ANNOUNCEMENTS */}
+              <Dropdown nav isOpen={this.state.annDropdownOpen} toggle={(e) => this.annDropdownToggle(e)}>
+                <DropdownToggle caret nav className="dropdown-toggle-split">
+                  <i className="nc-icon nc-send" />
                 </DropdownToggle>
-                <DropdownMenu right>
-                  <DropdownItem tag="a">Action</DropdownItem>
-                  <DropdownItem tag="a">Another Action</DropdownItem>
-                  <DropdownItem tag="a">Something else here</DropdownItem>
+                <DropdownMenu right className="pre-scrollable">
+                  <DropdownItem header>Announcements</DropdownItem>
+                  {this.state.announcements.map(announcement => 
+                    <div key={announcement.id}>
+                      <DropdownItem>
+                        <div>
+                          <p>{announcement.title}</p>
+                          <br></br>
+                          <p className="text-muted">{announcement.description}</p>
+                        </div>
+                      </DropdownItem>
+                      <DropdownItem divider/>
+                    </div>
+                    )}
+                </DropdownMenu>
+              </Dropdown>
+
+              {/* NOTIFICATIONS */}
+              <Dropdown nav isOpen={this.state.dropdownOpen} toggle={(e) => this.dropdownToggle(e)}>
+                <DropdownToggle caret nav className="dropdown-toggle-split">
+                  <i className="nc-icon nc-bell-55" />
+                </DropdownToggle>
+                <DropdownMenu right className="pre-scrollable">
+                  <DropdownItem header>Notifications</DropdownItem>
+                  {this.state.notifications.map(notification => 
+                    <div key={notification.id}>
+                      <DropdownItem>
+                        <div>
+                          <p>{notification.title}</p>
+                          <br></br>
+                          <p className="text-muted">{notification.description}</p>
+                        </div>
+                      </DropdownItem>
+                      <DropdownItem divider />
+                    </div>
+                    )}
                 </DropdownMenu>
               </Dropdown>
               <NavItem>
@@ -179,6 +237,29 @@ class Header extends React.Component {
       </Navbar>
     );
   }
+}
+
+// to use when viewing 
+function formatDate(d) {
+  if (d === undefined){
+      d = (new Date()).toISOString()
+      console.log(undefined)
+  }
+  let currDate = new Date(d);
+  console.log("currDate: " + currDate)
+  let year = currDate.getFullYear();
+  let month = currDate.getMonth() + 1;
+  let dt = currDate.getDate();
+  let time = currDate.toLocaleTimeString('en-SG')
+
+  if (dt < 10) {
+      dt = '0' + dt;
+  }
+  if (month < 10) {
+      month = '0' + month;
+  }
+
+  return dt + "/" + month + "/" + year + " " + time ;
 }
 
 export default Header;
