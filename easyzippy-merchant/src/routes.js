@@ -25,6 +25,7 @@ import Bookings from "views/Booking/Bookings";
 import Products from "views/Product/Products";
 import Credits from "views/Payment/Credits";
 import Orders from "views/Order/Orders";
+import TestProducts from "views/Product/TestProducts"
 
 var routes = [
   {
@@ -53,6 +54,13 @@ var routes = [
     name: "Products",
     icon: "nc-icon nc-shop",
     component: Products,
+    layout: "/admin"
+  },
+  {
+    path: "/testProducts",
+    name: "Test Products",
+    icon: "nc-icon nc-shop",
+    component: TestProducts,
     layout: "/admin"
   },
   {
