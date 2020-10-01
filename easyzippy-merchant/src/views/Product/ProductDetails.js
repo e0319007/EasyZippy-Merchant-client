@@ -198,7 +198,7 @@ function ProductDetails() {
                                                 {' '}
                                                 <Button color="primary" size="sm" onClick={()=>{
                                                     history.push('/admin/products')
-                                                }}>Return to Products Page</Button>
+                                                }}>Return to Products</Button>
                                             </div>
                                         </Row>
                                         { err &&<Alert color="danger">{error}</Alert> }
