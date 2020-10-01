@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
+import { useHistory } from 'react-router-dom';
+import axios from "axios";
+import Cookies from 'js-cookie';
 
 import {
     Card,
@@ -10,6 +13,10 @@ import {
 } from "reactstrap";
 
 function ListProduct() {
+    const history = useHistory()
+    const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
+    console.log(authToken)
+
     const [error, setError] = useState('')
     const [err, isError] = useState(false)
 
@@ -27,7 +34,7 @@ function ListProduct() {
                         <Card className="card-name">
                             <CardHeader>
                                 <div className="form-row">
-                                <CardTitle className="col-md-10" tag="h5">List a Product</CardTitle>
+                                <CardTitle className="col-md-10" tag="h5">List A Product</CardTitle>
                                 </div>
                             </CardHeader>
                             <CardBody>
@@ -94,7 +101,9 @@ function ListProduct() {
                                         <div className="update ml-auto mr-auto" >
                                             <Button color="success" size="sm" type="submit" onClick={()=>{}}>List Product</Button>
                                             {' '}
-                                            <Button color="primary" size="sm" onClick={()=>{}}>Return to Products Page</Button>
+                                            <Button color="primary" size="sm" onClick={()=>{
+                                                history.push('/admin/products')
+                                            }}>Return to Products Page</Button>
                                         </div>
                                     </Row>
                                     { !inModal && err &&<Alert color="danger">{error}</Alert> }

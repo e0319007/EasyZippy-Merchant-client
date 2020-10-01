@@ -26,10 +26,10 @@ function Products() {
                         <Card>
                             <CardHeader>
                                 <div className="form-row">
-                                    <CardTitle className="col-md-10" tag="h5">Products List</CardTitle>
+                                    <CardTitle className="col-md-10" tag="h5">Products</CardTitle>
                                     <Button color="info" onClick={() => {
                                         history.push('/admin/listProduct')
-                                    }}> <i className="nc-icon nc-plus"/>
+                                    }}> <i className="nc-icon nc-simple-add"/> {''}
                                         List a Product
                                     </Button>
                                 </div>
