@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, {useState} from 'react';
 import Cookies from 'js-cookie';
 import { useHistory, Link } from 'react-router-dom';
+import SweetAlert from 'react-bootstrap-sweetalert';
 
 import {
     Form,
@@ -26,7 +27,8 @@ function FileUpload() {
 
     const [file, setFile] = useState('');
     const [filename, setFilename] = useState('Choose File');
-    // const [uploadedFile, setUploadedFile] = useState({});
+
+    const [alert, setAlert] = useState(false);
 
     // FILE UPLOAD
     const onChange = e => {
@@ -52,12 +54,17 @@ function FileUpload() {
             isError(false)
             isSuccessful(true)
             setMsg("File uploaded!")
+            setAlert(true)
             Cookies.remove('merchantUser')
         }).catch(function(error){
             isError(true)
             setError(error.response.data)
         })
+    }
 
+    const hideAlert = () => {
+        console.log('Hiding alert...');
+        setAlert(false)
     }
 
     const redirect = () => {
@@ -101,11 +108,21 @@ function FileUpload() {
                 value='Upload'
                 className='btn btn-primary btn-block mt-4'
                 />
+
+                {alert && 
+                <SweetAlert
+                success
+                title="Your tenancy agreement has been uploaded!"
+                onConfirm={hideAlert}
+                >
+                    An email will be sent to you when your account has been approved.
+                </SweetAlert>
+                }
+                
                 <FormGroup> 
-                    <Link onClick={redirect}>● Return to login page to sign in.</Link>
+                    <Link onClick={redirect}>● Click here to return to login page.</Link>
                 </FormGroup>
                 { err &&<Alert color="danger">{error}</Alert> }
-                { successful &&<Alert color="success">{successMsg}</Alert> }
             </Form>
         </div>
     )

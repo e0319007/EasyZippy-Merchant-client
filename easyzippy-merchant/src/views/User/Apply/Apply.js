@@ -34,7 +34,7 @@ function Apply() {
 
     const onChangeName = e => {
         const name = e.target.value;
-        setName(name.trim())
+        setName(name)
         if (name.trim().length == 0) {
             setError("Name is a required field")
             isError(true)
@@ -45,7 +45,7 @@ function Apply() {
 
     const onChangePoc = e => {
         const poc = e.target.value
-        setPoc(poc.trim())
+        setPoc(poc)
     }
 
     const onChangeBlk = e => {
@@ -173,14 +173,7 @@ function Apply() {
         }
 
         let arr = fullUnitNum.split('-')
-        //if there's no dash or it's the first or last character
-        if (fullUnitNum.indexOf('-') <= 0 || fullUnitNum.charAt(0) === '-' 
-            || fullUnitNum.charAt(fullUnitNum.length -1)) {
-            
-            setError('Please enter a valid unit number')
-            isError(true)
-            return;
-        }
+
         console.log("arr0: " + arr[0])
         console.log("arr1: " + arr[1])
 
