@@ -19,6 +19,11 @@ function Apply() {
     const history = useHistory()
 
     const [name, setName] = useState('')
+    const [poc, setPoc] = useState('')
+    const [blk, setBlk] = useState('')
+    const [street, setStreet] = useState('')
+    const [postalCode, setPostalCode] = useState('')
+    const [fullUnitNum, setFullUnitNum] = useState('')
     const [mobileNumber, setMobileNumber] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -36,6 +41,37 @@ function Apply() {
         } else {
             isError(false)
         }
+    }
+
+    const onChangePoc = e => {
+        const poc = e.target.value
+        setPoc(poc.trim())
+    }
+
+    const onChangeBlk = e => {
+        const blk = e.target.value
+        setBlk(blk.trim())
+    }
+
+    const onChangeStreet = e => {
+        const street = e.target.value
+        setStreet(street)
+    }
+
+    const onChangePostalCode = e => {
+        const postal = e.target.value
+        if (postal.trim().length > 6) {
+            setError("Please key in a valid postal code")
+            isError(true)
+        } else {
+            isError(false)
+        }
+        setPostalCode(postal.trim())
+    }
+
+    const onChangeFullUnitNum = e => {
+        const unitNum = e.target.value
+        setFullUnitNum(unitNum.trim())
     }
 
     const onChangeMobileNumber = e => {
@@ -69,6 +105,14 @@ function Apply() {
         } else {
             isError(false)
         }
+
+        var reg = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})")
+        if (reg.test(password)) { //if valid
+            isError(false)
+        } else {
+            setError("Password is not strong enough (Have at least 1 Uppercase, 1 Lowercase, 1 Number and 1 Special Character)")
+            isError(true)
+        }
     }
 
     const onChangePassword2 = e => {
@@ -76,6 +120,9 @@ function Apply() {
         setPassword2(password2.trim())
         if (password2.trim().length == 0) {
             setError("Please re-enter password")
+            isError(true)
+        } else if (password2.trim() !== password.trim()) {
+            setError("Passwords are not the same")
             isError(true)
         } else {
             isError(false)
@@ -93,11 +140,26 @@ function Apply() {
             return;
         }
 
+        let arr = fullUnitNum.split('-')
+        if (arr[0].length === 0 || arr[1].length === 0) {
+            setError('Please enter a valid unit number')
+            isError(true)
+            return;
+        }
+        console.log("arr0: " + arr[0])
+        console.log("arr1: " + arr[1])
+
         // register merchant
         axios.post("/merchant", {
             name: name,
+            pointOfContact: poc,
             mobileNumber: mobileNumber,
             email: email,
+            blk: blk,
+            street: street,
+            floor: arr[0],
+            unitNumber: arr[1],
+            postalCode: postalCode,
             password: password
         }).then( response => {
             console.log("axios call went through")
@@ -124,33 +186,48 @@ function Apply() {
                     <span style={{fontWeight:"bold", color: 'white', width:'100%'}}>&nbsp;&nbsp;Easy Zippy</span>
                 </div>
             </Navbar>
-            <form style={{...padding(20, 57, 0, 57)}}>
+            <form style={{...padding(5, 37, 0, 37)}}>
                 <FormGroup>
                     <p className="h6" style={{textAlign: 'center'}}>
                         Join Ez2Keep as a Merchant!
                     </p>
                 </FormGroup>
                 <Row>
-                    <p></p>
-                </Row>
-                <Row>
                     <Col>
                         <FormGroup>
-                            <Label for="name">Name</Label>
+                            <Label for="name"><small>Merchant</small></Label>
                             <Input
                             type="name"
                             name="name"
                             id="name"
-                            placeholder="Enter Name"
+                            placeholder="Enter Merchant"
                             value={name}
                             onChange={onChangeName}
                             required
+                            style={{...padding(5, 5, 5, 5)}}
+                            />
+                        </FormGroup>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <FormGroup>
+                            <Label for="poc"><small>Point of Contact</small></Label>
+                            <Input
+                            type="name"
+                            name="poc"
+                            id="poc"
+                            placeholder="Enter Name of Point of Contact"
+                            value={poc}
+                            onChange={onChangePoc}
+                            required
+                            style={{...padding(5, 5, 5, 5)}}
                             />
                         </FormGroup>
                     </Col>
                     <Col>
                         <FormGroup>
-                            <Label for="mobileNumber">Mobile Number</Label>
+                            <Label for="mobileNumber"><small>Mobile Number</small></Label>
                             <Input
                             type="mobileNumber"
                             name="mobileNumber"
@@ -159,12 +236,77 @@ function Apply() {
                             value={mobileNumber}
                             onChange={onChangeMobileNumber}
                             required
+                            style={{...padding(5, 5, 5, 5)}}
+                            />
+                        </FormGroup>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <FormGroup>
+                            <Label for="blk"><small>Block</small></Label>
+                            <Input
+                            type="name"
+                            name="blk"
+                            id="blk"
+                            placeholder="Enter Block"
+                            value={blk}
+                            onChange={onChangeBlk}
+                            required
+                            style={{...padding(5, 5, 5, 5)}}
+                            />
+                        </FormGroup>
+                    </Col>
+                    <Col>
+                        <FormGroup>
+                            <Label for="street"><small>Street</small></Label>
+                            <Input
+                            type="name"
+                            name="street"
+                            id="street"
+                            placeholder="Enter Street"
+                            value={street}
+                            onChange={onChangeStreet}
+                            required
+                            style={{...padding(5, 5, 5, 5)}}
+                            />
+                        </FormGroup>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <FormGroup>
+                            <Label for="unitNum"><small>Unit Number</small></Label>
+                            <Input
+                            type="name"
+                            name="unitNum"
+                            id="unitNum"
+                            placeholder="Enter Unit Number (e.g. 03-05)"
+                            value={fullUnitNum}
+                            onChange={onChangeFullUnitNum}
+                            required
+                            style={{...padding(5, 5, 5, 5)}}
+                            />
+                        </FormGroup>
+                    </Col>
+                    <Col>
+                        <FormGroup>
+                            <Label for="postalCode"><small>Postal Code</small></Label>
+                            <Input
+                            type="name"
+                            name="postalCode"
+                            id="postalCode"
+                            placeholder="Enter Postal Code (e.g. 768590)"
+                            value={postalCode}
+                            onChange={onChangePostalCode}
+                            required
+                            style={{...padding(5, 5, 5, 5)}}
                             />
                         </FormGroup>
                     </Col>
                 </Row>
                 <FormGroup>
-                    <Label for="email">Email address</Label>
+                    <Label for="email"><small>Email address</small></Label>
                     <Input
                     type="email"
                     name="email"
@@ -173,35 +315,44 @@ function Apply() {
                     value={email}
                     onChange={onChangeEmail}
                     required
-                    />
-                </FormGroup>
-                <FormGroup>
-                    <Label for="password">Enter new password</Label>
-                    <Input
-                    type="password"
-                    name="password"
-                    id="password"
-                    placeholder="Enter Password"
-                    value={password}
-                    onChange={onChangePassword}
-                    required
-                    />
-                </FormGroup>
-                <FormGroup>
-                    <Label for="password2">Re-enter password</Label>
-                    <Input
-                    type="password"
-                    name="password2"
-                    id="password2"
-                    placeholder="Re-enter password"
-                    value={password2}
-                    onChange={onChangePassword2}
-                    required
+                    style={{...padding(5, 5, 5, 5)}}
                     />
                 </FormGroup>
                 <Row>
+                    <Col>
+                        <FormGroup>
+                            <Label for="password"><small>Enter password</small></Label>
+                            <Input
+                            type="password"
+                            name="password"
+                            id="password"
+                            placeholder="Enter Password"
+                            value={password}
+                            onChange={onChangePassword}
+                            required
+                            style={{...padding(5, 5, 5, 5)}}
+                            />
+                        </FormGroup>
+                    </Col>
+                    <Col>
+                        <FormGroup>
+                            <Label for="password2"><small>Re-enter password</small></Label>
+                            <Input
+                            type="password"
+                            name="password2"
+                            id="password2"
+                            placeholder="Re-enter password"
+                            value={password2}
+                            onChange={onChangePassword2}
+                            required
+                            style={{...padding(5, 5, 5, 5)}}
+                            />
+                        </FormGroup>
+                    </Col>
+                </Row>
+                <Row>
                 <div className="update ml-auto mr-auto" >
-                    <Button color="primary" type="submit" onClick={postApply} > 
+                    <Button color="primary" type="submit" onClick={postApply}  style={{...padding(10, 15, 10, 15)}}> 
                         Apply
                     </Button>
                 </div>
