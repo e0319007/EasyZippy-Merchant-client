@@ -230,6 +230,10 @@ class Header extends React.Component {
     localStorage.clear()
   }
 
+  redirect(e) {
+    console.log("redirecting")
+  }
+
   // to use when viewing 
   formatDate(d) {
     if (d === undefined){
@@ -308,7 +312,7 @@ class Header extends React.Component {
                   <DropdownItem header>Notifications</DropdownItem>
                   {this.state.notifications.map(notification => 
                     <div key={notification.id}>
-                      <DropdownItem style={{backgroundColor: 'transparent'}}>                          
+                      <DropdownItem style={{backgroundColor: 'transparent'}} onClick={(e) => this.redirect(e)} href='/admin/listProduct'>                          
                           <p style={{fontWeight:'bold', color:'grey'}}>{notification.title}</p> 
                           <br></br>
                           <small style={{color:'grey'}}>{this.formatDate(notification.sentTime)}</small>
@@ -335,7 +339,6 @@ class Header extends React.Component {
                       <DropdownItem style={{backgroundColor: 'transparent'}}> 
                         <div>
                           <p style={{fontWeight:'bold', color:'grey'}}>{announcement.title}</p>
-                          {/* <p style={{fontWeight:'bold'}}>{announcement.title}</p> */}
                           <br></br>
                           <small style={{color:'grey'}}>{this.formatDate(announcement.sentTime)}</small>
                           <br></br>
