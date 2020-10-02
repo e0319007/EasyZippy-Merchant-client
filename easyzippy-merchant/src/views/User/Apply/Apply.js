@@ -50,6 +50,15 @@ function Apply() {
 
     const onChangeBlk = e => {
         const blk = e.target.value
+
+        var nums = /^[0-9]+$/
+            if (!blk.match(nums) && blk.length > 0) { //if not all numbers
+                setError("Please enter a valid block number")
+                isError(true)
+            } else {
+                isError(false)
+            }
+
         setBlk(blk.trim())
     }
 
@@ -60,29 +69,52 @@ function Apply() {
 
     const onChangePostalCode = e => {
         const postal = e.target.value
-        if (postal.trim().length > 6) {
-            setError("Please key in a valid postal code")
+        
+        if (postal.trim().length !== 6) {
+            setError("Postal code has to be exactly 6 numbers")
             isError(true)
         } else {
-            isError(false)
+            var nums = /^[0-9]+$/
+            if (!postal.match(nums)) { //if not all numbers
+                setError("Please enter a valid postal code")
+                isError(true)
+            } else {
+                isError(false)
+            }
         }
         setPostalCode(postal.trim())
     }
 
     const onChangeFullUnitNum = e => {
         const unitNum = e.target.value
+
+        if ((unitNum.indexOf('-') <= 0 || unitNum.charAt(0) === '-') && unitNum.length > 0) {
+
+            setError("Please enter a valid Unit Number")
+            isError(true)
+        } else {
+            isError(false)
+        }
+
         setFullUnitNum(unitNum.trim())
     }
 
     const onChangeMobileNumber = e => {
         const mobileNumber = e.target.value;
-        setMobileNumber(mobileNumber.trim())
+        
         if (mobileNumber.trim().length == 0) {
             setError("Mobile Number is a required field")
             isError(true)
         } else {
-            isError(false)
+            var nums = /^[0-9]+$/
+            if (!mobileNumber.match(nums)) { //if not all numbers
+                setError("Please enter a valid mobile number")
+                isError(true)
+            } else {
+                isError(false)
+            }
         }
+        setMobileNumber(mobileNumber.trim())
     }
 
     const onChangeEmail = e => {
@@ -141,7 +173,10 @@ function Apply() {
         }
 
         let arr = fullUnitNum.split('-')
-        if (arr[0].length === 0 || arr[1].length === 0) {
+        //if there's no dash or it's the first or last character
+        if (fullUnitNum.indexOf('-') <= 0 || fullUnitNum.charAt(0) === '-' 
+            || fullUnitNum.charAt(fullUnitNum.length -1)) {
+            
             setError('Please enter a valid unit number')
             isError(true)
             return;
