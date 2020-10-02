@@ -227,7 +227,7 @@ class Header extends React.Component {
     console.log("in logout")
     Cookies.remove('authToken')
     Cookies.remove('merchantUser')
-    localStorage.removeItem('currentMerchant')
+    localStorage.clear()
   }
 
   // to use when viewing 
