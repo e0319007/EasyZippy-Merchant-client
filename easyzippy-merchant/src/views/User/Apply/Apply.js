@@ -149,6 +149,9 @@ function Apply() {
         console.log("arr0: " + arr[0])
         console.log("arr1: " + arr[1])
 
+        const fl = arr[0]
+        const un = arr[1]
+
         // register merchant
         axios.post("/merchant", {
             name: name,
@@ -157,8 +160,8 @@ function Apply() {
             email: email,
             blk: blk,
             street: street,
-            floor: arr[0],
-            unitNumber: arr[1],
+            floor: fl,
+            unitNumber: un,
             postalCode: postalCode,
             password: password
         }).then( response => {
@@ -167,6 +170,7 @@ function Apply() {
             isError(false)
             history.push('/fileUpload')
         }).catch(function(error) {
+            console.log(error.response.data)
             isError(true)
             setError(error.response.data)
         })
