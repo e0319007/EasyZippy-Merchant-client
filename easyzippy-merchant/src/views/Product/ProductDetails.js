@@ -33,13 +33,75 @@ function ProductDetails() {
     console.log(authToken)
 
     const productId = JSON.parse(localStorage.getItem('productToView'))
+
     const [data, setData] = useState([])
+
+    const [name, setName] = useState('')
+    const [description, setDescription] = useState('')
+    const [unitPrice, setUnitPrice] = useState('')
+    const [category, setCategory] = useState('')
+    const [quantityAvailable, setQuantityAvailable] = useState('')
 
     const [error, setError] = useState('')
     const [err, isError] = useState(false)
 
     const [successful, isSuccessful] = useState(false)
     const [successMsg, setMsg] = useState('')
+
+    const product_toupdate = {
+        name: '',
+        description: '',
+        unitPrice: '',
+        category: '',
+        quantityAvailable:''
+    }
+
+    const [pdf, setPdf] = useState([])
+
+    const [categories, setCategories] = useState([])
+
+    useEffect(() => {
+        console.log("axios use effect")
+        axios.get(`/product/${productId}`, 
+        {
+            headers: {
+                AuthToken: authToken
+            }
+        }).then(res => {
+            setData(res.data); 
+            
+            axios.get(`/assets/${res.data.images}`,{
+                responseType: 'arraybuffer'
+            }, {
+                headers: {
+                    AuthToken: authToken,
+                    'Content-type': 'application/json'
+                }
+            }).then(res => {
+                var blob = new Blob([res.data], {type: "application/pdf;charset=utf-8"});
+                //var blob = new Blob([res.data], {type: "image/png"});
+                setPdf(blob)
+            }).catch(function(error) {
+                console.log(error.response.data)
+            })
+        }).catch (function(error) {
+            console.log(error.response.data)
+        })
+
+        axios.get('/categories', {
+            headers: {
+                AuthToken: authToken
+            }
+        }).then(res => {
+            console.log("successfully retrieve categories")
+            setCategories(res.data)
+        }).catch(err => console.error(err))
+    },[])
+
+    const onChangeName = e => {
+        const name = e.target.value;
+        setName(name.trim())
+    }
 
     const DisableSwitch = withStyles((theme) => ({
         root: {
@@ -75,17 +137,17 @@ function ProductDetails() {
         checked: {},
         }))(Switch);
     
-        let enabled = !data.disabled
+        let enabled = !data.archived
         console.log("Enabled: " + enabled)
     
         const handleChange = (event) => {
             console.log("event.target.checked: " + event.target.checked)
             setData({
                 ...data,
-                disabled: !event.target.checked
+                archived: !event.target.checked
             })
-            axios.put(`/product/disable/${productId}`, {
-                disabled: !event.target.checked
+            axios.put(`/product/archive/${productId}`, {
+                archived: !event.target.checked
             },
             {
                 headers: {
@@ -98,6 +160,39 @@ function ProductDetails() {
             })
         };
 
+        function formatDate(d) {
+            if (d === undefined){
+                d = (new Date()).toISOString()
+                console.log(undefined)
+            }
+            let currDate = new Date(d);
+            console.log("currDate: " + currDate)
+            let year = currDate.getFullYear();
+            let month = currDate.getMonth() + 1;
+            let dt = currDate.getDate();
+            let time = currDate.toLocaleTimeString('en-SG')
+    
+            if (dt < 10) {
+                dt = '0' + dt;
+            }
+            if (month < 10) {
+                month = '0' + month;
+            }
+    
+            return dt + "/" + month + "/" + year + " " + time ;
+        }
+
+        const onChangeCategory = e => {
+            const category = e.target.value;
+            setCategory(category.trim())
+            if (category.trim().length == 0) {
+                setError("Category is a required field")
+                isError(true)
+            } else {
+                isError(false)
+            }
+        }
+
     return(
         <>
             <ThemeProvider theme={theme}>
@@ -107,7 +202,7 @@ function ProductDetails() {
                             <Card className="card-name">
                                 <CardHeader>
                                     <div className="form-row">
-                                    <CardTitle className="col-md-10" tag="h5">Product Details</CardTitle>
+                                    <CardTitle className="col-md-10" tag="h5">Product {data.id} Details</CardTitle>
                                     </div>
                                 </CardHeader>
                                 <CardBody>
@@ -115,25 +210,27 @@ function ProductDetails() {
                                         <div className="text-center" >
                                             <CardImg style={{width:"20rem"}} top src="../../easyzippylogo.jpg" alt="..."/>
                                         </div>
-                                        <fieldset>  
+                                        <fieldset disabled>  
                                             <FormGroup>
                                                 <Label for="inputId">Id</Label>
                                                 <Input
                                                     type="text"
                                                     id="inputId"
                                                     placeholder="id number here"
-                                                    //value={data.id}
+                                                    value={data.id}
                                                     //onChange={}
                                                 />
                                             </FormGroup>
+                                        </fieldset>
+                                        <fieldset>
                                             <FormGroup>
                                                 <Label for="inputName">Name</Label>
                                                 <Input
                                                     type="text"
                                                     id="inputName"
                                                     placeholder="name here"
-                                                    //value={data.name}
-                                                    //onChange={}
+                                                    value={data.name}
+                                                    onChange={onChangeName}
                                                 />
                                             </FormGroup>
                                             <FormGroup>
@@ -142,7 +239,7 @@ function ProductDetails() {
                                                     type="textarea"
                                                     id="inputDescription"
                                                     placeholder="description here"
-                                                    //value={data.description}
+                                                    value={data.description}
                                                     //onChange={}
                                                 />
                                             </FormGroup>
@@ -152,7 +249,7 @@ function ProductDetails() {
                                                     type="text" 
                                                     id="inputPrice" 
                                                     placeholder="Price" 
-                                                    //value={data.unitPrice} 
+                                                    value={data.unitPrice} 
                                                     //onChange={}                                                   
                                                     />
                                             </FormGroup>   
@@ -162,10 +259,14 @@ function ProductDetails() {
                                                     type="select" 
                                                     id="inputCategory" 
                                                     placeholder="Category" 
-                                                    //value={data.category}  
-                                                    //onChange={}                                                  
+                                                    value={data.category}  
+                                                    onChange={onChangeCategory}                                                  
                                                 >
-                                                    <option>get list of category</option>
+                                                    {
+                                                        categories.map(category => (
+                                                            <option>{category.name}</option>
+                                                        ))
+                                                    }
                                                 </Input>
                                             </FormGroup>  
                                             <FormGroup>
@@ -174,10 +275,21 @@ function ProductDetails() {
                                                     type="text" 
                                                     id="inputQuantityAvailable" 
                                                     placeholder="Quantity Available" 
-                                                    //value={data.quantityAvailable}  
+                                                    value={data.quantityAvailable}  
                                                     //onChange={}                                                  
                                                     />
                                             </FormGroup>                   
+                                        </fieldset>
+                                        <fieldset disabled>
+                                            <FormGroup>
+                                                <Label for="inputCreatedAt">Created On</Label>
+                                                <Input 
+                                                    type="text" 
+                                                    id="inputCreatedAt" 
+                                                    placeholder="Created On" 
+                                                    value={formatDate(data.createdAt)}                                                  
+                                                    />
+                                            </FormGroup>
                                         </fieldset>
                                         <Row>
                                             <div className="update ml-auto mr-auto" >
@@ -185,7 +297,7 @@ function ProductDetails() {
                                                     <Grid component="label" container alignItems="center" spacing={1}>
                                                     <Grid item>Disabled</Grid>
                                                     <Grid item>
-                                                        <DisableSwitch checked={!data.disabled} onChange={handleChange} name="checked" />
+                                                        <DisableSwitch checked={!data.archived} onChange={handleChange} name="checked" />
                                                     </Grid>
                                                     <Grid item>Enabled</Grid>
                                                     </Grid>
