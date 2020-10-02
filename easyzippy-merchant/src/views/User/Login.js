@@ -47,7 +47,10 @@ function Login() {
     const merchant = {
         name: '',
         mobileNum: '',
-        email: ''
+        email: '',
+        pointOfContact: '',
+        blk: '',
+        street: ''
     }
 
     const redirect = () => {
@@ -83,6 +86,9 @@ function Login() {
             merchant.name = response.data.merchant.name
             merchant.mobileNum = response.data.merchant.mobileNumber
             merchant.email = response.data.merchant.email
+            merchant.pointOfContact = response.data.merchant.pointOfContact
+            merchant.blk = response.data.merchant.blk
+            merchant.street = response.data.merchant.street
 
             console.log(merchant)
 

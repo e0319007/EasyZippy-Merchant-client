@@ -34,6 +34,11 @@ function Profile() {
     const [name, setName] = useState(merchant.name)
     const [email, setEmail] = useState(merchant.email)
     const [mobileNumber, setMobileNumber] = useState(merchant.mobileNum)
+    const [pointOfContact, setPointOfContact] = useState(merchant.pointOfContact)
+    const [blk, setBlk] = useState(merchant.setBlk)
+    const [street, setStreet] = useState(merchant.street)
+    const [fullUnitNum, setFullUnitNum] = useState(merchant.fullUnitNum)
+    const [postalCode, setPostalCode] = useState(merchant.postalCode)
 
     const [currentPw, setCurrentPw] = useState('')
     const [newPw, setNewPw] = useState('')
@@ -53,7 +58,12 @@ function Profile() {
     const merchant_toupdate = {
         name: '',
         mobileNum: '',
-        email: ''
+        email: '',
+        pointOfContact: '',
+        blk: '',
+        street: '',
+        fullUnitNum: '', 
+        postalCode: ''
     }
 
     const onChangeName = e => {
@@ -71,6 +81,52 @@ function Profile() {
         setMobileNumber(mobile.trim())
     }
 
+    const onChangePointOfContact = e => {
+        const pointOfContact = e.target.value;
+        setPointOfContact(pointOfContact.trim())
+    }
+
+    const onChangeBlk = e => {
+        const blk = e.target.value;
+        setBlk(blk.trim())
+    }
+
+    const onChangeStreet = e => {
+        const street = e.target.value;
+        setStreet(street.trim())
+    }
+
+    const onChangeFullUnitNum = e => {
+        const unitNum = e.target.value
+
+        if ((unitNum.indexOf('-') <= 0 || unitNum.charAt(0) === '-') && unitNum.length > 0) {
+
+            setError("Please enter a valid Unit Number")
+            isError(true)
+        } else {
+            isError(false)
+        }
+
+        setFullUnitNum(unitNum.trim())
+    }
+
+    const onChangePostalCode = e => {
+        const postal = e.target.value
+        if (postal.trim().length !== 6) {
+            setError("Postal code has to be exactly 6 numbers")
+            isError(true)
+        } else {
+            var nums = /^[0-9]+$/
+            if (!postal.match(nums)) { //if not all numbers
+                setError("Please enter a valid postal code")
+                isError(true)
+            } else {
+                isError(false)
+            }
+        }
+        setPostalCode(postal.trim())
+    }
+
     const updateProfile = e => {
         e.preventDefault()
         console.log("in update profile")
@@ -78,7 +134,12 @@ function Profile() {
         axios.put(`/merchant/${merchantid}`, {
             name: name,
             email: email,
-            mobileNumber: mobileNumber
+            mobileNumber: mobileNumber,
+            pointOfContact: pointOfContact,
+            blk: blk,
+            street: street,
+            fullUnitNum: fullUnitNum,
+            postalCode: postalCode
         },
         {
             headers: {
@@ -90,11 +151,21 @@ function Profile() {
             setName(response.data.name)
             setEmail(response.data.email)
             setMobileNumber(response.data.mobileNumber)
+            setPointOfContact(response.data.pointOfContact)
+            setBlk(response.data.blk)
+            setStreet(response.data.street)
+            setFullUnitNum(response.data.setFullUnitNum)
+            setPostalCode(response.data.postalCode)
             
             // save new values to staff local storage
-            merchant_toupdate.firstName = response.data.name
+            merchant_toupdate.name = response.data.name
             merchant_toupdate.mobileNum = response.data.mobileNumber
             merchant_toupdate.email = response.data.email
+            merchant_toupdate.pointOfContact = response.data.pointOfContact
+            merchant_toupdate.blk = response.data.blk
+            merchant_toupdate.street = response.data.street
+            merchant_toupdate.fullUnitNum = response.data.fullUnitNum
+            merchant_toupdate.postalCode = response.data.postalCode
             localStorage['currentMerchant'] = JSON.stringify(merchant_toupdate)
             
             isInModal(false)
@@ -201,36 +272,94 @@ function Profile() {
                             </CardHeader>
                             <CardBody>
                                 <form>
-                                    <FormGroup>
-                                        <Label for="inputName">Name</Label>
-                                        <Input 
-                                            type="text" 
-                                            id="inputName" 
-                                            placeholder="Name"
-                                            value={name}
-                                            onChange={onChangeName}
-                                        />
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="inputEmail">Email</Label>
-                                        <Input 
-                                            type="email" 
-                                            id="inputEmail" 
-                                            placeholder="Email" 
-                                            value={email}
-                                            onChange={onChangeEmail}
+                                    <div className="form-row">
+                                        <FormGroup className="col-md-6">
+                                            <Label for="inputName">Name</Label>
+                                            <Input 
+                                                type="text" 
+                                                id="inputName" 
+                                                placeholder="Name"
+                                                value={name}
+                                                onChange={onChangeName}
                                             />
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="inputMobile">Mobile Number</Label>
-                                        <Input 
-                                            type="text" 
-                                            id="inputMobile" 
-                                            placeholder="Mobile Number" 
-                                            value={mobileNumber}
-                                            onChange={onChangeMobile}
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6">
+                                            <Label for="inputPointOfContact">Point Of Contact</Label>
+                                            <Input 
+                                                type="text" 
+                                                id="inputPointOfContact" 
+                                                placeholder="Point of Contact"
+                                                value={pointOfContact}
+                                                onChange={onChangePointOfContact}
                                             />
-                                    </FormGroup>
+                                        </FormGroup>
+                                    </div>
+                                    <div className="form-row">
+                                        <FormGroup className="col-md-6">
+                                            <Label for="inputEmail">Email</Label>
+                                            <Input 
+                                                type="email" 
+                                                id="inputEmail" 
+                                                placeholder="Email" 
+                                                value={email}
+                                                onChange={onChangeEmail}
+                                                />
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6">
+                                            <Label for="inputMobile">Mobile Number</Label>
+                                            <Input 
+                                                type="text" 
+                                                id="inputMobile" 
+                                                placeholder="Mobile Number" 
+                                                value={mobileNumber}
+                                                onChange={onChangeMobile}
+                                                />
+                                        </FormGroup>
+                                    </div>
+                                    <div className="form-row">
+                                        <FormGroup className="col-md-6">
+                                            <Label for="inputBlock">Block</Label>
+                                            <Input 
+                                                type="text" 
+                                                id="inputBlock" 
+                                                placeholder="Block" 
+                                                value={blk}
+                                                onChange={onChangeBlk}
+                                                />
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6">
+                                            <Label for="inputStreet">Street</Label>
+                                            <Input 
+                                                type="text" 
+                                                id="inputStreet" 
+                                                placeholder="Street" 
+                                                value={street}
+                                                onChange={onChangeStreet}
+                                                />
+                                        </FormGroup>
+                                    </div>
+                                    <div className="form-row">
+                                        <FormGroup className="col-md-6">
+                                            <Label for="inputUnitNum"><small>Unit Number</small></Label>
+                                            <Input
+                                                type="name"
+                                                id="inputUnitNum"
+                                                placeholder="Enter Unit Number (e.g. 03-05)"
+                                                value={fullUnitNum}
+                                                onChange={onChangeFullUnitNum}
+                                            />
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6">
+                                            <Label for="inputPostalCode"><small>Postal Code</small></Label>
+                                            <Input
+                                                type="name"
+                                                id="inputPostalCode"
+                                                placeholder="Enter Postal Code (e.g. 768590)"
+                                                value={postalCode}
+                                                onChange={onChangePostalCode}
+                                            />
+                                        </FormGroup>
+                                    </div>
                                     <Row>
                                         <div className="update ml-auto mr-auto" >
                                             <Button color="success" size="sm" type="submit" onClick={updateProfile}>Update Profile</Button>
