@@ -50,7 +50,11 @@ function Login() {
         email: '',
         pointOfContact: '',
         blk: '',
-        street: ''
+        street: '',
+        //fullUnitNum: '',
+        floor: '',
+        unitNumber: '',
+        postalCode: ''
     }
 
     const redirect = () => {
@@ -70,6 +74,14 @@ function Login() {
             setError("Email field is required")
             return;
         }
+        // let arr = fullUnitNum.split('-')
+
+        // console.log("arr0: " + arr[0])
+        // console.log("arr1: " + arr[1])
+
+        // const fl = arr[0]
+        // const un = arr[1]
+
         axios.post('/merchant/login', {
             email: email,
             password: password
@@ -89,6 +101,10 @@ function Login() {
             merchant.pointOfContact = response.data.merchant.pointOfContact
             merchant.blk = response.data.merchant.blk
             merchant.street = response.data.merchant.street
+            //merchant.fullUnitNum = response.data.merchant.fullUnitNum
+            merchant.floor = response.data.merchant.floor
+            merchant.unitNumber = response.data.merchant.unitNumber
+            merchant.postalCode = response.data.merchant.postalCode
 
             console.log(merchant)
 

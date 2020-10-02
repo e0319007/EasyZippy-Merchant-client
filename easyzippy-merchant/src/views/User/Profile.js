@@ -35,9 +35,11 @@ function Profile() {
     const [email, setEmail] = useState(merchant.email)
     const [mobileNumber, setMobileNumber] = useState(merchant.mobileNum)
     const [pointOfContact, setPointOfContact] = useState(merchant.pointOfContact)
-    const [blk, setBlk] = useState(merchant.setBlk)
+    const [blk, setBlk] = useState(merchant.blk)
     const [street, setStreet] = useState(merchant.street)
-    const [fullUnitNum, setFullUnitNum] = useState(merchant.fullUnitNum)
+    const [floor, setFloor] = useState(merchant.floor)
+    const [unitNumber, setUnitNumber] = useState(merchant.unitNumber)
+   //const [fullUnitNum, setFullUnitNum] = useState(merchant.fullUnitNum)
     const [postalCode, setPostalCode] = useState(merchant.postalCode)
 
     const [currentPw, setCurrentPw] = useState('')
@@ -62,23 +64,50 @@ function Profile() {
         pointOfContact: '',
         blk: '',
         street: '',
-        fullUnitNum: '', 
+        floor: '',
+        unitNumber: '',
+        //fullUnitNum: '', 
         postalCode: ''
     }
 
     const onChangeName = e => {
         const name = e.target.value;
-        setName(name.trim())
+        setName(name)
+        if (name.trim().length == 0) {
+            setError("Name is a required field")
+            isError(true)
+        } else {
+            isError(false)
+        }
     }
 
     const onChangeEmail = e => {
         const email = e.target.value;
         setEmail(email.trim())
+        if (email.trim().length == 0) {
+            setError("Email is a required field")
+            isError(true)
+        } else {
+            isError(false)
+        }
     }
 
     const onChangeMobile = e => {
-        const mobile = e.target.value;
-        setMobileNumber(mobile.trim())
+        const mobileNumber = e.target.value;
+        
+        if (mobileNumber.trim().length == 0) {
+            setError("Mobile Number is a required field")
+            isError(true)
+        } else {
+            var nums = /^[0-9]+$/
+            if (!mobileNumber.match(nums)) { //if not all numbers
+                setError("Please enter a valid mobile number")
+                isError(true)
+            } else {
+                isError(false)
+            }
+        }
+        setMobileNumber(mobileNumber.trim())
     }
 
     const onChangePointOfContact = e => {
@@ -87,7 +116,16 @@ function Profile() {
     }
 
     const onChangeBlk = e => {
-        const blk = e.target.value;
+        const blk = e.target.value
+
+        var nums = /^[0-9]+$/
+            if (!blk.match(nums) && blk.length > 0) { //if not all numbers
+                setError("Please enter a valid block number")
+                isError(true)
+            } else {
+                isError(false)
+            }
+
         setBlk(blk.trim())
     }
 
@@ -96,19 +134,53 @@ function Profile() {
         setStreet(street.trim())
     }
 
-    const onChangeFullUnitNum = e => {
-        const unitNum = e.target.value
-
-        if ((unitNum.indexOf('-') <= 0 || unitNum.charAt(0) === '-') && unitNum.length > 0) {
-
-            setError("Please enter a valid Unit Number")
+    const onChangeFloor = e => {
+        const floor = e.target.value;
+        if (floor.trim().length == 0) {
+            setError("Floor is a required field")
             isError(true)
         } else {
-            isError(false)
+            var nums = /^[0-9]+$/
+            if (!floor.match(nums)) { //if not all numbers
+                setError("Please enter a valid floor")
+                isError(true)
+            } else {
+                isError(false)
+            }
         }
-
-        setFullUnitNum(unitNum.trim())
+        setFloor(floor.trim())
     }
+
+    const onChangeUnitNumber = e => {
+        const unitNumber = e.target.value;
+        if (unitNumber.trim().length == 0) {
+            setError("Unit number is a required field")
+            isError(true)
+        } else {
+            var nums = /^[0-9]+$/
+            if (!unitNumber.match(nums)) { //if not all numbers
+                setError("Please enter a valid unit number")
+                isError(true)
+            } else {
+                isError(false)
+            }
+        }
+        setUnitNumber(unitNumber.trim())
+    }
+
+    // const onChangeFullUnitNum = e => {
+    //     const unitNum = e.target.value
+
+    //     if ((unitNum.indexOf('-') <= 0 || unitNum.charAt(0) === '-') && unitNum.length > 0) {
+
+    //         setError("Please enter a valid Unit Number")
+    //         isError(true)
+    //     } else {
+    //         isError(false)
+    //     }
+
+    //     setFullUnitNum(unitNum.trim())
+    // }
 
     const onChangePostalCode = e => {
         const postal = e.target.value
@@ -131,6 +203,14 @@ function Profile() {
         e.preventDefault()
         console.log("in update profile")
 
+        // let arr = fullUnitNum.split('-')
+
+        // console.log("arr0: " + arr[0])
+        // console.log("arr1: " + arr[1])
+
+        // const floor = arr[0]
+        // const unitNumber = arr[1]
+
         axios.put(`/merchant/${merchantid}`, {
             name: name,
             email: email,
@@ -138,7 +218,9 @@ function Profile() {
             pointOfContact: pointOfContact,
             blk: blk,
             street: street,
-            fullUnitNum: fullUnitNum,
+            //fullUnitNum: fullUnitNum,
+            floor: floor,
+            unitNumber: unitNumber,
             postalCode: postalCode
         },
         {
@@ -154,7 +236,9 @@ function Profile() {
             setPointOfContact(response.data.pointOfContact)
             setBlk(response.data.blk)
             setStreet(response.data.street)
-            setFullUnitNum(response.data.setFullUnitNum)
+            setFloor(response.data.floor)
+            setUnitNumber(response.data.unitNumber)
+            //setFullUnitNum(response.data.fullUnitNum)
             setPostalCode(response.data.postalCode)
             
             // save new values to staff local storage
@@ -164,7 +248,9 @@ function Profile() {
             merchant_toupdate.pointOfContact = response.data.pointOfContact
             merchant_toupdate.blk = response.data.blk
             merchant_toupdate.street = response.data.street
-            merchant_toupdate.fullUnitNum = response.data.fullUnitNum
+            merchant_toupdate.floor = response.data.floor
+            merchant_toupdate.unitNumber = response.data.unitNumber
+            //merchant_toupdate.fullUnitNum = response.data.fullUnitNum
             merchant_toupdate.postalCode = response.data.postalCode
             localStorage['currentMerchant'] = JSON.stringify(merchant_toupdate)
             
@@ -281,6 +367,7 @@ function Profile() {
                                                 placeholder="Name"
                                                 value={name}
                                                 onChange={onChangeName}
+                                                required
                                             />
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
@@ -291,6 +378,7 @@ function Profile() {
                                                 placeholder="Point of Contact"
                                                 value={pointOfContact}
                                                 onChange={onChangePointOfContact}
+                                                required
                                             />
                                         </FormGroup>
                                     </div>
@@ -303,6 +391,7 @@ function Profile() {
                                                 placeholder="Email" 
                                                 value={email}
                                                 onChange={onChangeEmail}
+                                                required
                                                 />
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
@@ -313,6 +402,7 @@ function Profile() {
                                                 placeholder="Mobile Number" 
                                                 value={mobileNumber}
                                                 onChange={onChangeMobile}
+                                                required
                                                 />
                                         </FormGroup>
                                     </div>
@@ -325,6 +415,7 @@ function Profile() {
                                                 placeholder="Block" 
                                                 value={blk}
                                                 onChange={onChangeBlk}
+                                                required
                                                 />
                                         </FormGroup>
                                         <FormGroup className="col-md-6">
@@ -335,31 +426,56 @@ function Profile() {
                                                 placeholder="Street" 
                                                 value={street}
                                                 onChange={onChangeStreet}
+                                                required
                                                 />
                                         </FormGroup>
                                     </div>
                                     <div className="form-row">
-                                        <FormGroup className="col-md-6">
-                                            <Label for="inputUnitNum"><small>Unit Number</small></Label>
-                                            <Input
-                                                type="name"
-                                                id="inputUnitNum"
-                                                placeholder="Enter Unit Number (e.g. 03-05)"
+                                        <FormGroup className="col-md-4">
+                                            <Label for="inputFloor">Floor</Label>
+                                            <Input 
+                                                type="text" 
+                                                id="inputFloor" 
+                                                placeholder="Enter floor Number (e.g. 03)" 
+                                                value={floor}
+                                                onChange={onChangeFloor}
+                                                required
+                                                />
+                                        </FormGroup>
+                                        <FormGroup className="col-md-4">
+                                            <Label for="inputUnitNum">Unit Number</Label>
+                                            <Input 
+                                                type="text" 
+                                                id="inputUnitNum" 
+                                                placeholder="Enter unit number (e.g. 230)" 
+                                                value={unitNumber}
+                                                onChange={onChangeUnitNumber}
+                                                required
+                                                />
+                                        </FormGroup>
+                                        {/* <FormGroup className="col-md-6">
+                                            <Label for="inputUnitNum">Unit Number</Label>
+                                            <Input 
+                                                type="text" 
+                                                id="inputUnitNum" 
+                                                placeholder="Enter Unit Number (e.g. 03-05)" 
                                                 value={fullUnitNum}
                                                 onChange={onChangeFullUnitNum}
-                                            />
-                                        </FormGroup>
-                                        <FormGroup className="col-md-6">
-                                            <Label for="inputPostalCode"><small>Postal Code</small></Label>
-                                            <Input
-                                                type="name"
-                                                id="inputPostalCode"
-                                                placeholder="Enter Postal Code (e.g. 768590)"
+                                                required
+                                                />
+                                        </FormGroup> */}
+                                        <FormGroup className="col-md-4">
+                                            <Label for="inputPostalCode">Postal Code</Label>
+                                            <Input 
+                                                type="text" 
+                                                id="inputPostalCode" 
+                                                placeholder="Enter Postal Code (e.g. 768590)" 
                                                 value={postalCode}
                                                 onChange={onChangePostalCode}
-                                            />
+                                                required
+                                                />
                                         </FormGroup>
-                                    </div>
+                                    </div>                      
                                     <Row>
                                         <div className="update ml-auto mr-auto" >
                                             <Button color="success" size="sm" type="submit" onClick={updateProfile}>Update Profile</Button>

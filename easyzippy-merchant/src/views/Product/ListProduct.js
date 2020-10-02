@@ -303,14 +303,20 @@ function ListProduct() {
                                     <Row>
                                         <div className="update ml-auto mr-auto" >
                                             <Button color="success" size="sm" type="submit" onClick={createProduct}>List Product</Button>
-                                            {' '}
-                                            <Button color="primary" size="sm" onClick={()=>{
-                                                history.push('/admin/products')
-                                            }}>Return to Products</Button>
                                         </div>
                                     </Row>
                                     { err &&<Alert color="danger">{error}</Alert> }
                                     { successful &&<Alert color="success">{successMsg}</Alert> }
+                                    <Row>
+                                        <Col md="12">
+                                            <div className="form-add">
+                                                <Button onClick={() => {
+                                                    history.push('/admin/products')
+                                                }}> back
+                                                </Button>
+                                            </div>
+                                        </Col>
+                                    </Row>
                                 </form>
                             </CardBody>
                         </Card>
