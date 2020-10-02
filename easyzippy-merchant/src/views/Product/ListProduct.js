@@ -26,7 +26,36 @@ function ListProduct() {
     const [modal, setModal] = useState(false)
     const [inModal, isInModal] = useState(false)
 
+    const[name, setName] = useState([])
+
+    const[data, setData] = useState([])
+
+    const createProduct = e => {
+        e.preventDefault()
+        axios.post("/product", {
+            name:name
+        }, 
+        {
+            headers: {
+                AuthToken: authToken
+            }
+        }).then(res=> {
+            console.log("axios call went through")
+            isError(false)
+            isSuccessful(true)
+            setMsg("Category successfully added!")
+        }).catch(function(error) {
+            isSuccessful(false)
+            isError(true)
+            setError(error.response.data)
+            console.log(error.response.data)
+        })
+    }
+
     return(
+
+
+
         <>
             <div className="content">
                 <Row>
@@ -60,7 +89,17 @@ function ListProduct() {
                                             />
                                     </FormGroup>
                                     <div className="form-row">
-                                        <FormGroup className="col-md-6">
+                                        <FormGroup className="col-md-4">
+                                            <Label for="inputUnitPrice">Price</Label>
+                                            <Input
+                                                type="text"
+                                                id="inputUnitPrice"
+                                                placeholder="Price"
+                                                //value={unitPrice}
+                                                //onChange={onChangeUnitPrice}
+                                                />
+                                        </FormGroup>
+                                        <FormGroup className="col-md-4">
                                             <Label for="inputCategory">Category</Label>
                                             <Input
                                                 type="select"
@@ -71,7 +110,7 @@ function ListProduct() {
                                                 <option>get list of category</option>
                                             </Input>
                                         </FormGroup>
-                                        <FormGroup className="col-md-6">
+                                        <FormGroup className="col-md-4">
                                             <Label for="inputQuantityAvailable">Quantity Available</Label>
                                             <Input
                                                 type="text"
@@ -99,11 +138,11 @@ function ListProduct() {
                                     </div>
                                     <Row>
                                         <div className="update ml-auto mr-auto" >
-                                            <Button color="success" size="sm" type="submit" onClick={()=>{}}>List Product</Button>
+                                            <Button color="success" size="sm" type="submit" onClick={createProduct}>List Product</Button>
                                             {' '}
                                             <Button color="primary" size="sm" onClick={()=>{
                                                 history.push('/admin/products')
-                                            }}>Return to Products Page</Button>
+                                            }}>Return to Products</Button>
                                         </div>
                                     </Row>
                                     { !inModal && err &&<Alert color="danger">{error}</Alert> }
