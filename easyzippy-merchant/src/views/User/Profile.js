@@ -37,6 +37,7 @@ function Profile() {
 
     const [currentPw, setCurrentPw] = useState('')
     const [newPw, setNewPw] = useState('')
+    const [newCfmPw, setNewCfmPw] = useState('')
 
     const [error, setError] = useState('')
     const [err, isError] = useState(false)
@@ -115,13 +116,43 @@ function Profile() {
 
     const onChangeNewPassword = e => {
         const newPw = e.target.value;
+
+        var reg = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})")
+        if (reg.test(newPw)) { //if valid
+            isError(false)
+            isSuccessful(false)
+        } else {
+            isInModal(true)
+            setError("Password is not strong enough (Have at least 1 Uppercase, 1 Lowercase, 1 Number and 1 Special Character)")
+            isError(true)
+            isSuccessful(false)
+        }
+
         setNewPw(newPw.trim())
     }
 
+    const onChangeNewCfmPassword = e => {
+        const newCfmPw = e.target.value;
+        setNewCfmPw(newCfmPw.trim())
+    }
 
     const updatePassword = e => {
         e.preventDefault()
         console.log("inside update password")
+
+        if (newPw !== newCfmPw) {
+            isInModal(true)
+            setError("New passwords need to match!")
+            isError(true)
+            return;
+        }
+
+        if (newPw === currentPw) {
+            isInModal(true)
+            setError("Your old and new passwords are the same")
+            isError(true)
+            return;
+        }
 
         axios.put(`/merchant/${merchantid}/changePassword`, {
             currentPassword: currentPw,
@@ -137,6 +168,9 @@ function Profile() {
             isError(false)
             isSuccessful(true)
             setMsg("Password successfully updated!")
+            setCurrentPw('')
+            setNewCfmPw('')
+            setNewPw('')
         }).catch(function (error) {
             console.log(error.response.data)
             isInModal(true)
@@ -151,6 +185,7 @@ function Profile() {
         console.log("inside reset form")
         setCurrentPw('')
         setNewPw('')
+        setNewCfmPw('')
     }
 
     return(
@@ -229,6 +264,16 @@ function Profile() {
                                                 placeholder="Enter new password" 
                                                 value={newPw}
                                                 onChange={onChangeNewPassword}
+                                                />
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for="inputNewConfirmPassword">Re-enter new password</Label>
+                                            <Input 
+                                                type="password" 
+                                                id="inputNewConfirmPassword" 
+                                                placeholder="Re-enter new password" 
+                                                value={newCfmPw}
+                                                onChange={onChangeNewCfmPassword}
                                                 />
                                         </FormGroup>
                                         { inModal && err &&<Alert color="danger">{error}</Alert> }
