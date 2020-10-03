@@ -356,27 +356,18 @@ function ProductDetails() {
                                             </div> 
                                         </Row>
                                         <Row>
-                                            <div className="update ml-auto mr-auto" >
-                                                <Button color="success" size="sm" type="submit" onClick={updateProduct}>Update Product</Button>
-                                                {' '}
-                                                <Button color="primary" size="sm" onClick={()=>{
-                                                    history.push('/admin/products')
-                                                    localStorage.removeItem('productToView')
-                                                }}>Return to Products</Button>
-                                            </div>
-                                        </Row>
-                                        { err &&<Alert color="danger">{error}</Alert> }
-                                        { successful &&<Alert color="success">{successMsg}</Alert> }
-                                        <Row>
                                             <Col md="12">
                                                 <div className="form-add">
                                                     <Button onClick={() => {
                                                         history.push('/admin/products')
+                                                        localStorage.removeItem('productToView')
                                                     }}> back
                                                     </Button>
                                                 </div>
                                             </Col>
                                         </Row>
+                                        { err &&<Alert color="danger">{error}</Alert> }
+                                        { successful &&<Alert color="success">{successMsg}</Alert> }
                                     </form>
                                 </CardBody>
                             </Card>
