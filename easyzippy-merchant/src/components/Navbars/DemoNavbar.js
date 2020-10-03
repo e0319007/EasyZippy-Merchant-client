@@ -21,6 +21,7 @@ import {
 
 import routes from "routes.js";
 import { Card } from "@material-ui/core";
+import { maxWidth } from "@material-ui/system";
 
 class Header extends React.Component {
   constructor(props) {
@@ -308,7 +309,7 @@ class Header extends React.Component {
                   <DropdownItem header>Notifications</DropdownItem>
                   {this.state.notifications.map(notification => 
                     <div key={notification.id}>
-                      <DropdownItem style={{backgroundColor: 'transparent'}}>                          
+                      <DropdownItem style={{backgroundColor: 'transparent', flexGrow:'inherit', whiteSpace:'pre-wrap', width:'20rem'}}>                          
                           <p style={{fontWeight:'bold', color:'grey'}}>{notification.title}</p> 
                           <br></br>
                           <small style={{color:'grey'}}>{this.formatDate(notification.sentTime)}</small>
@@ -328,11 +329,17 @@ class Header extends React.Component {
                     <i className="nc-icon nc-chat-33" />
                   </Badge>
                 </DropdownToggle>
-                <DropdownMenu right className="pre-scrollable">
-                  <DropdownItem header>Announcements</DropdownItem>
+                <DropdownMenu right className="pre-scrollable"
+                  // modifiers={{
+                  //   preventOverflow:true,
+                  //   overflow:'auto',
+                  //   maxWidth:'20rem'
+                  // }}
+                >
+                  <DropdownItem header >Announcements</DropdownItem>
                   {this.state.announcements.map(announcement => 
                     <div key={announcement.id}>
-                      <DropdownItem style={{backgroundColor: 'transparent'}}> 
+                      <DropdownItem style={{backgroundColor: 'transparent', flexGrow:'inherit', whiteSpace:'pre-wrap', width:'20rem'}}> 
                         <div>
                           <p style={{fontWeight:'bold', color:'grey'}}>{announcement.title}</p>
                           {/* <p style={{fontWeight:'bold'}}>{announcement.title}</p> */}
