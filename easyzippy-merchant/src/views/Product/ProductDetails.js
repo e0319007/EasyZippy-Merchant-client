@@ -32,15 +32,17 @@ function ProductDetails() {
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
     console.log(authToken)
 
-    const productId = JSON.parse(localStorage.getItem('productToView'))
+    const product = JSON.parse(localStorage.getItem('productToView'))
 
     const [data, setData] = useState([])
 
-    const [name, setName] = useState('')
-    const [description, setDescription] = useState('')
-    const [unitPrice, setUnitPrice] = useState('')
-    const [category, setCategory] = useState('')
-    const [quantityAvailable, setQuantityAvailable] = useState('')
+    const id = product.id
+    const image = product.image
+    const [name, setName] = useState(product.name)
+    const [description, setDescription] = useState(product.description)
+    const [unitPrice, setUnitPrice] = useState(parseInt(product.unitPrice))
+    const [category, setCategory] = useState(product.category)
+    const [quantityAvailable, setQuantityAvailable] = useState(product.quantityAvailable)
 
     const [error, setError] = useState('')
     const [err, isError] = useState(false)
@@ -48,21 +50,11 @@ function ProductDetails() {
     const [successful, isSuccessful] = useState(false)
     const [successMsg, setMsg] = useState('')
 
-    const product_toupdate = {
-        name: '',
-        description: '',
-        unitPrice: '',
-        category: '',
-        quantityAvailable:''
-    }
-
-    const [pdf, setPdf] = useState([])
-
     const [categories, setCategories] = useState([])
 
     useEffect(() => {
         console.log("axios use effect")
-        axios.get(`/product/${productId}`, 
+        axios.get(`/product/${product.id}`, 
         {
             headers: {
                 AuthToken: authToken
@@ -70,17 +62,18 @@ function ProductDetails() {
         }).then(res => {
             setData(res.data); 
             
-            axios.get(`/assets/${res.data.images}`,{
-                responseType: 'arraybuffer'
+            axios.get(`/assets/${res.data.images[0]}`,{
+                responseType: 'blob'
             }, {
                 headers: {
                     AuthToken: authToken,
                     'Content-type': 'application/json'
                 }
             }).then(res => {
-                var blob = new Blob([res.data], {type: "application/pdf;charset=utf-8"});
-                //var blob = new Blob([res.data], {type: "image/png"});
-                setPdf(blob)
+                console.log("axios images thru: " + res.data)
+                var file = new File([res.data], {type:"image/png"})
+                let image = URL.createObjectURL(file)
+                
             }).catch(function(error) {
                 console.log(error.response.data)
             })
@@ -98,9 +91,93 @@ function ProductDetails() {
         }).catch(err => console.error(err))
     },[])
 
+    let enabled = !data.archived
+    console.log("Enabled: " + enabled)
+
+    const handleChange = (event) => {
+        console.log("event.target.checked: " + event.target.checked)
+        setData({
+            ...data,
+            archived: !event.target.checked
+        })
+        axios.put(`/product/archive/${product.id}`, {
+            archived: !event.target.checked
+        },
+        {
+            headers: {
+                AuthToken: authToken
+            }
+        }).then(res => {
+            console.log("axios call went through")
+        }).catch (function(error) {
+            console.log(error.response.data)
+        })
+    };
+
     const onChangeName = e => {
         const name = e.target.value;
-        setName(name.trim())
+        setName(name)
+    }
+    
+    const onChangeUnitPrice = e => {
+        const unitPrice = e.target.value;
+        setUnitPrice(unitPrice)
+    }
+
+    const onChangeCategory = e => {
+        const category = e.target.value;
+        setCategory(category)
+        if (category.trim().length == 0) {
+            setError("Category is a required field")
+            isError(true)
+        } else {
+            isError(false)
+        }
+    }
+
+    const onChangeQuantityAvailable = e => {
+        const quantityAvailable = e.target.value;
+        setQuantityAvailable(quantityAvailable)
+    }
+
+    const onChangeDescription = e => {
+        const description = e.target.value;
+        setDescription(description)
+    }
+
+    const updateProduct = e => {
+        axios.put(`/product/${product.id}`, {
+            headers: {
+                AuthToken: authToken,
+                'Content-Type': 'application/json'
+            }
+        }).then(res => {
+            console.log("axios call for update product went through")
+
+            for (var i in categories) {
+                if (res.data.categoryId === categories[i].id) {
+                    setCategory(categories[i].name)
+                    break;
+                }
+            }
+
+            const newProduct = {
+                id: res.data.id,
+                name: res.data.name,
+                unitPrice: res.data.unitPrice,
+                image: image,
+                category: category,
+                archived: res.data.archived,
+                description: res.data.description,
+                quantityAvailable: res.data.quantityAvailable
+            }
+            console.log("new product: " + newProduct)
+
+            localStorage.setItem('productToView', JSON.stringify(newProduct))
+
+        }).catch (function(error) {
+            console.log(error.response.data)
+        })
     }
 
     const DisableSwitch = withStyles((theme) => ({
@@ -137,61 +214,28 @@ function ProductDetails() {
         checked: {},
         }))(Switch);
     
-        let enabled = !data.archived
-        console.log("Enabled: " + enabled)
-    
-        const handleChange = (event) => {
-            console.log("event.target.checked: " + event.target.checked)
-            setData({
-                ...data,
-                archived: !event.target.checked
-            })
-            axios.put(`/product/archive/${productId}`, {
-                archived: !event.target.checked
-            },
-            {
-                headers: {
-                    AuthToken: authToken
-                }
-            }).then(res => {
-                console.log("axios call went through")
-            }).catch (function(error) {
-                console.log(error.response.data)
-            })
-        };
+    function formatDate(d) {
+        if (d === undefined){
+            d = (new Date()).toISOString()
+            console.log(undefined)
+        }
+        let currDate = new Date(d);
+        console.log("currDate: " + currDate)
+        let year = currDate.getFullYear();
+        let month = currDate.getMonth() + 1;
+        let dt = currDate.getDate();
+        let time = currDate.toLocaleTimeString('en-SG')
 
-        function formatDate(d) {
-            if (d === undefined){
-                d = (new Date()).toISOString()
-                console.log(undefined)
-            }
-            let currDate = new Date(d);
-            console.log("currDate: " + currDate)
-            let year = currDate.getFullYear();
-            let month = currDate.getMonth() + 1;
-            let dt = currDate.getDate();
-            let time = currDate.toLocaleTimeString('en-SG')
-    
-            if (dt < 10) {
-                dt = '0' + dt;
-            }
-            if (month < 10) {
-                month = '0' + month;
-            }
-    
-            return dt + "/" + month + "/" + year + " " + time ;
+        if (dt < 10) {
+            dt = '0' + dt;
+        }
+        if (month < 10) {
+            month = '0' + month;
         }
 
-        const onChangeCategory = e => {
-            const category = e.target.value;
-            setCategory(category.trim())
-            if (category.trim().length == 0) {
-                setError("Category is a required field")
-                isError(true)
-            } else {
-                isError(false)
-            }
-        }
+        return dt + "/" + month + "/" + year + " " + time ;
+    }
+    
 
     return(
         <>
@@ -217,8 +261,7 @@ function ProductDetails() {
                                                     type="text"
                                                     id="inputId"
                                                     placeholder="id number here"
-                                                    value={data.id}
-                                                    //onChange={}
+                                                    value={id}
                                                 />
                                             </FormGroup>
                                         </fieldset>
@@ -229,7 +272,7 @@ function ProductDetails() {
                                                     type="text"
                                                     id="inputName"
                                                     placeholder="name here"
-                                                    value={data.name}
+                                                    value={name}
                                                     onChange={onChangeName}
                                                 />
                                             </FormGroup>
@@ -239,8 +282,8 @@ function ProductDetails() {
                                                     type="textarea"
                                                     id="inputDescription"
                                                     placeholder="description here"
-                                                    value={data.description}
-                                                    //onChange={}
+                                                    value={description}
+                                                    onChange={onChangeDescription}
                                                 />
                                             </FormGroup>
                                             <FormGroup>
@@ -249,8 +292,8 @@ function ProductDetails() {
                                                     type="text" 
                                                     id="inputPrice" 
                                                     placeholder="Price" 
-                                                    value={data.unitPrice} 
-                                                    //onChange={}                                                   
+                                                    value={unitPrice} 
+                                                    onChange={onChangeUnitPrice}                                                   
                                                     />
                                             </FormGroup>   
                                             <FormGroup>
@@ -259,7 +302,7 @@ function ProductDetails() {
                                                     type="select" 
                                                     id="inputCategory" 
                                                     placeholder="Category" 
-                                                    value={data.category}  
+                                                    value={category}  
                                                     onChange={onChangeCategory}                                                  
                                                 >
                                                     {
@@ -275,8 +318,8 @@ function ProductDetails() {
                                                     type="text" 
                                                     id="inputQuantityAvailable" 
                                                     placeholder="Quantity Available" 
-                                                    value={data.quantityAvailable}  
-                                                    //onChange={}                                                  
+                                                    value={quantityAvailable}  
+                                                    onChange={onChangeQuantityAvailable}                                                  
                                                     />
                                             </FormGroup>                   
                                         </fieldset>
@@ -306,10 +349,11 @@ function ProductDetails() {
                                         </Row>
                                         <Row>
                                             <div className="update ml-auto mr-auto" >
-                                                <Button color="success" size="sm" type="submit" onClick={()=>{}}>Update Product</Button>
+                                                <Button color="success" size="sm" type="submit" onClick={updateProduct}>Update Product</Button>
                                                 {' '}
                                                 <Button color="primary" size="sm" onClick={()=>{
                                                     history.push('/admin/products')
+                                                    localStorage.remove('productToView')
                                                 }}>Return to Products</Button>
                                             </div>
                                         </Row>
