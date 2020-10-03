@@ -107,9 +107,20 @@ function Products() {
                         }
                     }
 
-                    const p = {id: productArr[index].id, name: productArr[index].name, unitPrice: productArr[index].unitPrice, 
-                        image: image, category: category, archived: productArr[index].archived, description: productArr[index].description,
-                        quantityAvailable: productArr[index].quantityAvailable}
+                    const p = {
+                        id: productArr[index].id, 
+                        name: productArr[index].name, 
+                        unitPrice: productArr[index].unitPrice, 
+                        image: image, 
+                        disabled: productArr[index].disabled,
+                        imageurl: [productArr[index].images[0]],
+                        categoryId: productArr[index].categoryId, 
+                        category: category, 
+                        archived: productArr[index].archived,
+                        description: productArr[index].description,
+                        quantityAvailable: productArr[index].quantityAvailable, 
+                        merchantId: productArr[index].merchantId
+                    }
 
                     setNewProdArr(newProdArr => [...newProdArr, p])
                     tempProdArr.push(p)

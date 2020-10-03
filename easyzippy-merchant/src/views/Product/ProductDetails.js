@@ -38,11 +38,14 @@ function ProductDetails() {
 
     const id = product.id
     const image = product.image
+    const imageurl = product.imageurl //supposedly alr an array
+    const merchantId = product.merchantId
     const [name, setName] = useState(product.name)
     const [description, setDescription] = useState(product.description)
     const [unitPrice, setUnitPrice] = useState(parseInt(product.unitPrice))
     const [category, setCategory] = useState(product.category)
     const [quantityAvailable, setQuantityAvailable] = useState(product.quantityAvailable)
+    const [disabled, setDisabled] = useState('')
 
     const [error, setError] = useState('')
     const [err, isError] = useState(false)
@@ -60,23 +63,8 @@ function ProductDetails() {
                 AuthToken: authToken
             }
         }).then(res => {
-            setData(res.data); 
-            
-            axios.get(`/assets/${res.data.images[0]}`,{
-                responseType: 'blob'
-            }, {
-                headers: {
-                    AuthToken: authToken,
-                    'Content-type': 'application/json'
-                }
-            }).then(res => {
-                console.log("axios images thru: " + res.data)
-                var file = new File([res.data], {type:"image/png"})
-                let image = URL.createObjectURL(file)
-                
-            }).catch(function(error) {
-                console.log(error.response.data)
-            })
+            setData(res.data)
+            setDisabled(res.data.disabled)
         }).catch (function(error) {
             console.log(error.response.data)
         })
@@ -96,12 +84,10 @@ function ProductDetails() {
 
     const handleChange = (event) => {
         console.log("event.target.checked: " + event.target.checked)
-        setData({
-            ...data,
-            archived: !event.target.checked
-        })
-        axios.put(`/product/archive/${product.id}`, {
-            archived: !event.target.checked
+        setDisabled(!event.target.checked)
+
+        axios.put(`/product/toggleDisable/${product.id}`, {
+            disabled: !event.target.checked
         },
         {
             headers: {
@@ -146,10 +132,28 @@ function ProductDetails() {
     }
 
     const updateProduct = e => {
-        axios.put(`/product/${product.id}`, {
+        e.preventDefault()
+
+        let categoryId = ''
+
+        for (var j in categories) {
+            if (categories[j].name === category) {
+                categoryId = categories[j].id
+            }
+        }
+
+        axios.put(`/product/${product.id}`, 
+        {
+            name: name,
+            unitPrice: unitPrice,
+            description: description,
+            quantityAvailable: quantityAvailable,
+            images: imageurl, 
+            categoryId: categoryId,
+            merchantId: merchantId
+        },{
             headers: {
                 AuthToken: authToken,
-                'Content-Type': 'application/json'
             }
         }).then(res => {
             console.log("axios call for update product went through")
@@ -166,10 +170,14 @@ function ProductDetails() {
                 name: res.data.name,
                 unitPrice: res.data.unitPrice,
                 image: image,
+                imageurl: imageurl,
+                categoryId: res.data.categoryId,
                 category: category,
+                disabled: disabled,
                 archived: res.data.archived,
                 description: res.data.description,
-                quantityAvailable: res.data.quantityAvailable
+                quantityAvailable: res.data.quantityAvailable,
+                merchantId: res.data.merchantId
             }
             console.log("new product: " + newProduct)
 
@@ -252,7 +260,7 @@ function ProductDetails() {
                                 <CardBody>
                                     <form>
                                         <div className="text-center" >
-                                            <CardImg style={{width:"20rem"}} top src="../../easyzippylogo.jpg" alt="..."/>
+                                            <CardImg style={{width:"20rem"}} top src={image} alt="..."/>
                                         </div>
                                         <fieldset disabled>  
                                             <FormGroup>
@@ -353,7 +361,7 @@ function ProductDetails() {
                                                 {' '}
                                                 <Button color="primary" size="sm" onClick={()=>{
                                                     history.push('/admin/products')
-                                                    localStorage.remove('productToView')
+                                                    localStorage.removeItem('productToView')
                                                 }}>Return to Products</Button>
                                             </div>
                                         </Row>
