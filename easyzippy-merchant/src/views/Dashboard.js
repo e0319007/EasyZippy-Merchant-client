@@ -20,13 +20,15 @@ import {
 function Dashboard() {
 
   const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
+  
+  const merchantId = (JSON.parse(Cookies.get('merchantUser'))).toString()
 
   const [productsLength, setProductsLength] = useState('')
 
   useEffect(() => {
 
     //GET PRODUCTS
-    axios.get('/products', {
+    axios.get(`/merchantProducts/${merchantId}`, {
       headers: {
         AuthToken: authToken
       }
