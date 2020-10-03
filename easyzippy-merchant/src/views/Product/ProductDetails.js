@@ -344,6 +344,14 @@ function ProductDetails() {
                                         </fieldset>
                                         <Row>
                                             <div className="update ml-auto mr-auto" >
+                                                <Button color="success" size="sm" type="submit" onClick={updateProduct}>Update Product</Button>
+                                            </div>
+                                        </Row>
+                                        <Row>
+                                            <p></p>
+                                        </Row>
+                                        <Row>
+                                            <div className="update ml-auto mr-auto" >
                                                 <Typography component="div">
                                                     <Grid component="label" container alignItems="center" spacing={1}>
                                                     <Grid item>Disabled</Grid>
@@ -355,6 +363,8 @@ function ProductDetails() {
                                                 </Typography>
                                             </div> 
                                         </Row>
+                                        { err &&<Alert color="danger">{error}</Alert> }
+                                        { successful &&<Alert color="success">{successMsg}</Alert> }
                                         <Row>
                                             <Col md="12">
                                                 <div className="form-add">
@@ -366,8 +376,6 @@ function ProductDetails() {
                                                 </div>
                                             </Col>
                                         </Row>
-                                        { err &&<Alert color="danger">{error}</Alert> }
-                                        { successful &&<Alert color="success">{successMsg}</Alert> }
                                     </form>
                                 </CardBody>
                             </Card>
