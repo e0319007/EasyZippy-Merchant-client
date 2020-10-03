@@ -182,6 +182,9 @@ function ProductDetails() {
             console.log("new product: " + newProduct)
 
             localStorage.setItem('productToView', JSON.stringify(newProduct))
+            isError(false)
+            isSuccessful(true)
+            setMsg("Product updated successfully!")
 
         }).catch (function(error) {
             console.log(error.response.data)

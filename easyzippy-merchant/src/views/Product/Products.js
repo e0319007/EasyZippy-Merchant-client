@@ -182,8 +182,7 @@ function Products() {
                             <CardHeader>
                                 <div className="form-row">
                                     <CardTitle className="col-md-10" tag="h5">Products</CardTitle>
-                                    {/* <MDBCol md="6"> */}
-                                        <form className="form-inline mt-4 mb-4">
+                                        <FormGroup className="form-inline mt-4 mb-4 col-md-6">
                                             <MDBIcon icon="search" />
                                             <input 
                                             className="form-control form-control-sm ml-3 w-75" 
@@ -192,7 +191,7 @@ function Products() {
                                             value={searchTerm}
                                             onChange={handleSearchChange}
                                             aria-label="Search" />
-                                        </form>
+                                        </FormGroup>
                                         <Col md="1" sm="1" xs="3">
                                             <p className="category">Sort by Price</p>
                                             <Button className="btn-icon btn-neutral" onClick={sortByPrice}>
@@ -201,11 +200,16 @@ function Products() {
                                         </Col>
                                     {/* </MDBCol> */}   
                                     &nbsp;&nbsp;&nbsp;
-                                    <Button class="float-right" color="info" onClick={() => {
-                                        history.push('/admin/listProduct')
-                                    }}> <i className="nc-icon nc-simple-add"/> {''}
-                                        List a Product
-                                    </Button>
+                                    <FormGroup className="col-md-4">
+                                        <div className="update ml-auto mr-auto" >
+                                            <Button color="info" size="sm" onClick={() => {
+                                                history.push('/admin/listProduct')
+                                            }}> <i className="nc-icon nc-simple-add"/> {''}
+                                                List a Product
+                                            </Button>
+                                        </div>
+
+                                    </FormGroup>
                                 </div>
                             </CardHeader>
                             <CardBody>
@@ -213,11 +217,12 @@ function Products() {
                                         {
                                             searchResults.map(prod => (
                                                 <Card style={{width: '22rem', margin:'0.45rem'}} className="text-center" key={prod.id} >
-                                                    <CardImg top src={prod.image}/>
+                                                    <CardImg style={{height:'25rem'}} top src={prod.image}/>
                                                     {/* <CardImg top src="../../easyzippylogo.jpg"/> */}
                                                     <CardBody>
                                                         <CardTitle className="h6">{prod.name}</CardTitle>
                                                         <CardText>${prod.unitPrice}</CardText>
+                                                        <CardText>Category: {prod.category}</CardText>
                                                         <CardText>{prod.archived}</CardText>
                                                         {/* product details page */}
                                                         <Button color="primary" onClick={() => {
