@@ -29,6 +29,8 @@ function Products() {
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
     console.log(authToken)
 
+    const merchantId = (JSON.parse(Cookies.get('merchantUser'))).toString()
+
     //const product = JSON.parse(localStorage.getItem('currentProduct'))
 
     //const [name, setName] = useState(product.name)
@@ -61,7 +63,7 @@ function Products() {
 
     useEffect(() => {
         //retrieving all products
-        axios.get('/products', {
+        axios.get(`/merchantProducts/${merchantId}`, {
             headers: {
                 AuthToken: authToken
             }

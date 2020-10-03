@@ -6,7 +6,7 @@ import Bookings from "views/Booking/Bookings";
 import Products from "views/Product/Products";
 import Credits from "views/Payment/Credits";
 import Orders from "views/Order/Orders";
-import TestProducts from "views/Product/TestProducts"
+//import TestProducts from "views/Product/TestProducts"
 import ListProduct from "views/Product/ListProduct";
 import ProductDetails from "./views/Product/ProductDetails";
 
@@ -55,13 +55,13 @@ var routes = [
     layout: "/admin",
     invisible: true
   },
-  {
-    path: "/testProducts",
-    name: "Test Products",
-    icon: "nc-icon nc-shop",
-    component: TestProducts,
-    layout: "/admin"
-  },
+  // {
+  //   path: "/testProducts",
+  //   name: "Test Products",
+  //   icon: "nc-icon nc-shop",
+  //   component: TestProducts,
+  //   layout: "/admin"
+  // },
   {
     path: "/bookings",
     name: "Bookings",
