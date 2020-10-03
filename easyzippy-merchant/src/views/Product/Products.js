@@ -50,6 +50,7 @@ function Products() {
     //for delete confirmation
     const [modal, setModal] = useState(false)
     const toggleModal = id => {
+        console.log(id)
         localStorage.setItem('productId', id)
         setModal(!modal);
     }
@@ -57,9 +58,6 @@ function Products() {
     let productArr = []
     let tempProdArr = []
     let tempCat = []
-
-    //not sure why need this but okay
-    const productId = JSON.parse(localStorage.getItem('productToView'))
 
     useEffect(() => {
         //retrieving all products
@@ -150,15 +148,20 @@ function Products() {
     const deleteProduct = e => {
         e.preventDefault()
 
-        axios.put(`/deleteProduct/${productId}`, {
+        const productId = localStorage.getItem('productId')
+
+        axios.put(`/deleteProduct/${productId}`, 
+        {
+            id: productId
+        },
+        {
             headers: {
                 AuthToken: authToken
             }
         }).then(res => {
             //later see
             console.log("axios delete product went through")
-            const allProducts = products.filter(item => item.productId !== productId)
-            setProducts(allProducts)
+            window.location.reload()
         }).catch(function (error) {
             console.log(error.response.data)
         })

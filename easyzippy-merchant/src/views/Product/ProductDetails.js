@@ -65,6 +65,7 @@ function ProductDetails() {
         }).then(res => {
             setData(res.data)
             setDisabled(res.data.disabled)
+            console.log("fetch disabled: " + res.data.disabled)
         }).catch (function(error) {
             console.log(error.response.data)
         })
@@ -79,7 +80,7 @@ function ProductDetails() {
         }).catch(err => console.error(err))
     },[])
 
-    let enabled = !data.archived
+    let enabled = !data.disabled
     console.log("Enabled: " + enabled)
 
     const handleChange = (event) => {
@@ -94,7 +95,7 @@ function ProductDetails() {
                 AuthToken: authToken
             }
         }).then(res => {
-            console.log("axios call went through")
+            console.log("axios call to toggle disable went through")
         }).catch (function(error) {
             console.log(error.response.data)
         })
@@ -359,7 +360,7 @@ function ProductDetails() {
                                                     <Grid component="label" container alignItems="center" spacing={1}>
                                                     <Grid item>Disabled</Grid>
                                                     <Grid item>
-                                                        <DisableSwitch checked={!data.archived} onChange={handleChange} name="checked" />
+                                                        <DisableSwitch checked={!disabled} onChange={handleChange} name="checked" />
                                                     </Grid>
                                                     <Grid item>Enabled</Grid>
                                                     </Grid>
