@@ -68,6 +68,9 @@ function FileUpload() {
     }
 
     const redirect = () => {
+        Cookies.remove('authToken')
+        Cookies.remove('merchantUser')
+        localStorage.clear()
         history.push('/login')
     }
 

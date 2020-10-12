@@ -75,7 +75,6 @@ function ListProduct() {
 
     const onChangeUnitPrice = e => {
         const unitPrice = e.target.value;
-        setUnitPrice(unitPrice.trim())
         if (unitPrice.trim().length === 0) {
             setError("Price is a required field")
             isError(true)
@@ -83,8 +82,15 @@ function ListProduct() {
             setError("Please enter the price without a '$' sign")
             isError(true)
         } else {
-            isError(false)
-        }
+            var nums = /^\d+(,\d{3})*(\.\d{1,2})?$/gm
+            if (!unitPrice.match(nums)) { //if not all numbers
+                setError("Please enter a valid price")
+                isError(true)
+            } else {
+                isError(false)
+            }
+        } 
+        setUnitPrice(unitPrice.trim())
     }
 
     const onChangeCategory = e => {
