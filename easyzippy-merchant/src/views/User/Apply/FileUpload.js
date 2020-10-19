@@ -32,8 +32,10 @@ function FileUpload() {
 
     // FILE UPLOAD
     const onChange = e => {
-        setFile(e.target.files[0]);
-        setFilename(e.target.files[0].name);
+        if (e.target.files[0] !== undefined) {
+            setFile(e.target.files[0]);
+            setFilename(e.target.files[0].name);
+        } 
     };
     
     const fileUpload = e => {

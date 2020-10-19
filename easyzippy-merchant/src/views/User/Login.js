@@ -74,54 +74,62 @@ function Login() {
             setError("Email field is required")
             return;
         }
-        // let arr = fullUnitNum.split('-')
-
-        // console.log("arr0: " + arr[0])
-        // console.log("arr1: " + arr[1])
-
-        // const fl = arr[0]
-        // const un = arr[1]
-
-        axios.post('/merchant/login', {
+        
+        // check if tenancy agreement for merchant has been uploaded
+        axios.post(`/merchant/email`, {
             email: email,
-            password: password
-        })
-        .then(response => {
-            console.log("axios call went through")
-            isError(false)
-            history.push('/admin/dashboard')
-            document.location.reload()
-            console.log(response.data.token)
-            Cookies.set('authToken', JSON.stringify(response.data.token));
-            Cookies.set('merchantUser', JSON.stringify(response.data.merchant.id));
-
-            merchant.name = response.data.merchant.name
-            merchant.mobileNum = response.data.merchant.mobileNumber
-            merchant.email = response.data.merchant.email
-            merchant.pointOfContact = response.data.merchant.pointOfContact
-            merchant.blk = response.data.merchant.blk
-            merchant.street = response.data.merchant.street
-            //merchant.fullUnitNum = response.data.merchant.fullUnitNum
-            merchant.floor = response.data.merchant.floor
-            merchant.unitNumber = response.data.merchant.unitNumber
-            merchant.postalCode = response.data.merchant.postalCode
-
-            console.log(merchant)
-
-            localStorage.setItem('currentMerchant', JSON.stringify(merchant))
-
-        }).catch(function (error) {
-            isError(true)
-            if (error.response.data === "Merchant is not approved") {
-                setError("Account not activated")
+        }).then(res => {
+            //if no tenancy agreement, redirect to file upload page
+            if (res.data.tenancyAgreement === null) {
+                Cookies.set('merchantUser', JSON.stringify(res.data.id));
+                history.push('/fileUpload')
             } else {
-                setError(error.response.data)
+                axios.post('/merchant/login', {
+                    email: email,
+                    password: password
+                })
+                .then(response => {
+                    console.log("axios call went through")
+                    isError(false)
+                    history.push('/admin/dashboard')
+                    document.location.reload()
+                    console.log(response.data.token)
+                    Cookies.set('authToken', JSON.stringify(response.data.token));
+                    Cookies.set('merchantUser', JSON.stringify(response.data.merchant.id));
+        
+                    merchant.name = response.data.merchant.name
+                    merchant.mobileNum = response.data.merchant.mobileNumber
+                    merchant.email = response.data.merchant.email
+                    merchant.pointOfContact = response.data.merchant.pointOfContact
+                    merchant.blk = response.data.merchant.blk
+                    merchant.street = response.data.merchant.street
+                    //merchant.fullUnitNum = response.data.merchant.fullUnitNum
+                    merchant.floor = response.data.merchant.floor
+                    merchant.unitNumber = response.data.merchant.unitNumber
+                    merchant.postalCode = response.data.merchant.postalCode
+        
+                    console.log(merchant)
+        
+                    localStorage.setItem('currentMerchant', JSON.stringify(merchant))
+        
+                }).catch(function (error) {
+                    isError(true)
+                    if (error.response.data === "Merchant is not approved") {
+                        setError("Account not activated")
+                    } else {
+                        setError(error.response.data)
+                    }
+                    console.log(error.response.data)
+                    // check below line again,, ideally dont want to refresh, want to show error caught from backend
+                    history.push('/login') 
+                    //add customised alerts according to errors
+                })
             }
-            console.log(error.response.data)
-            // check below line again,, ideally dont want to refresh, want to show error caught from backend
-            history.push('/login') 
-            //add customised alerts according to errors
+        }).catch (function(error) {
+
         })
+
+
     };
 
 

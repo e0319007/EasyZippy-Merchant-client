@@ -181,7 +181,7 @@ function ProductDetails() {
                 merchantId: res.data.merchantId
             }
             console.log("new product: " + newProduct)
-
+            console.log("new product id: " + newProduct.id)
             localStorage.setItem('productToView', JSON.stringify(newProduct))
             isError(false)
             isSuccessful(true)

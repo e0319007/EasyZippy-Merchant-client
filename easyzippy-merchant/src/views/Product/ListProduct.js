@@ -133,8 +133,10 @@ function ListProduct() {
     }
 
     const onChangeImages = e => {
-        setImages(e.target.files[0])
-        setImageName(e.target.files[0].name)
+        if (e.target.files[0] !== undefined) {
+            setImages(e.target.files[0])
+            setImageName(e.target.files[0].name)
+        }
     }
 
     const createProduct = e => {
