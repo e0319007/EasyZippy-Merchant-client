@@ -36,7 +36,7 @@ function ListProduct() {
     const [category, setCategory] = useState('')
     const [quantityAvailable, setQuantityAvailable] = useState('')
     const [images, setImages] = useState([])
-    const [imageName, setImageName] = useState('Choose Image');
+    const [imageName, setImageName] = useState([]);
 
     const [categoryId, setCategoryId] = useState('')
 
@@ -134,8 +134,16 @@ function ListProduct() {
 
     const onChangeImages = e => {
         if (e.target.files[0] !== undefined) {
-            setImages(e.target.files[0])
-            setImageName(e.target.files[0].name)
+            setImages(e.target.files)
+            let filenames = []
+            for (var i in e.target.files) {
+                filenames.push(e.target.files[i].name)
+                console.log(e.target.files[i].name)
+            }
+            //popping last 2 elements cos idk why they add random stuff behind
+            filenames.pop();
+            filenames.pop();
+            setImageName(filenames)
         }
     }
 
@@ -153,8 +161,16 @@ function ListProduct() {
 
         console.log("image uploading..")
         let formData = new FormData();
-        formData.append('images', images)
+        for (var image in images) {
+            formData.append(images[image].name, images[image])
+        }
+        // formData.append('images', images)
+        console.log(images[0])
         console.log('****' + formData.has('images'))
+        console.log('form data values: ')
+        for (var v of formData.values()) {
+            console.log(v)
+        }
 
         axios.post(`/product/addImage`, formData,
         {
@@ -169,9 +185,15 @@ function ListProduct() {
         
             let arr = []
             console.log("first: " + res.data[0])
+            console.log("second: " + res.data[1])
             console.log("typeof: " + typeof(res.data[0]))
             console.log("resdatatype: " + (typeof res.data))
-            arr.push(res.data[0])
+
+            for (var i in res.data) {
+                arr.push(res.data[i])
+            }
+
+            // arr.push(res.data[0])
             console.log(arr)
             try{
                 imageArr = arr
@@ -184,7 +206,9 @@ function ListProduct() {
             console.log("unit price: " + unitPrice)
             console.log("category id: " + categoryId)
             console.log("quantity available: " + quantityAvailable)
-            console.log("images: " + imageArr[0])
+            for (var j in imageArr) {
+                console.log("images: " + imageArr[i])
+            }
             console.log("merchant id: " + merchantid)
 
             //POST PRODUCT
@@ -259,12 +283,19 @@ function ListProduct() {
                                             <div className='custom-file mb-4'>
                                                 <Input
                                                     type='file'
+                                                    multiple
                                                     className='custom-file-input'
                                                     id='customFile'
                                                     onChange={onChangeImages}
                                                 />
                                                 <Label className='custom-file-label' htmlFor='customFile'>
-                                                    {imageName}
+                                                
+                                                {imageName.length + " images uploaded: "}
+                                                {
+                                                        imageName.map(name => (
+                                                            <span key={name}>{name + ", "}</span>
+                                                        ))
+                                                    }
                                                 </Label>
                                                 {/* <Button color="success" size="sm" onClick={imageUpload}>Upload Images</Button> */}
                                             </div>

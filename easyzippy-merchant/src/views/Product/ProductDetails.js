@@ -159,28 +159,31 @@ function ProductDetails() {
         }).then(res => {
             console.log("axios call for update product went through")
 
+            console.log(res.data[0])
+            console.log(res.data[1][0].id)
+
             for (var i in categories) {
-                if (res.data.categoryId === categories[i].id) {
+                if (res.data[1][0].categoryId === categories[i].id) {
                     setCategory(categories[i].name)
                     break;
                 }
             }
 
             const newProduct = {
-                id: res.data.id,
-                name: res.data.name,
-                unitPrice: res.data.unitPrice,
+                id: res.data[1][0].id,
+                name: res.data[1][0].name,
+                unitPrice: res.data[1][0].unitPrice,
                 image: image,
                 imageurl: imageurl,
-                categoryId: res.data.categoryId,
+                categoryId: res.data[1][0].categoryId,
                 category: category,
                 disabled: disabled,
-                archived: res.data.archived,
-                description: res.data.description,
-                quantityAvailable: res.data.quantityAvailable,
-                merchantId: res.data.merchantId
+                archived: res.data[1][0].archived,
+                description: res.data[1][0].description,
+                quantityAvailable: res.data[1][0].quantityAvailable,
+                merchantId: res.data[1][0].merchantId
             }
-            console.log("new product: " + newProduct)
+
             console.log("new product id: " + newProduct.id)
             localStorage.setItem('productToView', JSON.stringify(newProduct))
             isError(false)
@@ -189,6 +192,9 @@ function ProductDetails() {
 
         }).catch (function(error) {
             console.log(error.response.data)
+            isError(true)
+            isSuccessful(false)
+            setError(error.response.data)
         })
     }
 
