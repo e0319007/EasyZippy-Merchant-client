@@ -5,6 +5,10 @@ import Cookies from 'js-cookie';
 import {MDBCol, MDBIcon} from "mdbreact";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+
 import {
     Card,
     CardBody,
@@ -20,7 +24,8 @@ import {
     Label,
     Modal,
     ModalHeader,
-    ModalFooter
+    ModalFooter,
+    ModalBody
 } from "reactstrap";
 
 function Products() {
@@ -44,6 +49,8 @@ function Products() {
 
     const [searchResults, setSearchResults] = useState([])
 
+    const [imageArr, setImageArr] = useState([])
+
     //sorting 
     const [lowToHigh, setLowToHigh] = useState(true)
 
@@ -53,6 +60,71 @@ function Products() {
         console.log(id)
         localStorage.setItem('productId', id)
         setModal(!modal);
+    }
+
+    //display image carousell
+    const [imageModal, setImageModal] = useState(false)
+    const toggleImageModal = (e, id) => {
+
+        e.preventDefault()
+
+        axios.get(`/product/${id}`, 
+        {
+            headers: {
+                AuthToken: authToken
+            }
+        }).then(res => {
+            for (var i in res.data.images) {
+                axios.get(`/assets/${res.data.images[i]}`, {
+                    responseType: 'blob'
+                },
+                {
+                    headers: {
+                        AuthToken: authToken,
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    console.log('axios images thru')
+                    var file = new File([response.data], {type:"image/png"})
+                    let image = URL.createObjectURL(file)
+
+                    let obj = {
+                        key: i,
+                        src: URL.createObjectURL(file),
+                        alttext: 'product image',
+                        caption: 'Image ' + i,
+                    }
+
+                    setImageArr(imageArr => [...imageArr, obj])
+                }).catch (function (error) {
+                    console.log(error.response.data)
+                })
+            }
+
+        }).catch (function(error) {
+            console.log(error.response.data)
+        })
+        
+        // let imgarr = imageArray
+
+        // for (var i in imageArray) {
+        //     console.log(imageArray[i].key)
+        //     var productId = imageArray[i].key.split('_')[0]
+        //     console.log(productId)
+        //     if (productId === id) {
+        //         imgarr.push(imageArray[i])
+        //     }
+        // }
+        // console.log(imgarr)
+        // //set to only the product's images??
+        // setImageArray([...imgarr])
+
+        setImageModal(!imageModal)
+
+        // if closed, remove everything from imagearray
+        if (imageModal === false) {
+            setImageArr([])
+        }
     }
 
     let productArr = []
@@ -84,7 +156,10 @@ function Products() {
             //set pictures to pictures array that also has the product id
             //right now only consider the first picture
             for (var i in productArr) { //this one loops the product array and gets the image from the product
+                
                 let index = i
+                let imgarr = []
+
                 console.log(productArr[i])
                 axios.get(`/assets/${productArr[i].images[0]}`, {
                     responseType: 'blob'
@@ -94,9 +169,9 @@ function Products() {
                         AuthToken: authToken,
                         'Content-Type': 'application/json'
                     }
-                }).then (res => {
-                    console.log("axios images thru: " + res.data)
-                    var file = new File([res.data], {type:"image/png"})
+                }).then (r => {
+                    console.log("axios images thru: " + r.data)
+                    var file = new File([r.data], {type:"image/png"})
                     let image = URL.createObjectURL(file)
 
                     let category = ''
@@ -121,7 +196,7 @@ function Products() {
                         quantityAvailable: productArr[index].quantityAvailable, 
                         merchantId: productArr[index].merchantId
                     }
-
+                    console.log(p.image)
                     setNewProdArr(newProdArr => [...newProdArr, p])
                     tempProdArr.push(p)
 
@@ -138,12 +213,17 @@ function Products() {
                     }
 
                     setSearchResults(resultArr)
-
                 }).catch (err => console.error(err))
             }
         }).catch(err => console.error(err))
 
     },[searchTerm, lowToHigh])
+
+    // function group(arr, key) {
+    //     return [...arr.reduce( (acc, o) => 
+    //         acc.set(o[key], (acc.get(o[key]) || []).concat(o))
+    //     , new Map).values()];
+    // }
 
     const deleteProduct = e => {
         e.preventDefault()
@@ -220,7 +300,7 @@ function Products() {
                                         {
                                             searchResults.map(prod => (
                                                 <Card style={{width: '22rem', margin:'0.45rem'}} className="text-center" key={prod.id} >
-                                                    <CardImg style={{height:'25rem'}} top src={prod.image}/>
+                                                    <CardImg style={{height:'25rem'}} top src={prod.image} onClick={e => {toggleImageModal(e, prod.id)}}/>
                                                     {/* <CardImg top src="../../easyzippylogo.jpg"/> */}
                                                     <CardBody>
                                                         <CardTitle className="h6">{prod.name}</CardTitle>
@@ -250,6 +330,18 @@ function Products() {
                                 <Button color="danger" onClick={deleteProduct}>Delete</Button>
                                 <Button color="secondary" onClick={toggleModal}>Cancel</Button>
                             </ModalFooter>
+                        </Modal>
+                        <Modal isOpen={imageModal} toggle={toggleImageModal}>
+                            <ModalHeader toggle={toggleImageModal}>Product Images</ModalHeader>
+                            <ModalBody>
+                                <Slider dots={true} infinite={true} speed={1000} slidesToScroll={1} arrows={true} slidesToShow={1}  >
+                                    {
+                                        imageArr.map(image => (
+                                            <img key={image.key} src={image.src}/>
+                                        ))
+                                    }
+                                </Slider>
+                            </ModalBody>
                         </Modal>
                     </Col>
                 </Row>

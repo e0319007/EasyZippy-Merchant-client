@@ -8,6 +8,9 @@ import { withStyles } from '@material-ui/core/styles';
 import { Typography } from "@material-ui/core";
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 import {
     Card,
@@ -37,7 +40,7 @@ function ProductDetails() {
     const [data, setData] = useState([])
 
     const id = product.id
-    const image = product.image
+    const image = product.image //CHANGE LATER
     const imageurl = product.imageurl //supposedly alr an array
     const merchantId = product.merchantId
     const [name, setName] = useState(product.name)
@@ -55,6 +58,8 @@ function ProductDetails() {
 
     const [categories, setCategories] = useState([])
 
+    const [imgArr, setImgArr] = useState([])
+
     useEffect(() => {
         console.log("axios use effect")
         axios.get(`/product/${product.id}`, 
@@ -66,6 +71,34 @@ function ProductDetails() {
             setData(res.data)
             setDisabled(res.data.disabled)
             console.log("fetch disabled: " + res.data.disabled)
+
+            for (var i in res.data.images) {
+                axios.get(`/assets/${res.data.images[i]}`, {
+                    responseType: 'blob'
+                },
+                {
+                    headers: {
+                        AuthToken: authToken,
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    console.log('axios images thru')
+                    var file = new File([response.data], {type:"image/png"})
+                    let image = URL.createObjectURL(file)
+
+                    let obj = {
+                        key: i,
+                        src: URL.createObjectURL(file),
+                        alttext: 'product image',
+                        caption: 'Image ' + i,
+                    }
+
+                    setImgArr(imgArr => [...imgArr, obj])
+                }).catch (function (error) {
+                    console.log(error.response.data)
+                })
+            }
+
         }).catch (function(error) {
             console.log(error.response.data)
         })
@@ -269,8 +302,18 @@ function ProductDetails() {
                                 </CardHeader>
                                 <CardBody>
                                     <form>
-                                        <div className="text-center" >
-                                            <CardImg style={{width:"20rem"}} top src={image} alt="..."/>
+                                        <div className="text-center">
+                                            <Card style={{width:"18rem", marginLeft: "auto", marginRight: "auto"}} top >
+                                                <Slider dots={true} infinite={true} speed={1000} slidesToScroll={1} arrows={true} slidesToShow={1}  >
+                                                    {
+                                                            imgArr.map(image => (
+                                                                <img key={image.key} src={image.src}/>
+                                                            ))
+                                                        }
+                                                </Slider>
+                                            </Card>
+                                            {/* <CardImg style={{width:"20rem"}} top src={image} alt="..."/> */}
+                                            
                                         </div>
                                         <fieldset disabled>  
                                             <FormGroup>
@@ -280,6 +323,7 @@ function ProductDetails() {
                                                     id="inputId"
                                                     placeholder="id number here"
                                                     value={id}
+                                                    readOnly
                                                 />
                                             </FormGroup>
                                         </fieldset>
@@ -325,7 +369,7 @@ function ProductDetails() {
                                                 >
                                                     {
                                                         categories.map(category => (
-                                                            <option>{category.name}</option>
+                                                            <option key={category.id}>{category.name}</option>
                                                         ))
                                                     }
                                                 </Input>
@@ -348,7 +392,8 @@ function ProductDetails() {
                                                     type="text" 
                                                     id="inputCreatedAt" 
                                                     placeholder="Created On" 
-                                                    value={formatDate(data.createdAt)}                                                  
+                                                    value={formatDate(data.createdAt)}    
+                                                    readOnly                                              
                                                     />
                                             </FormGroup>
                                         </fieldset>
