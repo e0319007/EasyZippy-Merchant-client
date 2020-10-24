@@ -264,7 +264,7 @@ function Products() {
                         <Card>
                             <CardHeader>
                                 <div className="form-row">
-                                    <CardTitle className="col-md-10" tag="h5">Products</CardTitle>
+                                    <CardTitle className="col-md-10" tag="h5">Products</CardTitle>           
                                         <FormGroup className="form-inline mt-4 mb-4 col-md-6">
                                             <MDBIcon icon="search" />
                                             <input 
@@ -275,24 +275,45 @@ function Products() {
                                             onChange={handleSearchChange}
                                             aria-label="Search" />
                                         </FormGroup>
-                                        <Col md="1" sm="1" xs="3">
-                                            <p className="category">Sort by Price</p>
+                                        <FormGroup className="form-inline mt-4 mb-4 col-md-3">
+                                        <Label>Sort by Price</Label>
                                             <Button className="btn-icon btn-neutral" onClick={sortByPrice}>
                                             <i className="fas fa-sort" />
                                             </Button>
-                                        </Col>
-                                    {/* </MDBCol> */}   
-                                    &nbsp;&nbsp;&nbsp;
-                                    <FormGroup className="col-md-4">
-                                        <div className="update ml-auto mr-auto" >
+                                            {/* &nbsp; 
+                                            <div style={{float: "right"}}>
                                             <Button color="info" size="sm" onClick={() => {
                                                 history.push('/admin/listProduct')
                                             }}> <i className="nc-icon nc-simple-add"/> {''}
                                                 List a Product
                                             </Button>
-                                        </div>
 
-                                    </FormGroup>
+                                            </div> */}
+                                        </FormGroup>
+                                        <FormGroup className="form-inline mt-4 mb-4 col-md-3">
+                                        <div style={{float: "right"}}>
+                                            <Button color="info" size="sm" onClick={() => {
+                                                    history.push('/admin/listProduct')
+                                                }}> <i className="nc-icon nc-simple-add"/> {''}
+                                                    List a Product
+                                                </Button>
+                                        </div>
+                                        </FormGroup>
+                                        {/* <Col className="mt-4 mb-4 col-md-6" > */}
+                                            {/* <Label>Sort by Price</Label>
+                                            <Button className="btn-icon btn-neutral" onClick={sortByPrice}>
+                                            <i className="fas fa-sort" />
+                                            </Button>
+                                            &nbsp; 
+                                            <div style={{float: "right"}}>
+                                            <Button color="info" size="sm" onClick={() => {
+                                                history.push('/admin/listProduct')
+                                            }}> <i className="nc-icon nc-simple-add"/> {''}
+                                                List a Product
+                                            </Button>
+
+                                            </div> */}
+                                        {/* </Col> */}
                                 </div>
                             </CardHeader>
                             <CardBody>
