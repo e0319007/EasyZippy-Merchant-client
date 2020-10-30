@@ -204,6 +204,10 @@ function Apply() {
         })
     }
 
+    const redirect = () => {
+        history.push("/login")
+    }
+
     return (
         <div style={{backgroundColor:'#f4f3ef', height:'100vh'}}>
             <Navbar expand="lg" color="dark">
@@ -215,7 +219,7 @@ function Apply() {
                         height="30"
                     />
                     {' '}
-                    <span style={{fontWeight:"bold", color: 'white', width:'100%'}}>&nbsp;&nbsp;Easy Zippy</span>
+                    <span onClick={redirect} style={{fontWeight:"bold", color: 'white', width:'100%', cursor:"pointer"}}>&nbsp;&nbsp;Easy Zippy</span>
                 </div>
             </Navbar>
             <form style={{...padding(5, 37, 0, 37)}}>

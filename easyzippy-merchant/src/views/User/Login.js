@@ -9,7 +9,14 @@ import {
     Input,
     Alert,
     Button,
-    Navbar
+    Navbar,
+    NavbarBrand,
+    Nav,
+    NavLink,
+    NavItem,
+    NavbarText,
+    NavbarToggler,
+    Collapse
 } from "reactstrap";
 
 function Login() {
@@ -20,6 +27,10 @@ function Login() {
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
     const [err, isError] = useState(false)
+
+    const [isOpen, setIsOpen] = useState(false);
+
+    const toggle = () => setIsOpen(!isOpen);
 
     const onChangeEmail = e => {
         // console.log("inside on change email")
@@ -126,7 +137,9 @@ function Login() {
                 })
             }
         }).catch (function(error) {
-
+            isError(true)
+            setError(error.response.data)
+            console.log(error.response.data)
         })
 
 
@@ -136,7 +149,7 @@ function Login() {
     return (
         <div style={{backgroundColor:'#f4f3ef', height:'100vh'}}>
             <Navbar expand="lg" color="dark">
-                <div className="navbar-brand">
+                <NavbarBrand>
                     &nbsp;&nbsp;
                     <img 
                         src={require("../../easyzippylogo.jpg")}
@@ -145,7 +158,31 @@ function Login() {
                     />
                     {' '}
                     <span style={{fontWeight:"bold", color: 'white', width:'100%'}}>&nbsp;&nbsp;Easy Zippy</span>
-                </div>
+                </NavbarBrand>
+                <NavbarToggler onClick={toggle} style={{...padding(0, 50, 0, 0)}}>
+                    <span class="navbar-toggler-icon ml-6">   
+                        <i class="fas fa-bars" style={{color:"#fff", fontSize:"28px"}}></i>
+                    </span>
+                </NavbarToggler>
+                <Collapse isOpen={isOpen} navbar>
+                    <Nav navbar className="ml-auto navbar-dark sm"> 
+                        <NavItem>
+                            <NavLink onClick={redirect} href="/apply" >
+                                Register
+                            </NavLink>
+                        </NavItem>
+                        {/* <NavItem>
+                            <NavbarText style={{color:"white"}}>
+                                |
+                            </NavbarText>
+                        </NavItem> */}
+                        <NavItem>
+                            <NavLink href="/applyAdvertisement">
+                                Apply for Advertisement
+                            </NavLink>
+                        </NavItem>
+                    </Nav>
+                </Collapse>
             </Navbar>
             <form style={{...padding(65, 77, 0, 77)}}>
                 <FormGroup>
@@ -181,10 +218,7 @@ function Login() {
                     Log In
                 </Button>
                 <FormGroup> 
-                    <Link onClick={redirect}>● Don't have an account? Click here to apply.</Link>
-                </FormGroup>
-                <FormGroup> 
-                    <Link onClick={forgotPassword}>● Forgot Password?</Link>
+                    <Link onClick={forgotPassword}>Forgot Password?</Link>
                 </FormGroup>
                 { err &&<Alert color="danger">{error}</Alert> }
             </form>

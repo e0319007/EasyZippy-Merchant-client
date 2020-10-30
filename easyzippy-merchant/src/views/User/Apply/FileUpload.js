@@ -87,7 +87,7 @@ function FileUpload() {
                         height="30"
                     />
                     {' '}
-                    <span style={{fontWeight:"bold", color: 'white', width:'100%'}}>&nbsp;&nbsp;Easy Zippy</span>
+                    <span onClick={redirect} style={{fontWeight:"bold", color: 'white', width:'100%', cursor:"pointer"}}>&nbsp;&nbsp;Easy Zippy</span>
                 </div>
             </Navbar>
             <Form onSubmit={fileUpload} style={{...padding(30, 87, 0, 87)}}>

@@ -104,20 +104,6 @@ function Products() {
         }).catch (function(error) {
             console.log(error.response.data)
         })
-        
-        // let imgarr = imageArray
-
-        // for (var i in imageArray) {
-        //     console.log(imageArray[i].key)
-        //     var productId = imageArray[i].key.split('_')[0]
-        //     console.log(productId)
-        //     if (productId === id) {
-        //         imgarr.push(imageArray[i])
-        //     }
-        // }
-        // console.log(imgarr)
-        // //set to only the product's images??
-        // setImageArray([...imgarr])
 
         setImageModal(!imageModal)
 
