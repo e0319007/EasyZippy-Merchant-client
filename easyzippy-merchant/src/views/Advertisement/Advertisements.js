@@ -35,17 +35,21 @@ function Advertisements() {
     const [searchTerm, setSearchTerm] = useState("")
     const [searchResults, setSearchResults] = useState([])
 
-    const [image, setImage] = useState([])
-
-    //sorting 
+    //sorting : startdate
     const [lowToHigh, setLowToHigh] = useState(true)
+    //enddate
+    const [lowToHighEndDate, setLowToHighEndDate] = useState(true)
 
     //for delete confirmation
     const [modal, setModal] = useState(false)
     const toggleModal = id => {
         console.log(id)
-        localStorage.setItem('productId', id)
+        localStorage.setItem('advertisementId', id)
         setModal(!modal);
+
+        if (modal === true) {
+            localStorage.removeItem('advertisementId')
+        }
     }
 
     let advArr = []
@@ -58,9 +62,124 @@ function Advertisements() {
                 AuthToken: authToken
             }
         }).then (res => {
-            
+            advArr = res.data
+            for (var i in advArr) {
+                let index = i
+                console.log(advArr[i])
+
+                axios.get(`/assets/${advArr[i].image}`, {
+                    responseType: 'blob'
+                }, 
+                {
+                    headers: {
+                        AuthToken: authToken,
+                        'Content-Type': 'application/json'
+                    }
+                }).then(r => {
+                    console.log("axios get image through: " + r.data)
+                    var file = new File([r.data], {type:"image/png"})
+                    let image = URL.createObjectURL(file)
+
+                    const a = {
+                        id: advArr[index].id,
+                        title: advArr[index].title,
+                        description: advArr[index].description,
+                        image: image,
+                        advertiserUrl: advArr[index].advertiserUrl,
+                        startDate: advArr[index].startDate.substr(0,10),
+                        endDate: advArr[index].endDate.substr(0,10),
+                        approved: advArr[index].approved,
+                        amountPaid: advArr[index].amountPaid,
+                        expired: advArr[index].expired,
+                        disabled: advArr[index].disabled
+                    }
+
+                    tempAdvArr.push(a)
+
+                    //ADD FILTERING BY APPROVED OR NOT, EXPIRED OR NOT??
+
+                    //filtering by: title, description
+                    const resultTitle = tempAdvArr.filter(a => a.title.toLowerCase().includes(searchTerm));
+                    let resultArr = [...new Set([...resultTitle])]
+
+                    //sort by start date
+                    if (lowToHigh) {
+                        resultArr.sort(function(a, b) {
+                            let astartArr = a.startDate.split("-")
+                            var astartd = new Date(astartArr[0], astartArr[1]-1, astartArr[2])
+                            let bstartArr = b.startDate.split("-")
+                            var bstartd = new Date(bstartArr[0], bstartArr[1]-1, bstartArr[2])
+                            return astartd - bstartd
+                        })
+                    } else {
+                        resultArr.sort(function(a, b) {
+                            let astartArr = a.startDate.split("-")
+                            var astartd = new Date(astartArr[0], astartArr[1]-1, astartArr[2])
+                            let bstartArr = b.startDate.split("-")
+                            var bstartd = new Date(bstartArr[0], bstartArr[1]-1, bstartArr[2])
+                            return bstartd - astartd
+                        })
+                    }
+
+                    //sort by end date
+                    if (lowToHighEndDate) {
+                        resultArr.sort(function(a, b) {
+                            let aendArr = a.endDate.split("-")
+                            var aendd = new Date(aendArr[0], aendArr[1]-1, aendArr[2])
+                            let bendArr = b.endDate.split("-")
+                            var bendd = new Date(bendArr[0], bendArr[1]-1, bendArr[2])
+                            return aendd - bendd
+                        })
+                    } else {
+                        resultArr.sort(function(a, b) {
+                            let aendArr = a.endDate.split("-")
+                            var aendd = new Date(aendArr[0], aendArr[1]-1, aendArr[2])
+                            let bendArr = b.endDate.split("-")
+                            var bendd = new Date(bendArr[0], bendArr[1]-1, bendArr[2])
+                            return bendd - aendd
+                        })
+                    }
+
+                    setSearchResults(resultArr)
+                }).catch (err => console.error(err))
+            }
+        }).catch (err => console.error(err))
+    },[searchTerm, lowToHigh, lowToHighEndDate])
+
+    //pass in advertisement id also
+    const deleteAdvertisement = e => {
+        e.preventDefault()
+
+        const id = localStorage.getItem('advertisementId')
+
+        axios.put(`/deleteAdvertisement/${id}`, {
+            id: id
+        },{
+            headers: {
+                AuthToken: authToken
+            }
+        }).then(res => {
+            console.log("axios delete ad went through")
+            window.location.reload()
+        }).catch(function (error) {
+            console.log(error.response.data)
         })
-    })
+    }
+
+    const handleSearchChange = e => {
+        setSearchTerm(e.target.value)
+    }
+
+    const sortByStartDate = e => {
+        let toggle = lowToHigh
+        setLowToHigh(!toggle)
+    }
+
+    const sortByEndDate = e => {
+        let toggle = lowToHighEndDate
+        setLowToHighEndDate(!toggle)
+    }
+
 
     return(
         <>
@@ -68,11 +187,76 @@ function Advertisements() {
                 <Row>
                     <Col md = "12">
                         <Card>
+                            <CardHeader>
+                                <div className="form-row">
+                                    <CardTitle className="col-md-10" tag="h5">Advertisements</CardTitle>
+                                    <FormGroup className="form-inline mt-4 mb-4 col-md-6">
+                                        <MDBIcon icon="search" />
+                                        <input 
+                                        className="form-control form-control-sm ml-3 w-75" 
+                                        type="text" 
+                                        placeholder="Search by title" 
+                                        value={searchTerm}
+                                        onChange={handleSearchChange}
+                                        aria-label="Search" />
+                                    </FormGroup>    
+                                    <FormGroup className="form-inline mt-4 mb-4 col-md-3">
+                                    <Label>Sort by Start Date</Label>
+                                        <Button className="btn-icon btn-neutral" onClick={sortByStartDate}>
+                                        <i className="fas fa-sort" />
+                                        </Button>
+                                    </FormGroup>
+                                    <FormGroup className="form-inline mt-4 mb-4 col-md-3">
+                                    <Label>Sort by End Date</Label>
+                                        <Button className="btn-icon btn-neutral" onClick={sortByEndDate}>
+                                        <i className="fas fa-sort" />
+                                        </Button>
+                                    </FormGroup>
+                                    <FormGroup className="form-inline mt-4 mb-4 col-md-3">
+                                        <div style={{float: "right"}}>
+                                            <Button color="info" size="sm" onClick={() => {
+                                                    history.push('/admin/listAdvertisement')
+                                                }}> <i className="nc-icon nc-simple-add"/> {''}
+                                                    Apply for Advertisement
+                                            </Button>
+                                        </div>
+                                    </FormGroup>
+                                </div>
+                            </CardHeader>
                             <CardBody>
-                                <CardTitle>Advertisements title</CardTitle>
-                                <CardText>This is the Advertisements page</CardText>
+                                <div className="form-row">
+                                    {
+                                        searchResults.map(adv => (
+                                            <Card style={{width: '22rem', margin:'0.45rem'}} className="text-center" key={adv.id} >
+                                                <CardImg style={{height:'25rem'}} top src={adv.image}/>
+                                                <CardBody>
+                                                    <CardTitle className="h6">{adv.title}</CardTitle>
+                                                    <CardText><i>{adv.startDate}</i> &nbsp; to &nbsp;<i>{adv.endDate}</i></CardText>
+                                                    <CardText>Approved: {adv.approved.toString()}</CardText>
+                                                    <CardText>Expired: {adv.expired.toString()}</CardText>
+                                                    <Button color="primary" onClick={() => {
+                                                            history.push('/admin/advertisementDetails')
+                                                            localStorage.setItem('advertisementToView', JSON.stringify(adv))
+                                                        }}>
+                                                        <i className="fa fa-info-circle"/>
+                                                    </Button>
+                                                    <Button color="danger" onClick={() => {toggleModal(adv.id)}}>
+                                                        <i className="fa fa-trash-alt"/>
+                                                    </Button>
+                                                </CardBody>
+                                            </Card>
+                                        ))
+                                    }
+                                </div>
                             </CardBody>
                         </Card>
+                        <Modal isOpen={modal} toggle={toggleModal}>
+                            <ModalHeader toggle={toggleModal}>Are you sure you want to delete this advertisement?</ModalHeader>
+                            <ModalFooter>
+                                <Button color="danger" onClick={deleteAdvertisement}>Delete</Button>
+                                <Button color="secondary" onClick={toggleModal}>Cancel</Button>
+                            </ModalFooter>
+                        </Modal>
                     </Col>
                 </Row>
             </div>

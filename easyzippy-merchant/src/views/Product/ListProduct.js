@@ -11,7 +11,6 @@ import {
     Col,
     CardHeader, Label, FormGroup, Input, Button, Alert
 } from "reactstrap";
-import { resolveSoa } from "dns";
 
 function ListProduct() {
     const merchant = JSON.parse(localStorage.getItem('currentMerchant'))

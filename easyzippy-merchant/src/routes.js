@@ -9,6 +9,8 @@ import Orders from "views/Order/Orders";
 //import TestProducts from "views/Product/TestProducts"
 import ListProduct from "views/Product/ListProduct";
 import ProductDetails from "./views/Product/ProductDetails";
+import ListAdvertisement from "./views/Advertisement/ListAdvertisement"
+import AdvertisementDetails from "./views/Advertisement/AdvertisementDetails"
 
 var routes = [
   {
@@ -89,6 +91,22 @@ var routes = [
     icon: "nc-icon nc-image",
     component: Advertisements,
     layout: "/admin"
+  },
+  {
+    path: "/listAdvertisement",
+    name: "List an Advertisement",
+    icon: "nc-icon nc-image",
+    component: ListAdvertisement,
+    layout: "/admin",
+    invisible: true
+  },
+  {
+    path: "/advertisementDetails",
+    name: "Advertisement Details",
+    icon: "nc-icon nc-image",
+    component: AdvertisementDetails,
+    layout: "/admin",
+    invisible: true
   }
 ];
 export default routes;

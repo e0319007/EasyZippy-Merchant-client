@@ -60,6 +60,10 @@ function Products() {
         console.log(id)
         localStorage.setItem('productId', id)
         setModal(!modal);
+
+        if (modal === true) {
+            localStorage.removeItem('productId')
+        }
     }
 
     //display image carousell
