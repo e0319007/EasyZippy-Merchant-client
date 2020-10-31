@@ -80,6 +80,16 @@ function Advertisements() {
                     var file = new File([r.data], {type:"image/png"})
                     let image = URL.createObjectURL(file)
 
+                    var approvedstr = ""
+                    if (advArr[index].approved === true) {
+                        approvedstr = "Approved"
+                    } 
+
+                    var expiredstr = ""
+                    if (advArr[index].expiredstr === true) {
+                        expiredstr = "Expired"
+                    } 
+
                     const a = {
                         id: advArr[index].id,
                         title: advArr[index].title,
@@ -91,16 +101,18 @@ function Advertisements() {
                         approved: advArr[index].approved,
                         amountPaid: advArr[index].amountPaid,
                         expired: advArr[index].expired,
-                        disabled: advArr[index].disabled
+                        disabled: advArr[index].disabled,
+                        approvedString: approvedstr,
+                        expiredString: expiredstr
                     }
 
                     tempAdvArr.push(a)
 
-                    //ADD FILTERING BY APPROVED OR NOT, EXPIRED OR NOT??
-
-                    //filtering by: title, description
+                    //filtering by: title, description, approval status, expiry status
                     const resultTitle = tempAdvArr.filter(a => a.title.toLowerCase().includes(searchTerm));
-                    let resultArr = [...new Set([...resultTitle])]
+                    const resultApproved = tempAdvArr.filter(a => a.approvedString.toLowerCase().includes(searchTerm));
+                    const resultExpired = tempAdvArr.filter(a => a.expiredString.toLowerCase().includes(searchTerm));
+                    let resultArr = [...new Set([...resultTitle, ...resultApproved, ...resultExpired])]
 
                     //sort by start date
                     if (lowToHigh) {
@@ -195,7 +207,7 @@ function Advertisements() {
                                         <input 
                                         className="form-control form-control-sm ml-3 w-75" 
                                         type="text" 
-                                        placeholder="Search by title" 
+                                        placeholder="Search by title, approval, expiry status" 
                                         value={searchTerm}
                                         onChange={handleSearchChange}
                                         aria-label="Search" />
