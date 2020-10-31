@@ -38,6 +38,7 @@ function ProductDetails() {
     const product = JSON.parse(localStorage.getItem('productToView'))
 
     const [data, setData] = useState([])
+    const [variations, setVariations] = useState([])
 
     const id = product.id
     const image = product.image //CHANGE LATER
