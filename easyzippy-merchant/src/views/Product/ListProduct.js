@@ -112,7 +112,6 @@ function ListProduct() {
 
     const onChangeQuantityAvailable = e => {
         const quantityAvailable = e.target.value;
-        setQuantityAvailable(quantityAvailable.trim())
         if (quantityAvailable.trim().length === 0) {
             setError("Quantity available is a required field")
             isError(true)
@@ -129,6 +128,7 @@ function ListProduct() {
                 isError(false)
             }
         }
+        setQuantityAvailable(quantityAvailable.trim())
     }
 
     const onChangeImages = e => {
