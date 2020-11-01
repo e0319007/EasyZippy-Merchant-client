@@ -469,6 +469,9 @@ function ProductDetails() {
                                             {/* <CardImg style={{width:"20rem"}} top src={image} alt="..."/> */}
                                             
                                         </div>
+                                        <div className="text-center" style={{alignItems: "center"}}>
+                                            <Button outline color="info">View Variations</Button>
+                                        </div>
                                         <fieldset disabled>  
                                             <FormGroup>
                                                 <Label for="inputId">Id</Label>
