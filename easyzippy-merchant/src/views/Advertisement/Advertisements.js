@@ -202,7 +202,7 @@ function Advertisements() {
                             <CardHeader>
                                 <div className="form-row">
                                     <CardTitle className="col-md-10" tag="h5">Advertisements</CardTitle>
-                                    <FormGroup className="form-inline mt-4 mb-4 col-md-6">
+                                    <FormGroup className="form-inline mt-4 mb-4 col-md-5">
                                         <MDBIcon icon="search" />
                                         <input 
                                         className="form-control form-control-sm ml-3 w-75" 
@@ -212,13 +212,13 @@ function Advertisements() {
                                         onChange={handleSearchChange}
                                         aria-label="Search" />
                                     </FormGroup>    
-                                    <FormGroup className="form-inline mt-4 mb-4 col-md-3">
+                                    <FormGroup className="form-inline mt-4 mb-4 col-md-2">
                                     <Label>Sort by Start Date</Label>
                                         <Button className="btn-icon btn-neutral" onClick={sortByStartDate}>
                                         <i className="fas fa-sort" />
                                         </Button>
                                     </FormGroup>
-                                    <FormGroup className="form-inline mt-4 mb-4 col-md-3">
+                                    <FormGroup className="form-inline mt-4 mb-4 col-md-2">
                                     <Label>Sort by End Date</Label>
                                         <Button className="btn-icon btn-neutral" onClick={sortByEndDate}>
                                         <i className="fas fa-sort" />

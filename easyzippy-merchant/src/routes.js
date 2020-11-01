@@ -11,6 +11,7 @@ import ListProduct from "views/Product/ListProduct";
 import ProductDetails from "./views/Product/ProductDetails";
 import ListAdvertisement from "./views/Advertisement/ListAdvertisement"
 import AdvertisementDetails from "./views/Advertisement/AdvertisementDetails"
+import PromotionDetails from "views/Promotion/PromotionDetails";
 
 var routes = [
   {
@@ -84,6 +85,14 @@ var routes = [
     icon: "nc-icon nc-tag-content",
     component: Promotions,
     layout: "/admin"
+  },
+  {
+    path: "/promotionDetails",
+    name: "Promotion Details",
+    icon: "nc-icon nc-tag-content",
+    component: PromotionDetails,
+    layout: "/admin",
+    invisible: true
   },
   {
     path: "/advertisements",
