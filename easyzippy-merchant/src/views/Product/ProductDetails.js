@@ -19,7 +19,7 @@ import {
     Row,
     Col,
     CardHeader, FormGroup, Label, Input, Button, CardImg, Alert, CardSubtitle,
-    Modal, ModalBody, ModalHeader, ModalFooter
+    Modal, ModalBody, ModalHeader, ModalFooter, Tooltip
 } from "reactstrap";
 import { idText } from "typescript";
 
@@ -68,12 +68,85 @@ function ProductDetails() {
     const [inModal, setInModal] = useState(false)
     const toggleCreate = () => setCreateModal(!createModal)
 
+    //modal to confirm delete variation
+    const [deleteModal, setDeleteModal] = useState(false)
+    const toggleDeleteModal = () => setDeleteModal(!deleteModal)
+
+    //modal to view variations
+    const [viewVariationsModal, setViewVariationsModal] = useState(false)
+    const toggleVarModal = () => setViewVariationsModal(!viewVariationsModal)
+
+    //modal to view variation details
+    const [variationDetailsModal, setVariationDetailsModal] = useState(false)
+    const [inVarDetailsModal, setInVarDetailsModal] = useState(false)
+    const toggleVarDetailsModal = () => {
+
+        // var varToView = variations[variationId-1]
+
+        var v = ''
+
+        for (var i in variations) {
+            v = variations[i]
+            if (v.id === variationId) {
+                setVarDetailsName(v.name)
+                setVarDetailsUnitPrice(v.unitPrice)
+                setVarDetailsQty(v.quantityAvailable)
+                setVarDetailsDescription(v.description)
+                break;
+            }
+        }
+
+        // console.log(variationId-1)
+        // console.log(varToView)
+        // setVarDetailsName(varToView.name)
+        // setVarDetailsUnitPrice(varToView.unitPrice)
+        // setVarDetailsQty(varToView.quantityAvailable)
+        // setVarDetailsDescription(varToView.description)
+        
+        axios.get(`/assets/${v.image}`, {
+            responseType: 'blob'
+        },
+        {
+            headers: {
+                AuthToken: authToken,
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            console.log('axios images thru')
+            var file = new File([response.data], {type:"image/png"})
+            let image = URL.createObjectURL(file)
+            setVarDetailsImage(image)
+        }).catch (function (error) {
+            console.log(error.response.data)
+        })
+
+        if (variationDetailsModal) {
+            setError(false)
+            setInVarDetailsModal(false)
+            isSuccessful(false)
+        }
+
+        setVariationDetailsModal(!variationDetailsModal)
+    }
+
+    const [variation, setVariation] = useState('')
+    const [variationId, setVariationId] = useState('')
+
     const [varName, setVarName] = useState()
     const [varUnitPrice, setVarUnitPrice] = useState()
     const [varQty, setVarQty] = useState()
     const [varDescription, setVarDescription] = useState()
     const [varImage, setVarImage] = useState(null)
     const [varImageName, setVarImageName] = useState("Upload Image")
+
+    const [varDetailsName, setVarDetailsName] = useState('')
+    const [varDetailsUnitPrice, setVarDetailsUnitPrice] = useState('')
+    const [varDetailsQty, setVarDetailsQty] = useState('')
+    const [varDetailsDescription, setVarDetailsDescription] = useState('')
+    const [varDetailsImage, setVarDetailsImage] = useState(null)
+
+    const [tooltipCreate, setTooltipCreate] = useState(false);
+    const toggleTooltipCreate = () => setTooltipCreate(!tooltipCreate);
 
     useEffect(() => {
         console.log("axios use effect")
@@ -166,7 +239,23 @@ function ProductDetails() {
     
     const onChangeUnitPrice = e => {
         const unitPrice = e.target.value;
-        setUnitPrice(unitPrice)
+        setInModal(false)
+        if (unitPrice.trim().length === 0) {
+            setError("Price is a required field")
+            isError(true)
+        } else if (unitPrice.indexOf('$') > 0) {
+            setError("Please enter the price without a '$' sign")
+            isError(true)
+        } else {
+            var nums = /^\d+(,\d{3})*(\.\d{1,2})?$/gm
+            if (!unitPrice.match(nums)) { //if not all numbers
+                setError("Please enter a valid price")
+                isError(true)
+            } else {
+                isError(false)
+            }
+        } 
+        setUnitPrice(unitPrice.trim())
     }
 
     const onChangeCategory = e => {
@@ -335,8 +424,11 @@ function ProductDetails() {
             console.log(v)
         }
 
-        axios.post("/productVariation/addImage", formData)
-        .then (res => {
+        axios.post("/productVariation/addImage", formData, {
+            headers: {
+                AuthToken: authToken,
+            }
+        }).then (res => {
             console.log("image upload axios call went through")
             var imgString = res.data
             console.log("image string: " + imgString)
@@ -344,6 +436,7 @@ function ProductDetails() {
             axios.post(`/productVariation`, {
                 name: varName, 
                 unitPrice: varUnitPrice,
+                description: varDescription,
                 quantityAvailable: varQty,
                 image: imgString,
                 productId: id
@@ -358,6 +451,7 @@ function ProductDetails() {
                 isError(false)
                 isSuccessful(true)
                 setMsg("Product Variation created successfully!")
+                window.location.reload()
             }).catch (function (error) {
                 console.log(error.response.data)
                 setInModal(true)
@@ -435,6 +529,155 @@ function ProductDetails() {
         }
     }
 
+    const onChangeVariation = e => {
+        const variation = e.target.value;
+        let id = '';
+
+        for (var i in variations) {
+            let v = variations[i]
+            if (v.name === variation) {
+                setVariation(v)
+                id = v.id
+                break;
+            }
+        }
+
+        console.log("variation id: " + id)
+        console.log("variation: " + variation)
+        setVariationId(id)
+        // setVariation(variation)
+    }
+
+    const onChangeDetailsName = e => {
+        const name = e.target.value
+        setVarDetailsName(name)
+    }
+
+    const onChangeDetailsDescription = e => {
+        const descr = e.target.value
+        setVarDetailsDescription(descr)
+    }
+
+    const onChangeDetailsPrice = e => {
+        const unitPrice = e.target.value
+        setInVarDetailsModal(true)
+        if (unitPrice.trim().length === 0) {
+            setError("Price is a required field")
+            isError(true)
+        } else if (unitPrice.indexOf('$') > 0) {
+            setError("Please enter the price without a '$' sign")
+            isError(true)
+        } else {
+            var nums = /^\d+(,\d{3})*(\.\d{1,2})?$/gm
+            if (!unitPrice.match(nums)) { //if not all numbers
+                setError("Please enter a valid price")
+                isError(true)
+            } else {
+                isError(false)
+            }
+        } 
+        setVarDetailsUnitPrice(unitPrice.trim())
+    }
+
+    const onChangeDetailsQty = e => {
+        const qty = e.target.value
+        setInVarDetailsModal(true)
+        if (qty.trim().length === 0) {
+            setError("Quantity available is a required field")
+            isError(true)
+        } else if (parseInt(qty) === 0){
+            setError("Quantity Available has to be at least 1")
+            isError(true)
+        } else {
+            //make sure quantity available is a number
+            var nums = /^[0-9]+$/
+            if (!qty.match(nums)) { //if not all numbers
+                setError("Please enter a valid quantity")
+                isError(true)
+            } else {
+                isError(false)
+            }
+        }
+        setVarDetailsQty(qty.trim())
+    }
+
+    const updateProductVariation = e => {
+        e.preventDefault()
+
+        setInVarDetailsModal(true)
+
+        //validation
+        if (varDetailsName === "" || varDetailsName === undefined) {
+            setError("Name cannot be empty")
+            isError(true)
+            isSuccessful(false)
+            return;
+        }
+
+        if (varDetailsDescription === "" || varDetailsDescription === undefined) {
+            setError("Description cannot be empty")
+            isError(true)
+            isSuccessful(false)
+            return;
+        }
+
+        axios.put(`/productVariations/${variationId}`, {
+            name: varDetailsName,
+            description: varDetailsDescription,
+            unitPrice: varDetailsUnitPrice,
+            quantityAvailable: varDetailsQty
+        }, {
+            headers: {
+                AuthToken: authToken,
+            }
+        }).then (res => {
+            console.log("update product variation went through")
+            setVarDetailsName(res.data.name)
+            setVarDetailsDescription(res.data.description)
+            setVarDetailsUnitPrice(res.data.unitPrice)
+            setVarDetailsQty(res.data.quantityAvailable)
+
+            setInVarDetailsModal(true)
+            setError(false)
+            isSuccessful(true)
+            setMsg("Product Variation successfully updated!")
+        }).catch (function (error) {
+            console.log(error.response.data)
+            setInVarDetailsModal(true)
+            isError(true)
+            isSuccessful(false)
+            setError(error.response.data)
+        })
+    }
+
+    const deleteProductVariation = e => {
+        e.preventDefault()
+
+        setInVarDetailsModal(true)
+        
+        axios.put(`/deleteProductVariations/${variationId}`, {
+            id:variationId
+        },{
+            headers: {
+                AuthToken: authToken,
+            }
+        }).then (res => {
+            console.log("delete product variation axios went through")
+            isError(false)
+            isSuccessful(true)
+            setMsg("Product Variation Deleted Successfully")
+            window.location.reload()
+        }).catch (function (error) {
+            console.log(error.response.data)
+            isError(true)
+            isSuccessful(false)
+            setError(error.response.data)
+        })
+
+
+
+    }
+
     return(
         <>
             <ThemeProvider theme={theme}>
@@ -445,12 +688,7 @@ function ProductDetails() {
                                 <span>
                                     <CardHeader>
                                         <div className="form-row">
-                                            <CardTitle tag="h5">Product {data.id} Details          
-                                                <Button className="btn-icon btn-neutral" size="sm" onClick={toggleCreate}>
-                                                    <i className="fa fa-plus"/>
-                                                </Button>
-                                                <small style={{fontSize:"0.9rem"}}>Variation</small>                        
-                                            </CardTitle>
+                                            <CardTitle tag="h5">Product {data.id} Details</CardTitle>
                                         </div>
                                     </CardHeader>
                                 </span>
@@ -470,7 +708,16 @@ function ProductDetails() {
                                             
                                         </div>
                                         <div className="text-center" style={{alignItems: "center"}}>
-                                            <Button outline color="info">View Variations</Button>
+                                            {variations.length != 0 && 
+                                                <Button outline color="info" onClick={toggleVarModal}>View Variations</Button>
+                                            }         
+                                            <Button className="btn-icon btn-round ml-1" color="info" size="sm" id="createVariation" onClick={toggleCreate}>
+                                                    <i className="fa fa-plus"/>
+                                            </Button>
+                                            {' '}
+                                            <Tooltip placement="right" isOpen={tooltipCreate} target="createVariation" toggle={toggleTooltipCreate}>
+                                                    Create Product Variation
+                                            </Tooltip>
                                         </div>
                                         <fieldset disabled>  
                                             <FormGroup>
@@ -664,6 +911,102 @@ function ProductDetails() {
                                     <Button color="primary" onClick={createProductVariation}>Create</Button>{' '}
                                     </ModalFooter>
                                 </Modal>
+                                <Modal isOpen={viewVariationsModal} toggle={toggleVarModal}>
+                                    <ModalHeader toggle={toggleVarModal}>View Product Variations</ModalHeader>
+                                    <ModalBody>
+                                        <form>
+                                            <FormGroup>
+                                                <Label for="inputVarToView">Select Variation</Label>
+                                                    <Input
+                                                        type="select" 
+                                                        id="inputVarToView" 
+                                                        value={variation.name}
+                                                        onChange={onChangeVariation}
+                                                    >
+                                                    <option>[select]</option>
+                                                    {
+                                                        variations.map(variation => (
+                                                            <option key={variation.id}>{variation.name}</option>
+                                                        ))
+                                                    }
+                                                    </Input>
+                                                </FormGroup>
+                                        </form>
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        <Button color="primary" onClick={toggleVarDetailsModal}>View</Button>{' '}
+                                    </ModalFooter>
+                                </Modal>
+                                <Modal isOpen={variationDetailsModal} toggle={toggleVarDetailsModal}>
+                                    <ModalHeader toggle={toggleVarDetailsModal}></ModalHeader>
+                                    <div className="text-center" style={{alignItems: "center"}}>
+                                        <CardImg style={{width:"17rem", marginLeft: "auto", marginRight: "auto"}} top src={varDetailsImage} alt="product image"/>
+                                    </div>
+                                    <ModalBody>
+                                        <form>
+                                            <FormGroup>
+                                                <Label for="inputDetailsName">Name</Label>
+                                                <Input
+                                                    type="text"
+                                                    id="inputDetailsName"
+                                                    placeholder="name here"
+                                                    value={varDetailsName}
+                                                    onChange={onChangeDetailsName}
+                                                />
+                                            </FormGroup>
+                                            <FormGroup>
+                                                <Label for="inputDetailsDescription">Description</Label>
+                                                <Input 
+                                                    type="textarea"
+                                                    id="inputDetailsDescription"
+                                                    placeholder="description here"
+                                                    value={varDetailsDescription}
+                                                    onChange={onChangeDetailsDescription}
+                                                />
+                                            </FormGroup>
+                                            <Row>
+                                                <Col>
+                                                    <FormGroup>
+                                                        <Label for="inputDetailsPrice">Price</Label>
+                                                        <Input 
+                                                            type="text" 
+                                                            id="inputDetailsPrice" 
+                                                            placeholder="Price" 
+                                                            value={varDetailsUnitPrice} 
+                                                            onChange={onChangeDetailsPrice}                                                   
+                                                            />
+                                                    </FormGroup> 
+                                                </Col>
+                                                <Col>
+                                                    <FormGroup>
+                                                        <Label for="inputDetailsQty">Price</Label>
+                                                        <Input 
+                                                            type="text" 
+                                                            id="inputDetailsQty" 
+                                                            placeholder="Quantity" 
+                                                            value={varDetailsQty} 
+                                                            onChange={onChangeDetailsQty}                                                   
+                                                            />
+                                                    </FormGroup> 
+                                                </Col>
+                                                
+                                            </Row>    
+                                            { inVarDetailsModal && err &&<Alert color="danger">{error}</Alert> }
+                                            { inVarDetailsModal && successful &&<Alert color="success">{successMsg}</Alert>}                                        
+                                        </form>
+                                    </ModalBody>
+                                    <ModalFooter>
+                                        <Button color="primary" onClick={updateProductVariation}>Update</Button>{' '}
+                                        <Button color="danger" onClick={toggleDeleteModal}>Delete</Button>
+                                    </ModalFooter>
+                                </Modal>
+                                <Modal isOpen={deleteModal} toggle={toggleDeleteModal}>
+                                    <ModalHeader toggle={toggleDeleteModal}>Are you sure you want to delete this Product Variation?</ModalHeader>
+                                    <ModalFooter>
+                                        <Button color="danger" onClick={deleteProductVariation}>Delete</Button>
+                                        <Button color="secondary" onClick={toggleDeleteModal}>Cancel</Button>
+                                    </ModalFooter>
+                                </Modal>
                             </Card>
                         </Col>
                     </Row>
@@ -671,15 +1014,6 @@ function ProductDetails() {
             </ThemeProvider>
         </>
     );
-}
-
-function padding(a, b, c, d) {
-    return {
-        paddingTop: a,
-        paddingRight: b ? b : a,
-        paddingBottom: c ? c : a,
-        paddingLeft: d ? d : (b ? b : a)
-    }
 }
 
 export default ProductDetails;
