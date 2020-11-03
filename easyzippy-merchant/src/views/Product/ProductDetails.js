@@ -95,30 +95,25 @@ function ProductDetails() {
                 break;
             }
         }
-
-        // console.log(variationId-1)
-        // console.log(varToView)
-        // setVarDetailsName(varToView.name)
-        // setVarDetailsUnitPrice(varToView.unitPrice)
-        // setVarDetailsQty(varToView.quantityAvailable)
-        // setVarDetailsDescription(varToView.description)
         
-        axios.get(`/assets/${v.image}`, {
-            responseType: 'blob'
-        },
-        {
-            headers: {
-                AuthToken: authToken,
-                'Content-Type': 'application/json'
-            }
-        }).then(response => {
-            console.log('axios images thru')
-            var file = new File([response.data], {type:"image/png"})
-            let image = URL.createObjectURL(file)
-            setVarDetailsImage(image)
-        }).catch (function (error) {
-            console.log(error.response.data)
-        })
+        if (v.image !== null) {
+            axios.get(`/assets/${v.image}`, {
+                responseType: 'blob'
+            },
+            {
+                headers: {
+                    AuthToken: authToken,
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                console.log('axios images thru')
+                var file = new File([response.data], {type:"image/png"})
+                let image = URL.createObjectURL(file)
+                setVarDetailsImage(image)
+            }).catch (function (error) {
+                console.log(error)
+            })
+        }
 
         if (variationDetailsModal) {
             setError(false)
@@ -939,9 +934,11 @@ function ProductDetails() {
                                 </Modal>
                                 <Modal isOpen={variationDetailsModal} toggle={toggleVarDetailsModal}>
                                     <ModalHeader toggle={toggleVarDetailsModal}></ModalHeader>
-                                    <div className="text-center" style={{alignItems: "center"}}>
-                                        <CardImg style={{width:"17rem", marginLeft: "auto", marginRight: "auto"}} top src={varDetailsImage} alt="product image"/>
-                                    </div>
+                                    {varDetailsImage !== null && 
+                                        <div className="text-center" style={{alignItems: "center"}}>
+                                            <CardImg style={{width:"17rem", marginLeft: "auto", marginRight: "auto"}} top src={varDetailsImage} alt="product image"/>
+                                        </div>
+                                    }
                                     <ModalBody>
                                         <form>
                                             <FormGroup>
