@@ -160,8 +160,8 @@ function Login() {
                     <span style={{fontWeight:"bold", color: 'white', width:'100%'}}>&nbsp;&nbsp;Easy Zippy</span>
                 </NavbarBrand>
                 <NavbarToggler onClick={toggle} style={{...padding(0, 50, 0, 0)}}>
-                    <span class="navbar-toggler-icon ml-6">   
-                        <i class="fas fa-bars" style={{color:"#fff", fontSize:"28px"}}></i>
+                    <span className="navbar-toggler-icon ml-6">   
+                        <i className="fas fa-bars" style={{color:"#fff", fontSize:"28px"}}></i>
                     </span>
                 </NavbarToggler>
                 <Collapse isOpen={isOpen} navbar>
