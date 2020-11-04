@@ -52,6 +52,7 @@ function ProductDetails() {
     const [category, setCategory] = useState(product.category)
     const [quantityAvailable, setQuantityAvailable] = useState(product.quantityAvailable)
     const [disabled, setDisabled] = useState('')
+    const [disabledVariation, setDisabledVariation] = useState('')
 
     const [error, setError] = useState('')
     const [err, isError] = useState(false)
@@ -92,6 +93,7 @@ function ProductDetails() {
                 setVarDetailsUnitPrice(v.unitPrice)
                 setVarDetailsQty(v.quantityAvailable)
                 setVarDetailsDescription(v.description)
+                setDisabledVariation(v.disabled)
                 break;
             }
         }
@@ -195,13 +197,12 @@ function ProductDetails() {
             setCategories(res.data)
         }).catch(err => console.error(err))
 
-        axios.get(`/productVariations/${product.id}`, {
+        axios.get(`/productVariationsIncludingDisabled/${product.id}`, {
             headers: {
                 AuthToken: authToken
             }
         }).then(res => {
             setVariations(res.data)
-            //NEED LOG THE DISABLED PARAMETER SOMEHOW
         }).catch (err => console.error(err))
 
     },[])
@@ -226,6 +227,38 @@ function ProductDetails() {
             console.log(error.response.data)
         })
     };
+
+    const handleVariationChange = (event) => {
+
+        setInVarDetailsModal(true)
+
+        let varEnabled = !disabledVariation
+        console.log("Enabled: " + varEnabled)
+
+        console.log("event.target.checked: " + event.target.checked)
+        setDisabledVariation(!event.target.checked)
+
+        axios.put(`/productVariations/toggleDisable/${variationId}`, {
+            disabled: !event.target.checked
+        }, 
+        {
+            headers: {
+                AuthToken: authToken
+            }
+        }).then( res => {
+            console.log("axios call to toggle variation disable went through")
+            setMsg("success!")
+            isSuccessful(true)
+            isError(false)
+            window.location.reload()
+        }).catch (function(error) {
+            console.log(error.response.data)
+            setError(error.response.data)
+            isError(true)
+            isSuccessful(false)
+        })
+    };
+    
 
     const onChangeName = e => {
         const name = e.target.value;
@@ -976,7 +1009,7 @@ function ProductDetails() {
                                                 </Col>
                                                 <Col>
                                                     <FormGroup>
-                                                        <Label for="inputDetailsQty">Price</Label>
+                                                        <Label for="inputDetailsQty">Quantity Available</Label>
                                                         <Input 
                                                             type="text" 
                                                             id="inputDetailsQty" 
@@ -986,8 +1019,23 @@ function ProductDetails() {
                                                             />
                                                     </FormGroup> 
                                                 </Col>
-                                                
                                             </Row>    
+                                            <Row>
+                                            <p></p>
+                                        </Row>
+                                        <Row>
+                                            <div className="update ml-auto mr-auto" >
+                                                <Typography component="div">
+                                                    <Grid component="label" container alignItems="center" spacing={1}>
+                                                    <Grid item>Disabled</Grid>
+                                                    <Grid item>
+                                                        <DisableSwitch checked={!disabledVariation} onChange={handleVariationChange} name="checked" />
+                                                    </Grid>
+                                                    <Grid item>Enabled</Grid>
+                                                    </Grid>
+                                                </Typography>
+                                            </div> 
+                                        </Row>
                                             { inVarDetailsModal && err &&<Alert color="danger">{error}</Alert> }
                                             { inVarDetailsModal && successful &&<Alert color="success">{successMsg}</Alert>}                                        
                                         </form>
