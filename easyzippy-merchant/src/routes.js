@@ -12,6 +12,7 @@ import ProductDetails from "./views/Product/ProductDetails";
 import ListAdvertisement from "./views/Advertisement/ListAdvertisement"
 import AdvertisementDetails from "./views/Advertisement/AdvertisementDetails"
 import PromotionDetails from "views/Promotion/PromotionDetails";
+import OrderDetails from "views/Order/OrderDetails";
 
 var routes = [
   {
@@ -78,6 +79,14 @@ var routes = [
     icon: "nc-icon nc-paper",
     component: Orders,
     layout: "/admin"
+  },
+  {
+    path: "/orderDetails",
+    name: "Order Details",
+    icon: "nc-icon nc-paper",
+    component: OrderDetails,
+    layout: "/admin",
+    invisible: true
   },
   {
     path: "/promotions",

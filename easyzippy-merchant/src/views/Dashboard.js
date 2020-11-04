@@ -24,6 +24,8 @@ function Dashboard() {
   const merchantId = (JSON.parse(Cookies.get('merchantUser'))).toString()
 
   const [productsLength, setProductsLength] = useState('')
+  const [ordersLength, setOrdersLength] = useState('')
+  const [adsLength, setAdsLength] = useState('')
 
   useEffect(() => {
 
@@ -35,6 +37,22 @@ function Dashboard() {
     }).then(res => {
       console.log("successfully retrieve products")
       setProductsLength(res.data.length)
+
+      axios.get(`/orders/merchant/${merchantId}`, {
+        headers: {
+          AuthToken: authToken
+        }
+      }).then(res => {
+        setOrdersLength(res.data.length)
+      })
+
+      axios.get(`/advertisement/merchant/${merchantId}`, {
+        headers: {
+          AuthToken: authToken
+        }
+      }).then(res => {
+        setAdsLength(res.data.length)
+      })
     }).catch( function(error) {
       console.log(error.response)
     })
@@ -79,7 +97,7 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Orders</p>
-                      <CardTitle tag="p">-</CardTitle>
+                      <CardTitle tag="p">{ordersLength}</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -101,7 +119,7 @@ function Dashboard() {
                   <Col md="8" xs="7">
                     <div className="numbers">
                       <p className="card-category">Ads</p>
-                      <CardTitle tag="p">-</CardTitle>
+                      <CardTitle tag="p">{adsLength}</CardTitle>
                       <p />
                     </div>
                   </Col>
