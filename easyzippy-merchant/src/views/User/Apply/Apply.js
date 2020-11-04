@@ -29,6 +29,9 @@ function Apply() {
     const [password, setPassword] = useState('')
     const [password2, setPassword2] = useState('')
 
+    const [image, setImage] = useState()
+    const [imageName, setImageName] = useState('Upload Logo Image')
+
     const [error, setError] = useState('')
     const [err, isError] = useState(false)
 
@@ -161,6 +164,13 @@ function Apply() {
         }
     }
 
+    const onChangeImage = e => {
+        if (e.target.files[0] !== undefined) {
+            setImage(e.target.files[0])
+            setImageName(e.target.files[0].name)
+        }
+    }
+
     // apply without the tenancy agreement
     const postApply = e => {
         console.log("in post apply function")
@@ -180,28 +190,48 @@ function Apply() {
         const fl = arr[0]
         const un = arr[1]
 
-        // register merchant
-        axios.post("/merchant", {
-            name: name,
-            pointOfContact: poc,
-            mobileNumber: mobileNumber,
-            email: email,
-            blk: blk,
-            street: street,
-            floor: fl,
-            unitNumber: un,
-            postalCode: postalCode,
-            password: password
-        }).then( response => {
-            console.log("axios call went through")
-            Cookies.set('merchantUser', JSON.stringify(response.data.id));
-            isError(false)
-            history.push('/fileUpload')
-        }).catch(function(error) {
-            console.log(error.response.data)
-            isError(true)
-            setError(error.response.data)
+        //need to post the image first
+        let formData = new FormData();
+        formData.append(image.name, image)
+        console.log('form data values: ')
+        for (var v of formData.values()) {
+            console.log(v)
+        }  
+
+        axios.post(`/merchantUploadLogoPreRegistration`, formData, {
+
+        }).then(res => {
+            console.log("image upload axios call went through")
+            var imgString = res.data
+            console.log("image string: " + imgString)
+
+            // register merchant
+            axios.post("/merchant", {
+                name: name,
+                pointOfContact: poc,
+                mobileNumber: mobileNumber,
+                email: email,
+                blk: blk,
+                street: street,
+                floor: fl,
+                unitNumber: un,
+                postalCode: postalCode,
+                password: password,
+                merchantLogoImage: imgString
+            }).then( response => {
+                console.log("axios call went through")
+                Cookies.set('merchantUser', JSON.stringify(response.data.id));
+                isError(false)
+                history.push('/fileUpload')
+            }).catch(function(error) {
+                console.log(error.response.data)
+                isError(true)
+                setError(error.response.data)
+            })
+
         })
+
+
     }
 
     const redirect = () => {
@@ -228,23 +258,36 @@ function Apply() {
                         Join Ez2Keep as a Merchant!
                     </p>
                 </FormGroup>
-                <Row>
-                    <Col>
-                        <FormGroup>
-                            <Label for="name"><small>Merchant</small></Label>
-                            <Input
-                            type="name"
-                            name="name"
-                            id="name"
-                            placeholder="Enter Merchant"
-                            value={name}
-                            onChange={onChangeName}
-                            required
-                            style={{...padding(5, 5, 5, 5)}}
-                            />
-                        </FormGroup>
-                    </Col>
-                </Row>
+                <div className="form-row">
+                    <FormGroup className="col-md-6">
+                        <Label for="name"><small>Merchant</small></Label>
+                        <Input
+                        type="name"
+                        name="name"
+                        id="name"
+                        placeholder="Enter Merchant"
+                        value={name}
+                        onChange={onChangeName}
+                        required
+                        style={{...padding(8, 5, 8, 5)}}
+                        />
+                    </FormGroup>
+                    <FormGroup className="col-md-6">
+                        <Label><small>Choose Logo Image</small></Label>
+                            <div className='custom-file mb-4'>
+                                <Input
+                                    type='file'
+                                    className='custom-file-input'
+                                    id='customFile'
+                                    onChange={onChangeImage}
+                                    style={{...padding(4, 4, 4, 4)}}
+                                />
+                                <Label className='custom-file-label' htmlFor='customFile'>
+                                    {imageName}
+                                </Label>
+                            </div>
+                    </FormGroup>
+                </div>
                 <Row>
                     <Col>
                         <FormGroup>
