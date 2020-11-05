@@ -126,31 +126,51 @@ function Promotions() {
 
         var enddate = endDate
         enddate = enddate.toString().replace('/-/g', '/')
-     
+    
+        isInModal(true)
+        isSuccessful(false)
+
         //add validation
         if (promoCode === undefined || promoCode === "") {
-            isInModal(true)
             isError(true)
             setError("Unable to create new mall promotion. Please fill in the promo code field.")
-            isSuccessful(false)
             return;
         }
 
         if (startd === undefined || startd === "") {
-            isInModal(true)
             isError(true)
             setError("Unable to create new mall promotion. Please select a start date.")
-            isSuccessful(false)
             return;  
         }
 
         if (enddate === undefined || enddate === "") {
-            isInModal(true)
             isError(true)
             setError("Unable to create new mall promotion. Please select an end date.")
-            isSuccessful(false)
             return;  
         }
+
+        var nums = /^\d+(,\d{3})*(\.\d{1,2})?$/gm
+        if (!discount.match(nums)) { //if not all numbers
+            setError("Unable to create new mall promotion. Please enter a valid discount value.")
+            isError(true)
+            return;
+        } 
+
+        if (!usageLimit.match(nums)) { //if not all numbers
+            setError("Unable to create new mall promotion. Please enter a valid usage limit.")
+            isError(true)
+            return;
+        }
+
+        if (minimumSpend.indexOf('$') > 0) {
+            setError("Please enter the minimum spend without a '$'sign")
+            isError(true)
+        } else {
+            if (!minimumSpend.match(nums)) { //if not all numbers
+                setError("Please enter a valid minimum spend value")
+                isError(true)
+            } 
+        } 
 
         var percentageDiscount = null
         var flatDiscount = null

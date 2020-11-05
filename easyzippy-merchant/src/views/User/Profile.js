@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import defaultLogo from '../../assets/img/user.png';
+import creditLogo from '../../assets/img/dollar-symbol.png';
 
 import {
     Card,
@@ -21,7 +22,9 @@ import {
     ModalFooter,
     UncontrolledPopover,
     PopoverBody,
-    CardImg
+    CardImg,
+    Spinner,
+    UncontrolledAlert
 } from "reactstrap";
 
 function Profile() {
@@ -73,6 +76,15 @@ function Profile() {
     const [modal, setModal] = useState(false)
     const [inModal, isInModal] = useState(false)
     const toggle = () => setModal(!modal);
+
+    //for the credits input field
+    const [pressed, setPressed] = useState(false) 
+    const togglePressed = () => setPressed(!pressed)
+
+    const [topUpAmount, setTopUpAmount] = useState('')
+    const [inCredit, setInCredit] = useState(false)
+
+    const [loading, setLoading] = useState()
 
     useEffect(() => {
 
@@ -442,11 +454,47 @@ function Profile() {
         }
     }
 
+    const onChangeTopUpAmount = e => {
+        const topUpAmount = e.target.value
+        console.log(topUpAmount)
+        setTopUpAmount(topUpAmount)
+    }
+
+    const topUpCredits = e => {
+
+        if (topUpAmount === undefined || topUpAmount === "") {
+            return
+        }
+
+        setLoading(true)
+
+        axios.get(`/pay/${merchantid}/${topUpAmount}`, {
+            headers: {
+                AuthToken: authToken,
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/xml',
+                'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, POST, DELETE, OPTIONS',
+
+            }
+        }).then (res => {
+            setLoading(false)
+        }).catch(function(error) {
+            setLoading(false)
+            setInCredit(true)
+            setError('Something went wrong, unable to top up credits')
+            isError(true)
+            console.log(error)
+        })
+        
+        
+    }
+
     return(
         <>
             <div className="content">
                 <Row>
-                    <Col md = "6">
+                    <Col md = "8">
                         <Card className="card-name">
                             <CardHeader>
                                 <div className="form-row">
@@ -597,8 +645,8 @@ function Profile() {
                                             <Button color="primary" size="sm" onClick={toggle}>Change Password</Button>
                                         </div>
                                     </Row>
-                                    { !inModal && err &&<Alert color="danger">{error}</Alert> }
-                                    { !inModal && successful &&<Alert color="success">{successMsg}</Alert> }
+                                    { !inModal && !inCredit && err &&<Alert color="danger">{error}</Alert> }
+                                    { !inModal && !inCredit && successful &&<Alert color="success">{successMsg}</Alert> }
                                 </form>
                             </CardBody>
                             <Modal isOpen={modal} toggle={toggle}>
@@ -635,8 +683,8 @@ function Profile() {
                                                 onChange={onChangeNewCfmPassword}
                                                 />
                                         </FormGroup>
-                                        { inModal && err &&<Alert color="danger">{error}</Alert> }
-                                        { inModal && successful &&<Alert color="success">{successMsg}</Alert>}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+                                        { inModal && !inCredit && err &&<Alert color="danger">{error}</Alert> }
+                                        { inModal && !inCredit && successful &&<Alert color="success">{successMsg}</Alert>}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
                                     </form>
                                 </ModalBody>
                                 <ModalFooter>
@@ -686,6 +734,49 @@ function Profile() {
                                     <Button color="primary" onClick={addLogo}>Upload</Button>{' '}
                                 </ModalFooter>
                             </Modal>
+                        </Card>
+                    </Col>
+                    <Col md="4">
+                        <Card className="card-name">
+                            <CardHeader>
+                                <div className="form-row">
+                                    <CardTitle className="col-md-10" tag="h5">Credit</CardTitle>
+                                </div>
+                            </CardHeader>
+                            <CardBody className='text-center'>
+                                <p>{' '}</p>
+                                <div>
+                                    <CardImg src={creditLogo} style={{width:"5rem"}} top alt='...'/>
+                                </div>
+                                <p>&nbsp;</p>
+                                <Button onClick={togglePressed}>
+                                    Top-up Credits
+                                </Button>
+                                {!pressed && 
+                                <p>&nbsp;</p>
+                                }
+                                {pressed && 
+                                <form>
+                                    <FormGroup className='w-50 ml-auto mr-auto'>
+                                        <Label for="inputTopUpAmount"></Label>
+                                            <Input 
+                                                type="text" 
+                                                id="inputTopUpAmount" 
+                                                placeholder="Enter Amount to Top Up" 
+                                                value={topUpAmount}
+                                                onChange={onChangeTopUpAmount}
+                                                />
+                                    </FormGroup>
+                                    <Button color="primary" onClick={topUpCredits}>
+                                        <i className="fas fa-arrow-right"/>
+                                    </Button>{' '}
+                                    {loading &&
+                                    <Spinner size="sm" color="primary" />
+                                    }
+                                    { inCredit && !inModal && err &&<UncontrolledAlert color="danger">{error}</UncontrolledAlert> }
+                                </form>
+                                }
+                            </CardBody>
                         </Card>
                     </Col>
                 </Row>
