@@ -1,6 +1,7 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import defaultLogo from '../../assets/img/user.png';
 
 import {
     Card,
@@ -17,30 +18,40 @@ import {
     Modal, 
     ModalHeader, 
     ModalBody, 
-    ModalFooter
+    ModalFooter,
+    UncontrolledPopover,
+    PopoverBody,
+    CardImg
 } from "reactstrap";
 
 function Profile() {
 
-    const merchant = JSON.parse(localStorage.getItem('currentMerchant'))
-    console.log("test " + merchant.name)
+    const ad = JSON.parse(localStorage.getItem('advertisementToView'))
+
+    const merchant = localStorage.getItem('currentMerchant')
 
     const merchantid = parseInt(Cookies.get('merchantUser'))
-    console.log(typeof merchantid)
 
     const authToken = JSON.parse(Cookies.get('authToken'))
-    console.log(typeof authToken + " " + authToken)
+    console.log(authToken)
 
-    const [name, setName] = useState(merchant.name)
-    const [email, setEmail] = useState(merchant.email)
-    const [mobileNumber, setMobileNumber] = useState(merchant.mobileNum)
-    const [pointOfContact, setPointOfContact] = useState(merchant.pointOfContact)
-    const [blk, setBlk] = useState(merchant.blk)
-    const [street, setStreet] = useState(merchant.street)
-    const [floor, setFloor] = useState(merchant.floor)
-    const [unitNumber, setUnitNumber] = useState(merchant.unitNumber)
-   //const [fullUnitNum, setFullUnitNum] = useState(merchant.fullUnitNum)
-    const [postalCode, setPostalCode] = useState(merchant.postalCode)
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [mobileNumber, setMobileNumber] = useState('')
+    const [pointOfContact, setPointOfContact] = useState('')
+    const [blk, setBlk] = useState('')
+    const [street, setStreet] = useState('')
+    const [floor, setFloor] = useState('')
+    const [unitNumber, setUnitNumber] = useState('')
+    const [postalCode, setPostalCode] = useState('')
+
+    //in file alr not string
+    const [logoToView, setLogoToView] = useState(null)
+    //do like if logo to view = null then show the default photo
+    // src={'../../assets/img/user.png'} i think
+
+    const [logoToAdd, setLogoToAdd] = useState(null)
+    const [logoToChange, setLogoToChange] = useState(null)
 
     const [currentPw, setCurrentPw] = useState('')
     const [newPw, setNewPw] = useState('')
@@ -52,23 +63,63 @@ function Profile() {
     const [successful, isSuccessful] = useState(false)
     const [successMsg, setMsg] = useState('')
 
+    const [modalChange, setModalChange] = useState(false)
+    const toggleChange = () => setModalChange(!modalChange);
+
+    const [modalAdd, setModalAdd] = useState(false)
+    const toggleAdd = () => setModalAdd(!modalAdd);
+
+    //for update password modal
     const [modal, setModal] = useState(false)
     const [inModal, isInModal] = useState(false)
-
     const toggle = () => setModal(!modal);
 
-    const merchant_toupdate = {
-        name: '',
-        mobileNum: '',
-        email: '',
-        pointOfContact: '',
-        blk: '',
-        street: '',
-        floor: '',
-        unitNumber: '',
-        //fullUnitNum: '', 
-        postalCode: ''
-    }
+    useEffect(() => {
+
+        axios.get(`/merchant/${merchantid}`, {
+            headers: {
+                AuthToken: authToken,
+                'Content-Type': 'application/json'
+            }
+        }).then (response => {
+
+            setName(response.data.name)
+            setEmail(response.data.email)
+            setMobileNumber(response.data.mobileNumber)
+            setPointOfContact(response.data.pointOfContact)
+            setBlk(response.data.blk)
+            setStreet(response.data.street)
+            setFloor(response.data.floor)
+            setUnitNumber(response.data.unitNumber)
+            setPostalCode(response.data.postalCode)
+            // setLogoToView(response.data.merchantLogoImage)
+
+            console.log(response.data.merchantLogoImage)
+
+            if (response.data.merchantLogoImage !== null) {
+                axios.get(`/assets/${response.data.merchantLogoImage}`, {
+                    responseType: 'blob'
+                }, 
+                {
+                    headers: {
+                        AuthToken: authToken,
+                        'Content-Type': 'application/json'
+                    }
+                }).then(res => {
+                    console.log('axios images thru')
+                    var file = new File([response.data], {type:"image/png"})
+                    let image = URL.createObjectURL(file)
+                    console.log(image)
+                    setLogoToView(image)
+                }).catch(function (error) {
+                    console.log(error.response.data)
+                })
+            }
+            
+        }).catch(function (error) {
+            console.log(error)
+        })
+    }, [])
 
     const onChangeName = e => {
         const name = e.target.value;
@@ -168,20 +219,6 @@ function Profile() {
         setUnitNumber(unitNumber.trim())
     }
 
-    // const onChangeFullUnitNum = e => {
-    //     const unitNum = e.target.value
-
-    //     if ((unitNum.indexOf('-') <= 0 || unitNum.charAt(0) === '-') && unitNum.length > 0) {
-
-    //         setError("Please enter a valid Unit Number")
-    //         isError(true)
-    //     } else {
-    //         isError(false)
-    //     }
-
-    //     setFullUnitNum(unitNum.trim())
-    // }
-
     const onChangePostalCode = e => {
         const postal = e.target.value
         if (postal.trim().length !== 6) {
@@ -203,14 +240,6 @@ function Profile() {
         e.preventDefault()
         console.log("in update profile")
 
-        // let arr = fullUnitNum.split('-')
-
-        // console.log("arr0: " + arr[0])
-        // console.log("arr1: " + arr[1])
-
-        // const floor = arr[0]
-        // const unitNumber = arr[1]
-
         axios.put(`/merchant/${merchantid}`, {
             name: name,
             email: email,
@@ -221,7 +250,7 @@ function Profile() {
             //fullUnitNum: fullUnitNum,
             floor: floor,
             unitNumber: unitNumber,
-            postalCode: postalCode
+            postalCode: postalCode,
         },
         {
             headers: {
@@ -238,21 +267,7 @@ function Profile() {
             setStreet(response.data.street)
             setFloor(response.data.floor)
             setUnitNumber(response.data.unitNumber)
-            //setFullUnitNum(response.data.fullUnitNum)
             setPostalCode(response.data.postalCode)
-            
-            // save new values to staff local storage
-            merchant_toupdate.name = response.data.name
-            merchant_toupdate.mobileNum = response.data.mobileNumber
-            merchant_toupdate.email = response.data.email
-            merchant_toupdate.pointOfContact = response.data.pointOfContact
-            merchant_toupdate.blk = response.data.blk
-            merchant_toupdate.street = response.data.street
-            merchant_toupdate.floor = response.data.floor
-            merchant_toupdate.unitNumber = response.data.unitNumber
-            //merchant_toupdate.fullUnitNum = response.data.fullUnitNum
-            merchant_toupdate.postalCode = response.data.postalCode
-            localStorage['currentMerchant'] = JSON.stringify(merchant_toupdate)
             
             isInModal(false)
             isError(false)
@@ -345,11 +360,93 @@ function Profile() {
         setNewCfmPw('')
     }
 
+    const addLogo = e => {
+
+        console.log("in add logo function")
+        e.preventDefault()
+
+        //need to post the image first
+        let formData = new FormData();
+        formData.append(logoToAdd.name, logoToAdd)
+        console.log('form data values: ')
+        for (var v of formData.values()) {
+            console.log(v)
+        }
+
+        axios.post(`/merchantUploadLogo/${merchantid}`, formData, {
+
+        }).then (res => {
+            console.log("logo add axios call went through")
+            var file = new File([res.data.merchantLogoImage], {type:"image/png"})
+            let image = URL.createObjectURL(file)
+            setLogoToView(image)
+            window.location.reload()
+        }).catch(function (error) {
+            console.log(error.response.data)
+        })
+    }
+
+    const changeLogo = e => {
+        console.log("in change logo function")
+        e.preventDefault()
+
+        //need to post the image first
+        let formData = new FormData();
+        formData.append(logoToChange.name, logoToChange)
+        console.log('form data values: ')
+        for (var v of formData.values()) {
+            console.log(v)
+        }
+
+        axios.post(`/merchantChangeLogo/${merchantid}`, formData, {
+            headers: {
+                AuthToken: authToken,
+                'Content-Type': 'application/json'
+            }
+        }).then (res => {
+            console.log("logo change axios call went through")
+            var file = new File([res.data.merchantLogoImage], {type:"image/png"})
+            let image = URL.createObjectURL(file)
+            setLogoToView(image)
+            window.location.reload()
+        }).catch(function (error) {
+            console.log(error.response.data)
+        })
+    }
+
+    const deleteLogo = e => {
+        e.preventDefault()
+        console.log("in delete logo function")
+
+        axios.post(`/merchantRemoveLogo/${merchantid}`, {
+            headers: {
+                AuthToken: authToken,
+            }
+        }).then(res => {
+            console.log("logo successfully deleted")
+
+        }).catch(function(error) {
+            console.log(error.response.data)
+        })
+    }
+
+    const onChangeLogo = e => {
+        if (e.target.files[0] !== undefined) {
+            setLogoToChange(e.target.files[0])
+        }
+    }
+
+    const onChangeAddLogo = e => {
+        if (e.target.files[0] !== undefined) {
+            setLogoToAdd(e.target.files[0])
+        }
+    }
+
     return(
         <>
             <div className="content">
                 <Row>
-                    <Col md = "12">
+                    <Col md = "6">
                         <Card className="card-name">
                             <CardHeader>
                                 <div className="form-row">
@@ -357,6 +454,34 @@ function Profile() {
                                 </div>
                             </CardHeader>
                             <CardBody>
+                                <div id="popover" className="text-center" style={{...padding(0,0,6,0)}}>
+                                    {logoToView !== null &&
+                                        <CardImg style={{width:"7rem"}} top src={logoToView} alt='...'/>
+                                    }
+                                    {logoToView === null &&
+                                        <CardImg style={{width:"7rem"}} top src={defaultLogo} alt='...'/>
+                                    }               
+                                </div>
+                                <UncontrolledPopover placement="right" target="popover">
+                                    <PopoverBody>
+                                        {logoToView === null && 
+                                            <Button color="primary" onClick={toggleAdd}>
+                                                <i className="fas fa-plus"/>
+                                            </Button>
+                                        }
+                                        {logoToView !== null &&
+                                        <>
+                                            <Button onClick={toggleChange}>
+                                                <i className="fas fa-edit"/>
+                                            </Button>
+                                            <Button color="danger" onClick={deleteLogo}>
+                                                <i className="fa fa-trash-alt"/>
+                                            </Button> 
+                                        </>     
+                                        }
+                                    </PopoverBody>
+                                </UncontrolledPopover>
+                                <p>{' '}</p>
                                 <form>
                                     <div className="form-row">
                                         <FormGroup className="col-md-6">
@@ -453,17 +578,6 @@ function Profile() {
                                                 required
                                                 />
                                         </FormGroup>
-                                        {/* <FormGroup className="col-md-6">
-                                            <Label for="inputUnitNum">Unit Number</Label>
-                                            <Input 
-                                                type="text" 
-                                                id="inputUnitNum" 
-                                                placeholder="Enter Unit Number (e.g. 03-05)" 
-                                                value={fullUnitNum}
-                                                onChange={onChangeFullUnitNum}
-                                                required
-                                                />
-                                        </FormGroup> */}
                                         <FormGroup className="col-md-4">
                                             <Label for="inputPostalCode">Postal Code</Label>
                                             <Input 
@@ -530,6 +644,48 @@ function Profile() {
                                 <Button color="secondary" onClick={reset}>Reset</Button>
                                 </ModalFooter>
                             </Modal>
+                            <Modal isOpen={modalChange} toggle={toggleChange}>
+                                <ModalHeader toggle={toggleChange}>Change Logo</ModalHeader>
+                                <ModalBody>
+                                    <form>
+                                        <FormGroup>
+                                            <Label>Choose New Logo</Label>
+                                                <div className='custom-file mb-4'>
+                                                    <Input
+                                                        type='file'
+                                                        className='custom-file-input'
+                                                        id='customFile'
+                                                        onChange={onChangeLogo}
+                                                    />
+                                                </div>
+                                        </FormGroup>
+                                    </form>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button color="primary" onClick={changeLogo}>Upload</Button>{' '}
+                                </ModalFooter>
+                            </Modal>
+                            <Modal isOpen={modalAdd} toggle={toggleAdd}>
+                                <ModalHeader toggle={toggleAdd}>Upload New Logo</ModalHeader>
+                                <ModalBody>
+                                    <form>
+                                        <FormGroup>
+                                            <Label>Choose Logo</Label>
+                                                <div className='custom-file mb-4'>
+                                                    <Input
+                                                        type='file'
+                                                        className='custom-file-input'
+                                                        id='customFile'
+                                                        onChange={onChangeAddLogo}
+                                                    />
+                                                </div>
+                                        </FormGroup>
+                                    </form>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button color="primary" onClick={addLogo}>Upload</Button>{' '}
+                                </ModalFooter>
+                            </Modal>
                         </Card>
                     </Col>
                 </Row>
@@ -537,5 +693,15 @@ function Profile() {
         </>
     );
 }
+
+function padding(a, b, c, d) {
+    return {
+        paddingTop: a,
+        paddingRight: b ? b : a,
+        paddingBottom: c ? c : a,
+        paddingLeft: d ? d : (b ? b : a)
+    }
+}
+
 
 export default Profile;

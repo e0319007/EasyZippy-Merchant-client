@@ -36,23 +36,11 @@ function Login() {
         // console.log("inside on change email")
         const email = e.target.value;
         setEmail(email)
-        if (email.trim().length == 0) {
-            setError("Email is a required field")
-            isError(true)
-        } else {
-            isError(false)
-        }
     }
 
     const onChangePassword = e => {
         const password = e.target.value;
         setPassword(password)
-        if (password.trim().length == 0) {
-            setError("Password is a required field")
-            isError(true)
-        } else {
-            isError(false)
-        }
     }
 
     const merchant = {
@@ -65,7 +53,8 @@ function Login() {
         //fullUnitNum: '',
         floor: '',
         unitNumber: '',
-        postalCode: ''
+        postalCode: '',
+        merchantLogoImage: ''
     }
 
     const redirect = () => {
@@ -88,6 +77,7 @@ function Login() {
         
         // check if tenancy agreement for merchant has been uploaded
         axios.post(`/merchant/email`, {
+
             email: email,
         }).then(res => {
             //if no tenancy agreement, redirect to file upload page
@@ -102,8 +92,6 @@ function Login() {
                 .then(response => {
                     console.log("axios call went through")
                     isError(false)
-                    history.push('/admin/dashboard')
-                    document.location.reload()
                     console.log(response.data.token)
                     Cookies.set('authToken', JSON.stringify(response.data.token));
                     Cookies.set('merchantUser', JSON.stringify(response.data.merchant.id));
@@ -118,11 +106,26 @@ function Login() {
                     merchant.floor = response.data.merchant.floor
                     merchant.unitNumber = response.data.merchant.unitNumber
                     merchant.postalCode = response.data.merchant.postalCode
+                    console.log(response.data.merchant.merchantLogoImage)
+                    axios.get(`/assets/${response.data.merchant.merchantLogoImage}`, {
+                        responseType: 'blob'
+                    }).then(res => {
+                        console.log('axios images thru')
+                        var file = new File([response.data], {type:"image/png"})
+                        let image = URL.createObjectURL(file)
+                        console.log(image)
+                        merchant.merchantLogoImage = image
+
+                        console.log(merchant)
         
-                    console.log(merchant)
-        
-                    localStorage.setItem('currentMerchant', JSON.stringify(merchant))
-        
+                        localStorage.setItem('currentMerchant', JSON.stringify(merchant))
+                        
+                        history.push('/admin/dashboard')
+                        document.location.reload()
+                    }).catch(function (error) {
+                        console.log(error.response.data)
+                    })
+                    
                 }).catch(function (error) {
                     isError(true)
                     if (error.response.data === "Merchant is not approved") {
