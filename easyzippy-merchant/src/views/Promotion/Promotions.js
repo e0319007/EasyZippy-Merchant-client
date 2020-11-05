@@ -66,10 +66,12 @@ function Promotions() {
     const [termsAndConditions, setTermsAndConditions] = useState('')
     const [startDate, setStartDate] = useState('')
     const [endDate, setEndDate] = useState('')
-    const [percentageDiscount, setPercentageDiscount] = useState('')
-    const [flatDiscount, setFlatDiscount] = useState('')
+    const [discount, setDiscount] = useState('')
     const [usageLimit, setUsageLimit] = useState('')
     const [minimunSpend, setMinimumSpend] = useState('')
+
+    const [isPercentage, setIsPercentage] = useState(true)
+    const [isFlat, setIsFlat] = useState(false)
 
     const merchantId = parseInt(Cookies.get('merchantUser'))
     
@@ -126,14 +128,38 @@ function Promotions() {
         enddate = enddate.toString().replace('/-/g', '/')
      
         //add validation
+        if (promoCode === undefined || promoCode === "") {
+            isInModal(true)
+            isError(true)
+            setError("Unable to create new mall promotion. Please fill in the promo code field.")
+            isSuccessful(false)
+            return;
+        }
 
-        // if (promoCode === undefined || promoCode === "") {
-        //     isInModal(true)
-        //     isError(true)
-        //     setError("Unable to create new mall promotion. Please fill in the promo code field.")
-        //     isSuccessful(false)
-        //     return;
-        // }
+        if (startd === undefined || startd === "") {
+            isInModal(true)
+            isError(true)
+            setError("Unable to create new mall promotion. Please select a start date.")
+            isSuccessful(false)
+            return;  
+        }
+
+        if (enddate === undefined || enddate === "") {
+            isInModal(true)
+            isError(true)
+            setError("Unable to create new mall promotion. Please select an end date.")
+            isSuccessful(false)
+            return;  
+        }
+
+        var percentageDiscount = null
+        var flatDiscount = null
+
+        if (isPercentage) {
+            percentageDiscount = discount
+        } else if (isFlat) {
+            flatDiscount = discount
+        }
 
         axios.post("/promotion/merchant", {
             promoCode: promoCode,
@@ -170,7 +196,7 @@ function Promotions() {
 
     const onChangePromoCode = e => {
         const promoCode = e.target.value
-        setPromoCode(promoCode)
+        setPromoCode(promoCode.trim())
     }
     const onChangeTitle = e => {
         const title = e.target.value
@@ -192,25 +218,72 @@ function Promotions() {
         const endDate = e.target.value
         setEndDate(endDate)
     }
-    const onChangePercentageDiscount = e => {
-        const percentageDiscount = e.target.value
-        setPercentageDiscount(percentageDiscount)
-    }
-    const onChangeFlatDiscount = e => {
-        const flatDiscount = e.target.value
-        setFlatDiscount(flatDiscount)
-    }
-    // const onChangeDiscount = e => {
-    //     const discount = e.target.value
 
-    // }
+    const onChangeDiscount = e => {
+        isInModal(true)
+        const discount = e.target.value
+        if (discount.trim().length === 0) {
+            setError("Discount is a required field")
+            isError(true)
+        } else if (discount.indexOf('$') > 0 || discount.indexOf('%') > 0) {
+            setError("Please enter the discount without a '$' or '%' sign")
+            isError(true)
+        } else {
+            var nums = /^\d+(,\d{3})*(\.\d{1,2})?$/gm
+            if (!discount.match(nums)) { //if not all numbers
+                setError("Please enter a valid discount value")
+                isError(true)
+            } else {
+                isError(false)
+            }
+        } 
+        setDiscount(discount)
+    }
+
     const onChangeUsageLimit = e => {
+        isInModal(true)
         const usageLimit = e.target.value
+
+        var nums = /^[0-9]+$/
+        if (!usageLimit.match(nums)) { //if not all numbers
+            setError("Please enter a valid usage limit")
+            isError(true)
+        } else {
+            isError(false)
+        }
+    
         setUsageLimit(usageLimit)
     }
     const onChangeMinimumSpend = e => {
+        isInModal(true)
         const minimumSpend = e.target.value
+        if (minimumSpend.indexOf('$') > 0) {
+            setError("Please enter the minimum spend without a '$'sign")
+            isError(true)
+        } else {
+            var nums = /^\d+(,\d{3})*(\.\d{1,2})?$/gm
+            if (!minimumSpend.match(nums)) { //if not all numbers
+                setError("Please enter a valid minimum spend value")
+                isError(true)
+            } else {
+                isError(false)
+            }
+        } 
         setMinimumSpend(minimumSpend)
+    }
+
+    const onChangeRadioPercentage = e => {
+        const checked = e.target.checked
+        console.log("percentage checked: " + checked)
+        setIsPercentage(checked)
+        setIsFlat(!checked)
+    }
+
+    const onChangeRadioFlat = e => {
+        const checked = e.target.checked
+        console.log("flat checked: " + checked)
+        setIsPercentage(!checked)
+        setIsFlat(checked)
     }
 
     const handleRowDelete = (oldData, resolve) => {
@@ -337,11 +410,11 @@ function Promotions() {
                             />
                         </FormGroup>
                         <FormGroup>
-                            <Label for="inputTitile">Titile</Label>
+                            <Label for="inputTitle">Title</Label>
                             <Input 
                                 type="text"
-                                id="inputTitile"
-                                placeholder="Titile"
+                                id="inputTitle"
+                                placeholder="Title"
                                 value={title}
                                 onChange={onChangeTitle}
                             />
@@ -388,67 +461,47 @@ function Promotions() {
                                     />
                             </FormGroup>
                         </div>
-                        {/* <div>
-                            <FormGroup>
-                                <CustomInput 
-                                    type="radio" 
-                                    id="percentageDiscount" 
-                                    name="customRadio" 
-                                    label="Percentage Discount (%)" />
-                                <CustomInput 
-                                    type="radio" 
-                                    id="flatDiscount" 
-                                    name="customRadio" 
-                                    label="Flat Discount ($)" />
-                            </FormGroup>
-                            <Input
-                                type="number"                               
-                            />
-                        </div> */}
                         <div className="form-row">
-                            <FormGroup className="col-md-6">
-                                <Label for="inputPercentageDiscount">Percentage Discount (%)</Label>
-                                    <InputGroup>
-                                        <InputGroupAddon addonType="prepend">
-                                            <InputGroupText>
-                                                <Input addon 
-                                                    type="radio" 
-                                                    name="customRadio"
-                                                />
-                                              </InputGroupText>
-                                        </InputGroupAddon>
-                                        <Input 
-                                            type="number"
-                                            placeholder="%" 
-                                            onChange={onChangePercentageDiscount}
-                                        />
-                                            
-                                    </InputGroup>
+                            <FormGroup className="col-md-6" check>
+                                <Label check for="percentageRadio">
+                                <Input 
+                                    type="radio" 
+                                    id="percentageRadio" 
+                                    checked={isPercentage}
+                                    onChange={onChangeRadioPercentage}
+                                    style={{...padding(15,0,0,0)}}
+                                    />
+                                Percentage Discount (%)</Label>
                             </FormGroup>
-                            <FormGroup className="col-md-6">
-                                <Label for="inputPercentageDiscount">Flat Discount ($)</Label>
-                                    <InputGroup>
-                                        <InputGroupAddon addonType="prepend">
-                                            <InputGroupText>
-                                                <Input addon 
-                                                    type="radio" 
-                                                    name="customRadio"
-                                                />
-                                              </InputGroupText>
-                                        </InputGroupAddon>
-                                        <Input 
-                                            type="number"
-                                            placeholder="$" 
-                                            onChange={onChangeFlatDiscount}
-                                        />
-                                    </InputGroup>
+                            <FormGroup className="col-md-6" check>
+                                <Label check for="flatRadio">
+                                <Input 
+                                    type="radio" 
+                                    id="flatRadio" 
+                                    checked={isFlat}
+                                    onChange={onChangeRadioFlat}
+                                    style={{...padding(15,0,0,0)}}
+                                    />
+                                Flat Discount ($)</Label>
+                            </FormGroup>
+                        </div>
+                        <div className="form-row">
+                            <FormGroup className="col-md-12">
+                                <Label for="inputDiscount"></Label>
+                                    <Input 
+                                        type="text" 
+                                        id="inputDiscount" 
+                                        placeholder="Discount"
+                                        value={discount}
+                                        onChange={onChangeDiscount}
+                                    />
                             </FormGroup>
                         </div>
                         <div className="form-row">
                             <FormGroup className="col-md-6">
                                 <Label for="inputUsageLimit">Usage Limit</Label>
                                     <Input 
-                                        type="number" 
+                                        type="text" 
                                         id="inputUsageLimit" 
                                         placeholder="Usage Limit"
                                         value={usageLimit}
@@ -458,9 +511,9 @@ function Promotions() {
                             <FormGroup className="col-md-6">
                                 <Label for="inputMinimumSpend">Minimum Spend ($)</Label>
                                     <Input 
-                                        type="number" 
+                                        type="text" 
                                         id="inputMinimumSpend" 
-                                        placeholder="MinimumSpend"
+                                        placeholder="Minimum Spend"
                                         value={minimunSpend}
                                         onChange={onChangeMinimumSpend}
                                     />
@@ -474,13 +527,17 @@ function Promotions() {
                     <Button color="primary" onClick={addMerchantPromotion}>Create</Button>{' '}
                 </ModalFooter>
             </Modal>
-      
-                <ModalFooter>
-                    
-                </ModalFooter>
-            
         </ThemeProvider>     
     )
+}
+
+function padding(a, b, c, d) {
+    return {
+        paddingTop: a,
+        paddingRight: b ? b : a,
+        paddingBottom: c ? c : a,
+        paddingLeft: d ? d : (b ? b : a)
+    }
 }
 
 export default Promotions;
