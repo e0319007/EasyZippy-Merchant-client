@@ -254,6 +254,7 @@ function Promotions() {
     
         setUsageLimit(usageLimit)
     }
+    
     const onChangeMinimumSpend = e => {
         isInModal(true)
         const minimumSpend = e.target.value
