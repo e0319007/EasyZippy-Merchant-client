@@ -40,7 +40,8 @@ function Orders() {
             customFilterAndSearch: (term, rowData) => formatDate(rowData.orderDate).toLowerCase().includes(term.toLowerCase()),
             render: row => <span>{ formatDate(row["orderDate"]) }</span>},
         {title: "Collection Method", field: "collectionMethodEnum"},
-        {title: "Order Status", field:"orderStatusEnum", lookup:{Processing: "Processing", ReadyForCollection: "Ready For Collection"}}          
+        {title: "Order Status", field:"orderStatusEnum",
+            customFilterAndSearch: (term, rowData) => (rowData.orderStatusEnum).toLowerCase().includes(term.toLowerCase())}
     ]
 
     const [orderData, setOrderData] = useState([])
