@@ -11,9 +11,10 @@ import {
     Row,
     Col,
     Input,
-    CardHeader, FormGroup, Label, Button
+    CardHeader, FormGroup, Label, Button, Alert
 } from "reactstrap";
 import { Form } from "components/UseForm";
+import Orders from "./Orders";
 
 const theme = createMuiTheme({
     typography: {
@@ -35,6 +36,16 @@ function OrderDetails() {
     const [customers, setCustomers] = useState([])
     const [promotions, setPromotions] = useState([])    
 
+    const [error, setError] = useState('')
+    const [err, isError] = useState(false)
+
+    const [successful, isSuccessful] = useState(false)
+    const [successMsg, setMsg] = useState('')
+
+    //const [orderStatusEnum, setOrderStatusEnum] = useState('')
+    const [orderStatusEnum, setOrderStatusEnum] = useState(data.orderStatusEnum)
+    const [orderStatusesEnum, setOrderStatusesEnum] = useState([])
+
     useEffect(() => {
         axios.get(`/order/${orderId}`, 
         {
@@ -43,7 +54,10 @@ function OrderDetails() {
             }
         }).then(res => {
             setData(res.data[0])
+            setOrderStatusEnum(res.data[0].orderStatusEnum)
             console.log("axios call order")
+            console.log("current status: ")
+            console.log(res.data[0].orderStatusEnum)
             //console.log(res.data)
             //console.log(res.data[0].customerId)
            
@@ -65,8 +79,54 @@ function OrderDetails() {
             }).catch(err => console.error(err))
         }).catch(function (error) {
             console.log(error.response.data)
-        })     
+        })   
+        
+        axios.get("/order/orderStatus", {
+            headers: {
+                AuthToken: authToken
+            }
+        }).then(res => {
+            setOrderStatusesEnum(res.data)
+            console.log("get all order status enum axios")
+            console.log("retrieving order status: " + res.data[2])
+        }).catch(err => console.error(err))
     },[])
+
+    const onChangeOrderStatusEnum = e => {
+        console.log("in onChangeOrderStatusEnum")
+        const orderStatusEnum = e.target.value;
+        setOrderStatusEnum(orderStatusEnum)
+        console.log("on change: " + orderStatusEnum)
+    }
+
+    const updateOrderStatus = e => {
+        e.preventDefault()
+        axios.put(`/order/${orderId}`, {
+            orderStatus: orderStatusEnum
+        }, 
+        {
+            headers: {
+                AuthToken: authToken
+            }
+        }).then(res => {
+            console.log("update order status axios went through")
+            setOrderStatusEnum(res.data[0].orderStatusEnum)
+            //setOrderStatusEnum(res.data[0].orderStatusEnum)
+            console.log("order status: ")
+            console.log(res.data[1][0].orderStatusEnum) 
+            setData(res.data[0])
+            console.log("res.data: ")
+            console.log(res.data[1][0])
+            isError(false)
+            isSuccessful(true)
+            setMsg("Order status updated successfully!")
+        }).catch(function(error) {
+            console.log(error.response.data)
+            isError(true)
+            setError(error.response.data)
+            isSuccessful(false)
+        })
+    }
 
     //match customer id to customer name
     function getCustomerName(id) {
@@ -165,8 +225,7 @@ function OrderDetails() {
                                                     //value={data.orderDate}
                                                 />
                                             </FormGroup>
-                                            <div className="form-row">
-                                                <FormGroup className="col-md-6">
+                                                <FormGroup>
                                                     <Label for="inputCollectionMethod">Collection Method</Label>
                                                     <Input
                                                         type="text"
@@ -175,17 +234,32 @@ function OrderDetails() {
                                                         value={data.collectionMethodEnum}
                                                     />
                                                 </FormGroup>
-                                                <FormGroup className="col-md-6">
+                                            </fieldset>
+                                            <fieldset>
+                                                <FormGroup>
                                                     <Label for="inputOrderStatus">Order Status</Label>
                                                     <Input
-                                                        type="text"
+                                                        type="select"
+                                                        name="select"
                                                         id="inputOrderStatus"
-                                                        placeholder="-"
-                                                        value={data.orderStatusEnum}
-                                                    />
-                                                </FormGroup>
-                                            </div>
+                                                        value={orderStatusEnum}
+                                                        onChange={onChangeOrderStatusEnum}
+                                                    >
+                                                        {
+                                                            orderStatusesEnum.map(orderStatusEnum => (
+                                                                <option key={orderStatusEnum.id}>{orderStatusEnum}</option>
+                                                            ))
+                                                        }
+                                                    </Input>
+                                                </FormGroup>  
                                         </fieldset>
+                                        <Row>
+                                            <div className="update ml-auto mr-auto" >
+                                                <Button color="success" size="sm" type="submit" onClick={updateOrderStatus}>Update</Button>
+                                            </div>
+                                        </Row>
+                                        {err &&<Alert color="danger">{error}</Alert> }
+                                        {successful &&<Alert color="success">{successMsg}</Alert>} 
                                         <Row>
                                             <Col md="12">
                                                 <div className="form-add">
