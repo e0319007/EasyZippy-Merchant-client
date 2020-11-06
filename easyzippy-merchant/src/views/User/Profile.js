@@ -145,7 +145,7 @@ function Profile() {
                     }
                 }).then(res => {
                     console.log('axios images thru')
-                    var file = new File([response.data], {type:"image/png"})
+                    var file = new File([res.data], {type:"image/png"})
                     let image = URL.createObjectURL(file)
                     console.log(image)
                     setLogoToView(image)
@@ -157,7 +157,6 @@ function Profile() {
         }).catch(function (error) {
             console.log(error)
         })
-
     }, [])
 
     const onChangeName = e => {
@@ -529,14 +528,20 @@ function Profile() {
                                 </div>
                             </CardHeader>
                             <CardBody>
-                                <div id="popover" className="text-center" style={{...padding(0,0,6,0)}}>
+                                <div id="popover" className="text-center">
                                     {logoToView !== null &&
-                                        <CardImg style={{width:"7rem"}} top src={logoToView} alt='...'/>
+                                        <CardImg 
+                                        style={{width:"7rem"}} 
+                                        top src={logoToView} 
+                                        alt='...'
+                                        className='rounded-circle'
+                                        />
                                     }
                                     {logoToView === null &&
                                         <CardImg style={{width:"7rem"}} top src={defaultLogo} alt='...'/>
                                     }               
                                 </div>
+                                <div>&nbsp;</div>
                                 <UncontrolledPopover placement="right" target="popover">
                                     <PopoverBody>
                                         {logoToView === null && 

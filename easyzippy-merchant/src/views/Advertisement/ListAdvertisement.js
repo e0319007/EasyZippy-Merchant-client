@@ -178,7 +178,7 @@ function ListAdvertisement() {
                 isSuccessful(false)
                 isError(true)
                 setError(errormsg)
-                console.log(error.response.data)
+                console.log(error)
             })
         }).catch (function (error) {
             let errormsg = error.response.data;
@@ -189,7 +189,7 @@ function ListAdvertisement() {
             isSuccessful(false)
             isError(true)
             setError(errormsg)
-            console.log(error.response.data)
+            console.log(error)
         })
 
     }
