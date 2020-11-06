@@ -54,7 +54,8 @@ function Login() {
         floor: '',
         unitNumber: '',
         postalCode: '',
-        merchantLogoImage: ''
+        merchantLogoImage: '',
+        creditBalance: ''
     }
 
     const redirect = () => {
@@ -106,6 +107,7 @@ function Login() {
                     merchant.floor = response.data.merchant.floor
                     merchant.unitNumber = response.data.merchant.unitNumber
                     merchant.postalCode = response.data.merchant.postalCode
+                    merchant.creditBalance = response.data.merchant.creditBalance
                     console.log(response.data.merchant.merchantLogoImage)
                     axios.get(`/assets/${response.data.merchant.merchantLogoImage}`, {
                         responseType: 'blob'

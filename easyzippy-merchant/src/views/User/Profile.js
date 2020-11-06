@@ -86,6 +86,8 @@ function Profile() {
 
     const [loading, setLoading] = useState()
 
+    const [bookingPackage, setBookingPackage] = useState('')
+
     useEffect(() => {
 
         axios.get(`/merchant/${merchantid}`, {
@@ -777,6 +779,13 @@ function Profile() {
                                 </form>
                                 }
                             </CardBody>
+                        </Card>
+                        <Card className="card-name">
+                            <CardHeader>
+                                <div className="form-row">
+                                    <CardTitle className="col-md-10" tag="h5">Buy Booking Package</CardTitle>
+                                </div>
+                            </CardHeader>
                         </Card>
                     </Col>
                 </Row>

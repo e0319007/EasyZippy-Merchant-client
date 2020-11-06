@@ -16,7 +16,8 @@ import {
   DropdownMenu,
   DropdownItem,
   Container,
-  NavLink, CardText, CardBody
+  NavLink, CardText, CardBody,
+  NavbarText
 } from "reactstrap";
 
 import routes from "routes.js";
@@ -32,6 +33,7 @@ class Header extends React.Component {
       annDropdownOpen: false, //announcement drop down
       color: "transparent",
       merchantId: parseInt(Cookies.get('merchantUser')),
+      creditBalance: localStorage.getItem('currentMerchant').creditBalance,
       authToken: JSON.parse(Cookies.get('authToken')),
       notifications: [],
       announcements: [],
@@ -131,7 +133,8 @@ class Header extends React.Component {
     console.log("mounted")
     console.log(parseInt(Cookies.get('merchantUser')))
     console.log(JSON.parse(Cookies.get('authToken')))
-
+    const merc = JSON.parse(localStorage.getItem('currentMerchant'))
+    console.log(merc.creditBalance)
     // GET NOTIFICATIONS
     axios.get(`/notification/merchant/${parseInt(Cookies.get('merchantUser'))}`, 
     {
@@ -297,6 +300,28 @@ class Header extends React.Component {
             className="justify-content-end"
           >
             <Nav navbar>
+
+              <NavItem style={{paddingTop:"4px"}}>
+                <Badge color="secondary" variant="dot" invisible={true}>
+                  <i className="nc-icon nc-money-coins" />
+                </Badge>
+              </NavItem>
+
+              <NavItem>
+                &nbsp;
+              </NavItem>
+
+              <NavItem style={{paddingTop:"4px"}}>
+                <Badge color="secondary" variant="dot" invisible={true}>
+                <NavbarText>
+                  ${JSON.parse(localStorage.getItem('currentMerchant')).creditBalance}
+                </NavbarText>
+                </Badge>
+              </NavItem>
+              
+              <NavItem>
+                &nbsp;
+              </NavItem>
 
               {/* NOTIFICATIONS */}
               <Dropdown nav isOpen={this.state.dropdownOpen} toggle={(e) => this.dropdownToggle(e)}>
