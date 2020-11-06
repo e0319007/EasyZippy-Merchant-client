@@ -47,3 +47,4 @@
 [1005/202445.250:ERROR:crash_report_database_win.cc(469)] failed to stat report
 [1012/112845.815:ERROR:crash_report_database_win.cc(469)] failed to stat report
 [1105/213732.832:ERROR:crash_report_database_win.cc(457)] unexpected header
+[1105/222227.930:ERROR:crash_report_database_win.cc(457)] unexpected header
