@@ -77,6 +77,10 @@ function Profile() {
     const [inModal, isInModal] = useState(false)
     const toggle = () => setModal(!modal);
 
+    //for view current booking package details modal
+    const [bookingPackageDetailsModal, setBookingPackageDetailsModal] = useState(false)
+    const toggleBookingPackageDetails = () => setBookingPackageDetailsModal(!bookingPackageDetailsModal)
+
     //for the credits input field
     const [pressed, setPressed] = useState(false) 
     const togglePressed = () => setPressed(!pressed)
@@ -87,6 +91,8 @@ function Profile() {
     const [loading, setLoading] = useState()
 
     const [bookingPackage, setBookingPackage] = useState(null)
+    const [bookingPackageModel, setBookingPackageModel] = useState(null)
+    const [kioskAddress, setKioskAddress] = useState('')
 
     useEffect(() => {
 
@@ -113,21 +119,37 @@ function Profile() {
                 }
             }).then (response => {
                 console.log('get booking package thru')
-                var bookingPackageModelId = response.data[0].bookingPackageModelId
-                console.log(bookingPackageModelId)
 
-                if (bookingPackageModelId !== null) {
-                    axios.get(`/bookingPackageModel/${bookingPackageModelId}`, {
-                        headers: {
-                            AuthToken: authToken
-                        }
-                    }).then( res => {
-                        console.log("get booking package model thru")
-                        setBookingPackage(res.data)
-                    }).catch(function (error) {
-                        console.log(error)
-                    })
+                for (var i in response.data) {
+                    if (response.data[i].expired === false) {
+                        var bookingPackageModelId = response.data[i].bookingPackageModelId
+                        setBookingPackage(response.data[i])
+
+                        axios.get(`/kiosk/${response.data[i].kioskId}`, {
+                            headers: {
+                                AuthToken: authToken
+                            }
+                        }).then (r => {
+                            console.log('get kiosk address axios through')
+                            console.log(r.data.address)
+                            setKioskAddress(r.data.address)
+                        })
+
+                        axios.get(`/bookingPackageModel/${bookingPackageModelId}`, {
+                            headers: {
+                                AuthToken: authToken
+                            }
+                        }).then( res => {
+                            console.log("get booking package model thru")
+                            setBookingPackageModel(res.data)
+                        }).catch(function (error) {
+                            console.log(error)
+                        })
+
+                        break;
+                    }
                 }
+
             }).catch(function (error) {
                 console.log(error)
             })
@@ -145,7 +167,7 @@ function Profile() {
                     }
                 }).then(res => {
                     console.log('axios images thru')
-                    var file = new File([response.data], {type:"image/png"})
+                    var file = new File([res.data], {type:"image/png"})
                     let image = URL.createObjectURL(file)
                     console.log(image)
                     setLogoToView(image)
@@ -157,7 +179,6 @@ function Profile() {
         }).catch(function (error) {
             console.log(error)
         })
-
     }, [])
 
     const onChangeName = e => {
@@ -463,9 +484,9 @@ function Profile() {
             }
         }).then(res => {
             console.log("logo successfully deleted")
-
+            window.location.reload()
         }).catch(function(error) {
-            console.log(error.response.data)
+            console.log(error)
         })
     }
 
@@ -529,14 +550,20 @@ function Profile() {
                                 </div>
                             </CardHeader>
                             <CardBody>
-                                <div id="popover" className="text-center" style={{...padding(0,0,6,0)}}>
+                                <div id="popover" className="text-center">
                                     {logoToView !== null &&
-                                        <CardImg style={{width:"7rem"}} top src={logoToView} alt='...'/>
+                                        <CardImg 
+                                        style={{width:"7rem"}} 
+                                        top src={logoToView} 
+                                        alt='...'
+                                        className='rounded-circle'
+                                        />
                                     }
                                     {logoToView === null &&
                                         <CardImg style={{width:"7rem"}} top src={defaultLogo} alt='...'/>
                                     }               
                                 </div>
+                                <div>&nbsp;</div>
                                 <UncontrolledPopover placement="right" target="popover">
                                     <PopoverBody>
                                         {logoToView === null && 
@@ -664,7 +691,8 @@ function Profile() {
                                                 required
                                                 />
                                         </FormGroup>
-                                    </div>                      
+                                    </div>             
+                                    <p>&nbsp;</p>         
                                     <Row>
                                         <div className="update ml-auto mr-auto" >
                                             <Button color="success" size="sm" type="submit" onClick={updateProfile}>Update Profile</Button>
@@ -811,10 +839,14 @@ function Profile() {
                                     <div className="form-row">
                                         <CardTitle className="col-md-10" tag="h5"><small>Current Booking Package</small></CardTitle>
                                     </div>
-                                    <p>&nbsp;</p>
                                     {/* //duration name locker type */}
                                     <CardBody className='text-center'>
-                                        <p>{' '}</p>
+                                        <div>
+                                            <i className="nc-icon nc-box fa-5x"/>
+                                        </div> {' '} 
+                                        <p className="mt-10"></p>
+                                        <Button color="info">View Package</Button>
+                                        <p>&nbsp;</p>
                                     </CardBody>
                                 </CardHeader>
                             }
@@ -823,12 +855,28 @@ function Profile() {
                                     <div className="form-row">
                                         <CardTitle className="col-md-10" tag="h5"><small>Booking Package</small></CardTitle>
                                         <CardBody className='text-center'>
+                                            <div>
+                                                <i className="nc-icon nc-box fa-5x"/>
+                                            </div> {' '} 
+                                            <p className="mt-10"></p>
+                                            <Button color="info">Buy Package</Button>
                                             <p>&nbsp;</p>
-                                            <Button>Buy Package</Button>
                                         </CardBody>
                                     </div>
                                 </CardHeader>
                             }
+                            <Modal isOpen={bookingPackageDetailsModal} toggle={toggleBookingPackageDetails}>
+                                <ModalHeader toggle={toggleBookingPackageDetails}>Booking Package Details</ModalHeader>
+                                <ModalBody>
+                                    <form>
+                                        <fieldset disabled>
+                                            <FormGroup>
+
+                                            </FormGroup>
+                                        </fieldset>
+                                    </form>
+                                </ModalBody>
+                            </Modal>
                         </Card>
                     </Col>
                 </Row>

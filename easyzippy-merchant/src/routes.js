@@ -13,6 +13,7 @@ import ListAdvertisement from "./views/Advertisement/ListAdvertisement"
 import AdvertisementDetails from "./views/Advertisement/AdvertisementDetails"
 import PromotionDetails from "views/Promotion/PromotionDetails";
 import OrderDetails from "views/Order/OrderDetails";
+import ChooseBookingPackageModel from "views/Booking/ChooseBookingPackageModel"
 
 var routes = [
   {
@@ -123,6 +124,14 @@ var routes = [
     name: "Advertisement Details",
     icon: "nc-icon nc-image",
     component: AdvertisementDetails,
+    layout: "/admin",
+    invisible: true
+  },
+  {
+    path: "/chooseBookingPackageModel",
+    name: "Choose Booking Package Model",
+    icon: "nc-icon nc-image",
+    component: ChooseBookingPackageModel,
     layout: "/admin",
     invisible: true
   }

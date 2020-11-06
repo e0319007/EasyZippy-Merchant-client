@@ -314,7 +314,7 @@ function AdvertisementDetails() {
                                 <CardBody>
                                     <form>
                                         <div className="text-center">
-                                            <CardImg style={{width:"18rem"}} top src={ad.image}  alt="..."/>
+                                            <CardImg style={{width:"18rem"}} top src={image}  alt="..."/>
                                         </div>
                                         <fieldset disabled>  
                                             <FormGroup>
