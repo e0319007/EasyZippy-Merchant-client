@@ -162,11 +162,11 @@ function Promotions() {
             return;
         }
 
-        if (minimumSpend.indexOf('$') > 0) {
+        if (minimunSpend.indexOf('$') > 0) {
             setError("Please enter the minimum spend without a '$'sign")
             isError(true)
         } else {
-            if (!minimumSpend.match(nums)) { //if not all numbers
+            if (!minimunSpend.match(nums)) { //if not all numbers
                 setError("Please enter a valid minimum spend value")
                 isError(true)
             } 
