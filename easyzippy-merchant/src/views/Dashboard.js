@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from 'js-cookie';
 import { Line } from "react-chartjs-2";
+import ReactShadowScroll from 'react-shadow-scroll';
+
+
 // reactstrap components
 import {
   Card,
@@ -10,7 +13,12 @@ import {
   CardFooter,
   CardTitle,
   Row,
-  Col
+  Col,
+  ListGroupItem,
+  ListGroup,
+  DropdownMenu,
+  Dropdown,
+  DropdownItem
 } from "reactstrap";
 // core components
 import {
@@ -26,6 +34,12 @@ function Dashboard() {
   const [productsLength, setProductsLength] = useState('')
   const [ordersLength, setOrdersLength] = useState('')
   const [adsLength, setAdsLength] = useState('')
+  const [promoLength, setPromoLength] = useState('')
+  const [notifications, setNotifications] = useState([])
+  const [announcements, setAnnouncements] = useState([])
+  const [annDropdownOpen, setAnnDropdownOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(true)
+
 
   useEffect(() => {
 
@@ -57,7 +71,57 @@ function Dashboard() {
       console.log(error.response)
     })
 
+    axios.get(`/promotion/merchant/${merchantId}`, {
+      headers: {
+        AuthToken: authToken
+      }
+    }).then(res => {
+      setPromoLength(res.data.length)
+    })
+
+    axios.get(`/notification/merchant/${merchantId}`, {
+      headers: {
+        AuthToken: authToken
+      }
+    }).then(res => {
+      setNotifications(res.data)
+    })
+
+    axios.get('/announcements', {
+      headers: {
+        AuthToken: authToken
+      }
+    }).then(res => {
+      setAnnouncements(res.data)
+    })
+
   },[])
+
+  const annDropdownToggle = e => {
+    setAnnDropdownOpen(!annDropdownOpen)
+  }
+
+  function formatDate(d) {
+    //console.log(d)
+    if (d === undefined){
+        d = (new Date()).toISOString()
+        console.log(undefined)
+    }
+    let currDate = new Date(d);
+    let year = currDate.getFullYear();
+    let month = currDate.getMonth() + 1;
+    let dt = currDate.getDate();
+    //let time = currDate.toLocaleTimeString('en-SG')
+
+    if (dt < 10) {
+        dt = '0' + dt;
+    }
+    if (month < 10) {
+        month = '0' + month;
+    }
+
+    return dt + "/" + month + "/" + year;
+  }
 
   return (
     <>
@@ -145,14 +209,14 @@ function Dashboard() {
                   <Col md="4" xs="5">
                   <br/><br/>
                     <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-money-coins text-primary" />
+                      <i className="nc-icon nc-tag-content text-primary" />
                     </div>
                   </Col>
                   <Col md="8" xs="7">
                   <br/><br/>
                     <div className="numbers">
-                      <p className="card-category">Revenue</p>
-                      <CardTitle tag="p">-</CardTitle>
+                      <p className="card-category">Promotions</p>
+                      <CardTitle tag="p">{promoLength}</CardTitle>
                       <p />
                     </div>
                   </Col>
@@ -165,21 +229,50 @@ function Dashboard() {
           </Col>
         </Row>
         <Row>
-          <Col md="12">
-            <Card>
+        <Col md="6">
+          <Card className="card-name" style={{height:"28rem"}}>
               <CardHeader>
-                <CardTitle tag="h5">Sales Revenue</CardTitle>
+                  <div className="form-row">
+                      <CardTitle className="col-md-10" tag="h5"><small>Notifications</small></CardTitle>
+                  </div>
               </CardHeader>
-              <CardBody>
-                <Line
-                  //data={dashboard24HoursPerformanceChart.data}
-                  options={dashboard24HoursPerformanceChart.options}
-                  width={400}
-                  height={100}
-                />
-              </CardBody>
+                <ListGroup flush style={{overflow:"scroll"}}>
+                {
+                  notifications.map(notification => (
+                    <ListGroupItem key={notification.id}>
+                      <p style={{fontWeight:'bold', color:'grey'}}>{notification.title}</p>
+                      <small style={{color:'grey'}}>{formatDate(notification.sentTime)}</small>
+                      <p className="text-muted">{notification.description}</p>
+
+                    </ListGroupItem>
+                  )).reverse()
+                }
+              </ListGroup>
+              <CardBody></CardBody>
             </Card>
           </Col>
+          <Col md="6">
+          <Card className="card-name" style={{height:"28rem"}}>
+              <CardHeader>
+                  <div className="form-row">
+                      <CardTitle className="col-md-10" tag="h5"><small>Announcements</small></CardTitle>
+                  </div>
+              </CardHeader>
+              <ListGroup flush style={{overflow:"scroll"}}>
+                {
+                    announcements.map(announcement => (
+                      <ListGroupItem key={announcement.id}>
+                        <p style={{fontWeight:'bold', color:'grey'}}>{announcement.title}</p>
+                        <small style={{color:'grey'}}>{formatDate(announcement.sentTime)}</small>
+                        <p className="text-muted">{announcement.description}</p>
+
+                      </ListGroupItem>
+                    )).reverse()
+                  }
+              </ListGroup>
+              <CardBody></CardBody>
+            </Card>
+          </Col>    
         </Row>
       </div>
     </>

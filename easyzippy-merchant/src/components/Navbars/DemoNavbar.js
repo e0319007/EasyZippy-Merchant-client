@@ -301,22 +301,22 @@ class Header extends React.Component {
           >
             <Nav navbar>
 
-              <NavItem style={{paddingTop:"4px"}}>
+              <NavItem style={{paddingTop:"14px"}}>
                 <Badge color="secondary" variant="dot" invisible={true}>
                   <i className="nc-icon nc-money-coins" />
                 </Badge>
               </NavItem>
 
               <NavItem>
-                &nbsp;
+                &nbsp;&nbsp;
               </NavItem>
 
-              <NavItem style={{paddingTop:"4px"}}>
-                <Badge color="secondary" variant="dot" invisible={true}>
+              <NavItem style={{paddingTop:"6px"}}>
+                {/* <Badge color="secondary" variant="dot" invisible={true}> */}
                 <NavbarText>
                   ${JSON.parse(localStorage.getItem('currentMerchant')).creditBalance}
                 </NavbarText>
-                </Badge>
+                {/* </Badge> */}
               </NavItem>
               
               <NavItem>
