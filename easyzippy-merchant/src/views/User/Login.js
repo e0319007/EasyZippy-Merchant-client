@@ -54,7 +54,7 @@ function Login() {
         floor: '',
         unitNumber: '',
         postalCode: '',
-        merchantLogoImage: '',
+        merchantLogoImage: null,
         creditBalance: ''
     }
 
@@ -109,25 +109,32 @@ function Login() {
                     merchant.postalCode = response.data.merchant.postalCode
                     merchant.creditBalance = response.data.merchant.creditBalance
                     console.log(response.data.merchant.merchantLogoImage)
-                    axios.get(`/assets/${response.data.merchant.merchantLogoImage}`, {
-                        responseType: 'blob'
-                    }).then(res => {
-                        console.log('axios images thru')
-                        var file = new File([response.data], {type:"image/png"})
-                        let image = URL.createObjectURL(file)
-                        console.log(image)
-                        merchant.merchantLogoImage = image
 
-                        console.log(merchant)
-        
+                    if (response.data.merchant.merchantLogoImage !== null) {
+                        axios.get(`/assets/${response.data.merchant.merchantLogoImage}`, {
+                            responseType: 'blob'
+                        }).then(res => {
+                            console.log('axios images thru')
+                            var file = new File([response.data], {type:"image/png"})
+                            let image = URL.createObjectURL(file)
+                            console.log(image)
+                            merchant.merchantLogoImage = image
+    
+                            console.log(merchant)
+            
+                            localStorage.setItem('currentMerchant', JSON.stringify(merchant))
+                            
+                            history.push('/admin/dashboard')
+                            document.location.reload()
+                        }).catch(function (error) {
+                            console.log(error.response.data)
+                        })
+                    } else {
                         localStorage.setItem('currentMerchant', JSON.stringify(merchant))
-                        
+                            
                         history.push('/admin/dashboard')
                         document.location.reload()
-                    }).catch(function (error) {
-                        console.log(error.response.data)
-                    })
-                    
+                    }
                 }).catch(function (error) {
                     isError(true)
                     if (error.response.data === "Merchant is not approved") {

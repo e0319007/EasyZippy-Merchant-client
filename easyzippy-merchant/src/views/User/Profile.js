@@ -86,7 +86,7 @@ function Profile() {
 
     const [loading, setLoading] = useState()
 
-    const [bookingPackage, setBookingPackage] = useState('')
+    const [bookingPackage, setBookingPackage] = useState(null)
 
     useEffect(() => {
 
@@ -106,7 +106,31 @@ function Profile() {
             setFloor(response.data.floor)
             setUnitNumber(response.data.unitNumber)
             setPostalCode(response.data.postalCode)
-            // setLogoToView(response.data.merchantLogoImage)
+
+            axios.get(`/merchantBookingPackages/${merchantid}`, {
+                headers: {
+                    AuthToken: authToken
+                }
+            }).then (response => {
+                console.log('get booking package thru')
+                var bookingPackageModelId = response.data[0].bookingPackageModelId
+                console.log(bookingPackageModelId)
+
+                if (bookingPackageModelId !== null) {
+                    axios.get(`/bookingPackageModel/${bookingPackageModelId}`, {
+                        headers: {
+                            AuthToken: authToken
+                        }
+                    }).then( res => {
+                        console.log("get booking package model thru")
+                        setBookingPackage(res.data)
+                    }).catch(function (error) {
+                        console.log(error)
+                    })
+                }
+            }).catch(function (error) {
+                console.log(error)
+            })
 
             console.log(response.data.merchantLogoImage)
 
@@ -126,13 +150,14 @@ function Profile() {
                     console.log(image)
                     setLogoToView(image)
                 }).catch(function (error) {
-                    console.log(error.response.data)
+                    console.log(error)
                 })
             }
             
         }).catch(function (error) {
             console.log(error)
         })
+
     }, [])
 
     const onChangeName = e => {
@@ -496,11 +521,11 @@ function Profile() {
         <>
             <div className="content">
                 <Row>
-                    <Col md = "8">
+                    <Col md = "7">
                         <Card className="card-name">
                             <CardHeader>
                                 <div className="form-row">
-                                <CardTitle className="col-md-10" tag="h5">Edit Profile</CardTitle>
+                                <CardTitle className="col-md-10" tag="h5"><small>Edit Profile</small></CardTitle>
                                 </div>
                             </CardHeader>
                             <CardBody>
@@ -738,11 +763,11 @@ function Profile() {
                             </Modal>
                         </Card>
                     </Col>
-                    <Col md="4">
+                    <Col md="5">
                         <Card className="card-name">
                             <CardHeader>
                                 <div className="form-row">
-                                    <CardTitle className="col-md-10" tag="h5">Credit</CardTitle>
+                                    <CardTitle className="col-md-10" tag="h5"><small>Credit</small></CardTitle>
                                 </div>
                             </CardHeader>
                             <CardBody className='text-center'>
@@ -781,11 +806,29 @@ function Profile() {
                             </CardBody>
                         </Card>
                         <Card className="card-name">
-                            <CardHeader>
-                                <div className="form-row">
-                                    <CardTitle className="col-md-10" tag="h5">Buy Booking Package</CardTitle>
-                                </div>
-                            </CardHeader>
+                            {bookingPackage !== null &&
+                                <CardHeader>
+                                    <div className="form-row">
+                                        <CardTitle className="col-md-10" tag="h5"><small>Current Booking Package</small></CardTitle>
+                                    </div>
+                                    <p>&nbsp;</p>
+                                    {/* //duration name locker type */}
+                                    <CardBody className='text-center'>
+                                        <p>{' '}</p>
+                                    </CardBody>
+                                </CardHeader>
+                            }
+                            {bookingPackage === null && 
+                                <CardHeader>
+                                    <div className="form-row">
+                                        <CardTitle className="col-md-10" tag="h5"><small>Booking Package</small></CardTitle>
+                                        <CardBody className='text-center'>
+                                            <p>&nbsp;</p>
+                                            <Button>Buy Package</Button>
+                                        </CardBody>
+                                    </div>
+                                </CardHeader>
+                            }
                         </Card>
                     </Col>
                 </Row>
