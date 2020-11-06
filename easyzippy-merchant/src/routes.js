@@ -29,13 +29,13 @@ var routes = [
     component: Profile,
     layout: "/admin"
   },
-  {
-    path: "/credits",
-    name: "Credits",
-    icon: "nc-icon nc-money-coins",
-    component: Credits,
-    layout: "/admin"
-  },
+  // {
+  //   path: "/credits",
+  //   name: "Credits",
+  //   icon: "nc-icon nc-money-coins",
+  //   component: Credits,
+  //   layout: "/admin"
+  // },
   {
     path: "/products",
     name: "Products",

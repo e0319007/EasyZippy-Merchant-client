@@ -68,11 +68,13 @@ function Dashboard() {
               <CardBody>
                 <Row>
                   <Col md="4" xs="5">
+                    <br/><br/>
                     <div className="icon-big text-center icon-warning">
                       <i className="nc-icon nc-shop text-warning" />
                     </div>
                   </Col>
                   <Col md="8" xs="7">
+                  <br/><br/>
                     <div className="numbers">
                       <p className="card-category">Products</p>
                       <CardTitle tag="p">{productsLength}</CardTitle>
@@ -81,6 +83,7 @@ function Dashboard() {
                   </Col>
                 </Row>
               </CardBody>
+              <br/><br/>
               <CardFooter>
               </CardFooter>
             </Card>
@@ -90,11 +93,13 @@ function Dashboard() {
               <CardBody>
                 <Row>
                   <Col md="4" xs="5">
+                  <br/><br/>
                     <div className="icon-big text-center icon-warning">
                       <i className="nc-icon nc-paper text-success" />
                     </div>
                   </Col>
                   <Col md="8" xs="7">
+                    <br/><br/>
                     <div className="numbers">
                       <p className="card-category">Orders</p>
                       <CardTitle tag="p">{ordersLength}</CardTitle>
@@ -103,6 +108,7 @@ function Dashboard() {
                   </Col>
                 </Row>
               </CardBody>
+              <br/><br/>
               <CardFooter>
               </CardFooter>
             </Card>
@@ -112,19 +118,22 @@ function Dashboard() {
               <CardBody>
                 <Row>
                   <Col md="4" xs="5">
+                  <br/><br/>
                     <div className="icon-big text-center icon-warning">
                       <i className="nc-icon nc-image text-danger" />
                     </div>
                   </Col>
                   <Col md="8" xs="7">
+                  <br/><br/>
                     <div className="numbers">
-                      <p className="card-category">Ads</p>
+                      <p className="card-category">Advertisements</p>
                       <CardTitle tag="p">{adsLength}</CardTitle>
                       <p />
                     </div>
                   </Col>
                 </Row>
               </CardBody>
+              <br/><br/>
               <CardFooter>
               </CardFooter>
             </Card>
@@ -134,11 +143,13 @@ function Dashboard() {
               <CardBody>
                 <Row>
                   <Col md="4" xs="5">
+                  <br/><br/>
                     <div className="icon-big text-center icon-warning">
                       <i className="nc-icon nc-money-coins text-primary" />
                     </div>
                   </Col>
                   <Col md="8" xs="7">
+                  <br/><br/>
                     <div className="numbers">
                       <p className="card-category">Revenue</p>
                       <CardTitle tag="p">-</CardTitle>
@@ -147,6 +158,7 @@ function Dashboard() {
                   </Col>
                 </Row>
               </CardBody>
+              <br/><br/>
               <CardFooter>
               </CardFooter>
             </Card>
