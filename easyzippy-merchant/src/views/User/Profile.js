@@ -463,9 +463,9 @@ function Profile() {
             }
         }).then(res => {
             console.log("logo successfully deleted")
-
+            window.location.reload()
         }).catch(function(error) {
-            console.log(error.response.data)
+            console.log(error)
         })
     }
 
