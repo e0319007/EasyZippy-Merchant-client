@@ -823,6 +823,7 @@ function Profile() {
                                                 />
                                     </FormGroup>
                                     <Button color="primary" onClick={topUpCredits}>
+                                        Pay By Paypal &nbsp;
                                         <i className="fas fa-arrow-right"/>
                                     </Button>{' '}
                                     {loading &&
