@@ -15,6 +15,7 @@ import PromotionDetails from "views/Promotion/PromotionDetails";
 import OrderDetails from "views/Order/OrderDetails";
 import ChooseBookingPackageModel from "views/Booking/ChooseBookingPackageModel"
 import BookingPackages from "views/BookingPackage/BookingPackages";
+import BookingPackageDetails from "views/BookingPackage/BookingPackageDetails.";
 
 var routes = [
   {
@@ -81,6 +82,14 @@ var routes = [
     icon: "nc-icon nc-box",
     component: BookingPackages,
     layout: "/admin"
+  },
+  {
+    path: "/bookingPackageDetails",
+    name: "Booking Package Details",
+    icon: "nc-icon nc-box",
+    component: BookingPackageDetails,
+    layout: "/admin",
+    invisible: true
   },
   {
     path: "/orders",

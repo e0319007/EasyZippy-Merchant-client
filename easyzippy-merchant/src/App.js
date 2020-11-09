@@ -22,6 +22,7 @@ import AdvertisementDetails from "./views/Advertisement/AdvertisementDetails"
 import PromotionDetails from "views/Promotion/PromotionDetails.js";
 import OrderDetails from "views/Order/OrderDetails.js";
 import ChooseBookingPackageModel from "views/Booking/ChooseBookingPackageModel.js"
+import BookingPackageDetails from "views/BookingPackage/BookingPackageDetails..js";
 
 const hist = createBrowserHistory();
 
@@ -54,6 +55,8 @@ function App(props) {
                 <Route exact path="/admin/promotionDetails" component={PromotionDetails}/>
                 <Route exact path="/admin/orderDetails" component={OrderDetails}/>
                 <Route exact path="/admin/chooseBookingPackageModel" component={ChooseBookingPackageModel}/>
+                <Route exact path="/admin/bookingPackageDetails" component={BookingPackageDetails}/>
+
 
                 {/* <Redirect to="/error" component={Error} /> */}
             </Switch>
