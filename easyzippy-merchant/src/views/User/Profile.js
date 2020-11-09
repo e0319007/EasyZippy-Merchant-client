@@ -804,8 +804,12 @@ function Profile() {
                                     <CardImg src={creditLogo} style={{width:"5rem"}} top alt='...'/>
                                 </div>
                                 <p>&nbsp;</p>
-                                <Button onClick={togglePressed}>
+                                <Button onClick={togglePressed} style={{fontSize:"0.7rem"}}>
                                     Top-up Credits
+                                </Button>
+                                &nbsp;&nbsp;&nbsp;
+                                <Button onClick={togglePressed} style={{fontSize:"0.7rem"}}>
+                                    Withdraw Credits
                                 </Button>
                                 {!pressed && 
                                 <p>&nbsp;</p>

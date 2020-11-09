@@ -37,8 +37,7 @@ function Dashboard() {
   const [promoLength, setPromoLength] = useState('')
   const [notifications, setNotifications] = useState([])
   const [announcements, setAnnouncements] = useState([])
-  const [annDropdownOpen, setAnnDropdownOpen] = useState(true)
-  const [isOpen, setIsOpen] = useState(true)
+  
 
 
   useEffect(() => {
@@ -97,9 +96,6 @@ function Dashboard() {
 
   },[])
 
-  const annDropdownToggle = e => {
-    setAnnDropdownOpen(!annDropdownOpen)
-  }
 
   function formatDate(d) {
     //console.log(d)

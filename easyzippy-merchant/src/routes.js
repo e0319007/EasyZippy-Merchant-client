@@ -14,6 +14,7 @@ import AdvertisementDetails from "./views/Advertisement/AdvertisementDetails"
 import PromotionDetails from "views/Promotion/PromotionDetails";
 import OrderDetails from "views/Order/OrderDetails";
 import ChooseBookingPackageModel from "views/Booking/ChooseBookingPackageModel"
+import BookingPackages from "views/BookingPackage/BookingPackages";
 
 var routes = [
   {
@@ -72,6 +73,13 @@ var routes = [
     name: "Bookings",
     icon: "nc-icon nc-bookmark-2",
     component: Bookings,
+    layout: "/admin"
+  },
+  {
+    path: "/bookingPackages",
+    name: "Booking Packages",
+    icon: "nc-icon nc-box",
+    component: BookingPackages,
     layout: "/admin"
   },
   {
