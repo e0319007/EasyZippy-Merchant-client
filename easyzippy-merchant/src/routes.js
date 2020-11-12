@@ -16,6 +16,9 @@ import OrderDetails from "views/Order/OrderDetails";
 import ChooseBookingPackageModel from "views/Booking/ChooseBookingPackageModel"
 import BookingPackages from "views/BookingPackage/BookingPackages";
 import BookingPackageDetails from "views/BookingPackage/BookingPackageDetails.";
+import AllBookingDetails from "views/Booking/AllBookingDetails";
+import CurrentBookingDetails from "views/Booking/CurrentBookingDetails";
+import OrderDetails2 from "views/Order/OrderDetails2";
 
 var routes = [
   {
@@ -62,19 +65,28 @@ var routes = [
     layout: "/admin",
     invisible: true
   },
-  // {
-  //   path: "/testProducts",
-  //   name: "Test Products",
-  //   icon: "nc-icon nc-shop",
-  //   component: TestProducts,
-  //   layout: "/admin"
-  // },
   {
     path: "/bookings",
     name: "Bookings",
     icon: "nc-icon nc-bookmark-2",
     component: Bookings,
     layout: "/admin"
+  },
+  {
+    path: "/allBookingDetails",
+    name: "Booking Details",
+    icon: "nc-icon nc-bookmark-2",
+    component: AllBookingDetails,
+    layout: "/admin",
+    invisible: true
+  },
+  {
+    path: "/currentBookingDetails",
+    name: "Booking Details",
+    icon: "nc-icon nc-bookmark-2",
+    component: CurrentBookingDetails,
+    layout: "/admin",
+    invisible: true
   },
   {
     path: "/bookingPackages",
@@ -103,6 +115,14 @@ var routes = [
     name: "Order Details",
     icon: "nc-icon nc-paper",
     component: OrderDetails,
+    layout: "/admin",
+    invisible: true
+  },
+  {
+    path: "/orderDetails2",
+    name: "Order Details2",
+    icon: "nc-icon nc-paper",
+    component: OrderDetails2,
     layout: "/admin",
     invisible: true
   },
