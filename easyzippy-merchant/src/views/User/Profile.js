@@ -726,6 +726,7 @@ function Profile() {
                                             <Button color="primary" size="sm" onClick={toggle}>Change Password</Button>
                                         </div>
                                     </Row>
+                                    <p>{' '}</p>
                                     { !inModal && !inCredit && err &&<Alert color="danger">{error}</Alert> }
                                     { !inModal && !inCredit && successful &&<Alert color="success">{successMsg}</Alert> }
                                 </form>
@@ -825,13 +826,12 @@ function Profile() {
                                 </div>
                             </CardHeader>
                             <CardBody className='text-center'>
-                                <p>{' '}</p>
-                                <div style={{fontSize:"2rem"}}>
-                                    <i className="fas fa-dollar-sign"/>
-                                    {' '}
-                                    {parseFloat(merchant.creditBalance).toFixed(2)}
+                                {/* <p>{' '}</p> */}
+                                <div style={{fontSize:"1.2rem"}}>Current Balance: </div>
+                                <div style={{fontSize:"2rem"}}>  
+                                    $ {parseFloat(merchant.creditBalance).toFixed(2)}
                                 </div>
-                                <p>&nbsp;</p>
+                                <p>{' '}</p>
                                 <p><i>Top-up or Withdraw Credits via PayPal</i></p>
                                 <Button onClick={togglePressed} style={{fontSize:"0.7rem"}}>
                                     Top-up
@@ -890,9 +890,10 @@ function Profile() {
                                         <CardTitle className="col-md-10" tag="h5"><small>Booking Package</small></CardTitle>
                                         <CardBody className='text-center'>
                                             <div>
-                                                <i className="nc-icon nc-box fa-5x"/>
+                                                <i className="nc-icon nc-box fa-4x"/>
                                             </div> {' '} 
                                             <p className="mt-10"></p>
+                                            <p><i>A Booking Package gives you unlimited locker usage for a period of time.</i></p>
                                             <Button color="info" onClick={() => {
                                                 history.push('/admin/chooseBookingPackageModel')
                                             }}>Buy Package</Button>
