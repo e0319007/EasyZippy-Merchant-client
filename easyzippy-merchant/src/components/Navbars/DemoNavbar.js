@@ -172,6 +172,8 @@ class Header extends React.Component {
       console.log(error.response.data)
     })
 
+    
+
   }
 
   componentDidUpdate(e) {
@@ -314,7 +316,7 @@ class Header extends React.Component {
               <NavItem style={{paddingTop:"6px"}}>
                 {/* <Badge color="secondary" variant="dot" invisible={true}> */}
                 <NavbarText>
-                  ${JSON.parse(localStorage.getItem('currentMerchant')).creditBalance}
+                  ${parseFloat(JSON.parse(localStorage.getItem('currentMerchant')).creditBalance).toFixed(2)}
                 </NavbarText>
                 {/* </Badge> */}
               </NavItem>

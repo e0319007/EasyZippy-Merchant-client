@@ -898,6 +898,9 @@ function Profile() {
                                                 setInCredit(true)
                                                 isSuccessful(true)
                                                 setMsg('Credits topped-up successfully!')
+                                                merchant.creditBalance = parseFloat(merchant.creditBalance - parseFloat(topUpAmount))
+                                                localStorage.setItem('currentMerchant', JSON.stringify(merchant))
+                                                window.location.reload()
                                             }}
                                         />
                                     </div>
