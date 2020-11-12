@@ -130,8 +130,7 @@ function Orders() {
                                         icon: 'info',
                                         tooltip: "View Order Details",
                                         onClick: (event, rowData) => {
-                                            history.push('/admin/orderDetails2')
-                                            //history.push('/admin/orderDetails')
+                                            history.push('/admin/orderDetails')
                                             localStorage.setItem('orderToView', JSON.stringify(rowData.id))
                                         }
                                     },
