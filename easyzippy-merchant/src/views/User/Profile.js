@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from "react";
+import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import defaultLogo from '../../assets/img/user.png';
@@ -29,9 +30,9 @@ import {
 
 function Profile() {
 
-    const ad = JSON.parse(localStorage.getItem('advertisementToView'))
+    const history = useHistory()
 
-    const merchant = localStorage.getItem('currentMerchant')
+    const merchant = JSON.parse(localStorage.getItem('currentMerchant'))
 
     const merchantid = parseInt(Cookies.get('merchantUser'))
 
@@ -90,8 +91,8 @@ function Profile() {
 
     const [loading, setLoading] = useState()
 
-    const [bookingPackage, setBookingPackage] = useState(null)
-    const [bookingPackageModel, setBookingPackageModel] = useState(null)
+    const [bookingPackage, setBookingPackage] = useState('')
+    const [bookingPackageModel, setBookingPackageModel] = useState('')
     const [kioskAddress, setKioskAddress] = useState('')
 
     useEffect(() => {
@@ -119,37 +120,40 @@ function Profile() {
                 }
             }).then (response => {
                 console.log('get booking package thru')
-
-                for (var i in response.data) {
-                    if (response.data[i].expired === false) {
-                        var bookingPackageModelId = response.data[i].bookingPackageModelId
-                        setBookingPackage(response.data[i])
-
-                        axios.get(`/kiosk/${response.data[i].kioskId}`, {
-                            headers: {
-                                AuthToken: authToken
-                            }
-                        }).then (r => {
-                            console.log('get kiosk address axios through')
-                            console.log(r.data.address)
-                            setKioskAddress(r.data.address)
-                        })
-
-                        axios.get(`/bookingPackageModel/${bookingPackageModelId}`, {
-                            headers: {
-                                AuthToken: authToken
-                            }
-                        }).then( res => {
-                            console.log("get booking package model thru")
-                            setBookingPackageModel(res.data)
-                        }).catch(function (error) {
-                            console.log(error)
-                        })
-
-                        break;
+                //if merchant has booking package
+                if (response.data !== undefined || response.data.length !== 0) {
+                    for (var i in response.data) {
+                        if (response.data[i].expired === false) {
+                            var bookingPackageModelId = response.data[i].bookingPackageModelId
+                            setBookingPackage(response.data[i])
+    
+                            axios.get(`/kiosk/${response.data[i].kioskId}`, {
+                                headers: {
+                                    AuthToken: authToken
+                                }
+                            }).then (r => {
+                                console.log('get kiosk address axios through')
+                                console.log(r.data.address)
+                                setKioskAddress(r.data.address)
+                            })
+    
+                            axios.get(`/bookingPackageModel/${bookingPackageModelId}`, {
+                                headers: {
+                                    AuthToken: authToken
+                                }
+                            }).then( res => {
+                                console.log("get booking package model thru")
+                                setBookingPackageModel(res.data)
+                                console.log("Booking package model: ")
+                                console.log(res.data)
+                            }).catch(function (error) {
+                                console.log(error)
+                            })
+    
+                            break;
+                        }
                     }
                 }
-
             }).catch(function (error) {
                 console.log(error)
             })
@@ -538,6 +542,28 @@ function Profile() {
         
     }
 
+    function formatDate(d) {
+        if (d === undefined){
+            d = (new Date()).toISOString()
+            console.log(undefined)
+        }
+        let currDate = new Date(d);
+        console.log("currDate: " + currDate)
+        let year = currDate.getFullYear();
+        let month = currDate.getMonth() + 1;
+        let dt = currDate.getDate();
+        let time = currDate.toLocaleTimeString('en-SG')
+
+        if (dt < 10) {
+            dt = '0' + dt;
+        }
+        if (month < 10) {
+            month = '0' + month;
+        }
+
+        return dt + "/" + month + "/" + year + " " + time ;
+    }
+
     return(
         <>
             <div className="content">
@@ -700,6 +726,7 @@ function Profile() {
                                             <Button color="primary" size="sm" onClick={toggle}>Change Password</Button>
                                         </div>
                                     </Row>
+                                    <p>{' '}</p>
                                     { !inModal && !inCredit && err &&<Alert color="danger">{error}</Alert> }
                                     { !inModal && !inCredit && successful &&<Alert color="success">{successMsg}</Alert> }
                                 </form>
@@ -799,17 +826,19 @@ function Profile() {
                                 </div>
                             </CardHeader>
                             <CardBody className='text-center'>
-                                <p>{' '}</p>
-                                <div>
-                                    <CardImg src={creditLogo} style={{width:"5rem"}} top alt='...'/>
+                                {/* <p>{' '}</p> */}
+                                <div style={{fontSize:"1.2rem"}}>Current Balance: </div>
+                                <div style={{fontSize:"2rem"}}>  
+                                    $ {parseFloat(merchant.creditBalance).toFixed(2)}
                                 </div>
-                                <p>&nbsp;</p>
+                                <p>{' '}</p>
+                                <p><i>Top-up or Withdraw Credits via PayPal</i></p>
                                 <Button onClick={togglePressed} style={{fontSize:"0.7rem"}}>
-                                    Top-up Credits
+                                    Top-up
                                 </Button>
                                 &nbsp;&nbsp;&nbsp;
-                                <Button onClick={togglePressed} style={{fontSize:"0.7rem"}}>
-                                    Withdraw Credits
+                                <Button style={{fontSize:"0.7rem"}}>
+                                    Withdraw
                                 </Button>
                                 {!pressed && 
                                 <p>&nbsp;</p>
@@ -827,6 +856,7 @@ function Profile() {
                                                 />
                                     </FormGroup>
                                     <Button color="primary" onClick={topUpCredits}>
+                                        Pay By Paypal &nbsp;
                                         <i className="fas fa-arrow-right"/>
                                     </Button>{' '}
                                     {loading &&
@@ -838,7 +868,7 @@ function Profile() {
                             </CardBody>
                         </Card>
                         <Card className="card-name">
-                            {bookingPackage !== null &&
+                            {bookingPackage !== '' &&
                                 <CardHeader>
                                     <div className="form-row">
                                         <CardTitle className="col-md-10" tag="h5"><small>Current Booking Package</small></CardTitle>
@@ -849,21 +879,24 @@ function Profile() {
                                             <i className="nc-icon nc-box fa-5x"/>
                                         </div> {' '} 
                                         <p className="mt-10"></p>
-                                        <Button color="info">View Package</Button>
+                                        <Button color="info" onClick={toggleBookingPackageDetails}>View Package</Button>
                                         <p>&nbsp;</p>
                                     </CardBody>
                                 </CardHeader>
                             }
-                            {bookingPackage === null && 
+                            {bookingPackage === '' && 
                                 <CardHeader>
                                     <div className="form-row">
                                         <CardTitle className="col-md-10" tag="h5"><small>Booking Package</small></CardTitle>
                                         <CardBody className='text-center'>
                                             <div>
-                                                <i className="nc-icon nc-box fa-5x"/>
+                                                <i className="nc-icon nc-box fa-4x"/>
                                             </div> {' '} 
                                             <p className="mt-10"></p>
-                                            <Button color="info">Buy Package</Button>
+                                            <p><i>A Booking Package gives you unlimited locker usage for a period of time.</i></p>
+                                            <Button color="info" onClick={() => {
+                                                history.push('/admin/chooseBookingPackageModel')
+                                            }}>Buy Package</Button>
                                             <p>&nbsp;</p>
                                         </CardBody>
                                     </div>
@@ -875,8 +908,81 @@ function Profile() {
                                     <form>
                                         <fieldset disabled>
                                             <FormGroup>
-
+                                                <Label for="packageName">Booking Package Name</Label>
+                                                <Input 
+                                                    type="text" 
+                                                    id="packageName" 
+                                                    placeholder="Name" 
+                                                    value={bookingPackageModel.name}
+                                                    readOnly
+                                                />
                                             </FormGroup>
+                                            <FormGroup>
+                                                <Label for="packageDescription">Booking Package Description</Label>
+                                                <Input 
+                                                    type="textarea" 
+                                                    id="packageDescription" 
+                                                    placeholder="Description" 
+                                                    value={bookingPackageModel.description}
+                                                    readOnly
+                                                />
+                                            </FormGroup>
+                                            <FormGroup>
+                                            <FormGroup>
+                                                <Label for="packageKiosk">Kiosk</Label>
+                                                <Input 
+                                                    type="text" 
+                                                    id="packageKiosk" 
+                                                    placeholder="kiosk" 
+                                                    value={kioskAddress}
+                                                    readOnly
+                                                />
+                                                </FormGroup>
+                                            </FormGroup>
+                                            <Row>
+                                                <FormGroup className="col-md-6">
+                                                    <Label for="packageQuota">Package Locker Quota</Label>
+                                                    <Input 
+                                                        type="text" 
+                                                        id="packageQuota" 
+                                                        placeholder="Quota" 
+                                                        value={bookingPackageModel.quota}
+                                                        readOnly
+                                                    />
+                                                </FormGroup>
+                                                <FormGroup className="col-md-6">
+                                                    <Label for="lockerUsage">Your Locker Usage</Label>
+                                                    <Input 
+                                                        type="text" 
+                                                        id="lockerUsage" 
+                                                        placeholder="Quota" 
+                                                        value={bookingPackage.lockerCount + "/" + bookingPackageModel.quota}
+                                                        readOnly
+                                                    />
+                                                </FormGroup>
+                                            </Row>
+                                            <Row>
+                                                <FormGroup className="col-md-6">
+                                                    <Label for="packageStart">Date Bought</Label>
+                                                    <Input 
+                                                        type="text" 
+                                                        id="packageStart" 
+                                                        placeholder="Start Date" 
+                                                        value={formatDate(bookingPackage.startDate)}
+                                                        readOnly
+                                                    />
+                                                </FormGroup>
+                                                <FormGroup className="col-md-6">
+                                                    <Label for="packageExpiry">Expiry Date</Label>
+                                                    <Input 
+                                                        type="text" 
+                                                        id="packageExpiry" 
+                                                        placeholder="Expiry Date" 
+                                                        value={formatDate(bookingPackage.endDate)}
+                                                        readOnly
+                                                    />
+                                                </FormGroup>
+                                            </Row>
                                         </fieldset>
                                     </form>
                                 </ModalBody>
