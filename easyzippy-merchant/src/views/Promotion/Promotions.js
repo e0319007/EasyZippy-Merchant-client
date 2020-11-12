@@ -68,7 +68,7 @@ function Promotions() {
     const [endDate, setEndDate] = useState('')
     const [discount, setDiscount] = useState('')
     const [usageLimit, setUsageLimit] = useState('')
-    const [minimunSpend, setMinimumSpend] = useState('')
+    const [minimumSpend, setMinimumSpend] = useState('')
 
     const [isPercentage, setIsPercentage] = useState(true)
     const [isFlat, setIsFlat] = useState(false)
@@ -133,44 +133,55 @@ function Promotions() {
         //add validation
         if (promoCode === undefined || promoCode === "") {
             isError(true)
-            setError("Unable to create new mall promotion. Please fill in the promo code field.")
+            setError("Unable to create new promotion. Please fill in the promo code field.")
             return;
         }
 
         if (startd === undefined || startd === "") {
             isError(true)
-            setError("Unable to create new mall promotion. Please select a start date.")
+            setError("Unable to create new promotion. Please select a start date.")
             return;  
         }
 
         if (enddate === undefined || enddate === "") {
             isError(true)
-            setError("Unable to create new mall promotion. Please select an end date.")
+            setError("Unable to create new promotion. Please select an end date.")
             return;  
         }
 
         var nums = /^\d+(,\d{3})*(\.\d{1,2})?$/gm
         if (!discount.match(nums)) { //if not all numbers
-            setError("Unable to create new mall promotion. Please enter a valid discount value.")
+            setError("Unable to create new promotion. Please enter a valid discount value.")
             isError(true)
             return;
         } 
 
         if (!usageLimit.match(nums)) { //if not all numbers
-            setError("Unable to create new mall promotion. Please enter a valid usage limit.")
+            setError("Unable to create new promotion. Please enter a valid usage limit.")
             isError(true)
             return;
         }
 
-        if (minimunSpend.indexOf('$') > 0) {
+        if (minimumSpend.indexOf('$') > 0) {
             setError("Please enter the minimum spend without a '$'sign")
             isError(true)
         } else {
-            if (!minimunSpend.match(nums)) { //if not all numbers
+            if (!minimumSpend.match(nums)) { //if not all numbers
                 setError("Please enter a valid minimum spend value")
                 isError(true)
             } 
         } 
+        let startArray = startDate.split("-") 
+        var pastdate = new Date(startArray[0], startArray[1]-1, startArray[2])
+        var today = new Date()
+        //if start date is before today, dont allow to create
+        if (today > pastdate) {
+            //invalid = true
+            isError(true)
+            setError("Unable to create promotion where Start Date is before today")
+            isSuccessful(false)
+            return;
+        }
 
         var percentageDiscount = null
         var flatDiscount = null
@@ -191,7 +202,7 @@ function Promotions() {
             percentageDiscount: percentageDiscount,
             flatDiscount: flatDiscount,
             usageLimit: usageLimit,
-            minimunSpend: minimunSpend,
+            minimumSpend: minimumSpend,
             merchantId: merchantId
         },
         {
@@ -535,7 +546,7 @@ function Promotions() {
                                         type="text" 
                                         id="inputMinimumSpend" 
                                         placeholder="Minimum Spend"
-                                        value={minimunSpend}
+                                        value={minimumSpend}
                                         onChange={onChangeMinimumSpend}
                                     />
                             </FormGroup>
