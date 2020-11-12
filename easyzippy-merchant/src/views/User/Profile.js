@@ -900,6 +900,13 @@ function Profile() {
                                                 setMsg('Credits topped-up successfully!')
                                                 merchant.creditBalance = parseFloat(merchant.creditBalance - parseFloat(topUpAmount))
                                                 localStorage.setItem('currentMerchant', JSON.stringify(merchant))
+                                                // var xhr = new XMLHttpRequest();
+                                                // xhr.onreadystatechange = function() {
+                                                //     if (xhr.readyState === 4) {
+                                                //         let resp = JSON.parse(JSON.parse(xhr.responseText))
+                                                //         console.log(resp)
+                                                //     }
+                                                // }
                                                 window.location.reload()
                                             }}
                                         />
