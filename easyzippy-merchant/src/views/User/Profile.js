@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from "react";
+import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import defaultLogo from '../../assets/img/user.png';
@@ -29,7 +30,7 @@ import {
 
 function Profile() {
 
-    const ad = JSON.parse(localStorage.getItem('advertisementToView'))
+    const history = useHistory()
 
     const merchant = localStorage.getItem('currentMerchant')
 
@@ -90,8 +91,8 @@ function Profile() {
 
     const [loading, setLoading] = useState()
 
-    const [bookingPackage, setBookingPackage] = useState(null)
-    const [bookingPackageModel, setBookingPackageModel] = useState(null)
+    const [bookingPackage, setBookingPackage] = useState('')
+    const [bookingPackageModel, setBookingPackageModel] = useState('')
     const [kioskAddress, setKioskAddress] = useState('')
 
     useEffect(() => {
@@ -119,37 +120,40 @@ function Profile() {
                 }
             }).then (response => {
                 console.log('get booking package thru')
-
-                for (var i in response.data) {
-                    if (response.data[i].expired === false) {
-                        var bookingPackageModelId = response.data[i].bookingPackageModelId
-                        setBookingPackage(response.data[i])
-
-                        axios.get(`/kiosk/${response.data[i].kioskId}`, {
-                            headers: {
-                                AuthToken: authToken
-                            }
-                        }).then (r => {
-                            console.log('get kiosk address axios through')
-                            console.log(r.data.address)
-                            setKioskAddress(r.data.address)
-                        })
-
-                        axios.get(`/bookingPackageModel/${bookingPackageModelId}`, {
-                            headers: {
-                                AuthToken: authToken
-                            }
-                        }).then( res => {
-                            console.log("get booking package model thru")
-                            setBookingPackageModel(res.data)
-                        }).catch(function (error) {
-                            console.log(error)
-                        })
-
-                        break;
+                //if merchant has booking package
+                if (response.data !== undefined || response.data.length !== 0) {
+                    for (var i in response.data) {
+                        if (response.data[i].expired === false) {
+                            var bookingPackageModelId = response.data[i].bookingPackageModelId
+                            setBookingPackage(response.data[i])
+    
+                            axios.get(`/kiosk/${response.data[i].kioskId}`, {
+                                headers: {
+                                    AuthToken: authToken
+                                }
+                            }).then (r => {
+                                console.log('get kiosk address axios through')
+                                console.log(r.data.address)
+                                setKioskAddress(r.data.address)
+                            })
+    
+                            axios.get(`/bookingPackageModel/${bookingPackageModelId}`, {
+                                headers: {
+                                    AuthToken: authToken
+                                }
+                            }).then( res => {
+                                console.log("get booking package model thru")
+                                setBookingPackageModel(res.data)
+                                console.log("Booking package model: ")
+                                console.log(res.data)
+                            }).catch(function (error) {
+                                console.log(error)
+                            })
+    
+                            break;
+                        }
                     }
                 }
-
             }).catch(function (error) {
                 console.log(error)
             })
@@ -538,6 +542,28 @@ function Profile() {
         
     }
 
+    function formatDate(d) {
+        if (d === undefined){
+            d = (new Date()).toISOString()
+            console.log(undefined)
+        }
+        let currDate = new Date(d);
+        console.log("currDate: " + currDate)
+        let year = currDate.getFullYear();
+        let month = currDate.getMonth() + 1;
+        let dt = currDate.getDate();
+        let time = currDate.toLocaleTimeString('en-SG')
+
+        if (dt < 10) {
+            dt = '0' + dt;
+        }
+        if (month < 10) {
+            month = '0' + month;
+        }
+
+        return dt + "/" + month + "/" + year + " " + time ;
+    }
+
     return(
         <>
             <div className="content">
@@ -835,7 +861,7 @@ function Profile() {
                             </CardBody>
                         </Card>
                         <Card className="card-name">
-                            {bookingPackage !== null &&
+                            {bookingPackage !== '' &&
                                 <CardHeader>
                                     <div className="form-row">
                                         <CardTitle className="col-md-10" tag="h5"><small>Current Booking Package</small></CardTitle>
@@ -846,12 +872,12 @@ function Profile() {
                                             <i className="nc-icon nc-box fa-5x"/>
                                         </div> {' '} 
                                         <p className="mt-10"></p>
-                                        <Button color="info">View Package</Button>
+                                        <Button color="info" onClick={toggleBookingPackageDetails}>View Package</Button>
                                         <p>&nbsp;</p>
                                     </CardBody>
                                 </CardHeader>
                             }
-                            {bookingPackage === null && 
+                            {bookingPackage === '' && 
                                 <CardHeader>
                                     <div className="form-row">
                                         <CardTitle className="col-md-10" tag="h5"><small>Booking Package</small></CardTitle>
@@ -860,7 +886,9 @@ function Profile() {
                                                 <i className="nc-icon nc-box fa-5x"/>
                                             </div> {' '} 
                                             <p className="mt-10"></p>
-                                            <Button color="info">Buy Package</Button>
+                                            <Button color="info" onClick={() => {
+                                                history.push('/admin/chooseBookingPackageModel')
+                                            }}>Buy Package</Button>
                                             <p>&nbsp;</p>
                                         </CardBody>
                                     </div>
@@ -872,8 +900,74 @@ function Profile() {
                                     <form>
                                         <fieldset disabled>
                                             <FormGroup>
-
+                                                <Label for="packageName">Booking Package Name</Label>
+                                                <Input 
+                                                    type="text" 
+                                                    id="packageName" 
+                                                    placeholder="Name" 
+                                                    value={bookingPackageModel.name}
+                                                />
                                             </FormGroup>
+                                            <FormGroup>
+                                                <Label for="packageDescription">Booking Package Description</Label>
+                                                <Input 
+                                                    type="textarea" 
+                                                    id="packageDescription" 
+                                                    placeholder="Description" 
+                                                    value={bookingPackageModel.description}
+                                                />
+                                            </FormGroup>
+                                            <FormGroup>
+                                            <FormGroup>
+                                                <Label for="packageKiosk">Kiosk</Label>
+                                                <Input 
+                                                    type="text" 
+                                                    id="packageKiosk" 
+                                                    placeholder="kiosk" 
+                                                    value={kioskAddress}
+                                                />
+                                                </FormGroup>
+                                            </FormGroup>
+                                            <Row>
+                                                <FormGroup className="col-md-6">
+                                                    <Label for="packageQuota">Package Locker Quota</Label>
+                                                    <Input 
+                                                        type="text" 
+                                                        id="packageQuota" 
+                                                        placeholder="Quota" 
+                                                        value={bookingPackageModel.quota}
+                                                    />
+                                                </FormGroup>
+                                                <FormGroup className="col-md-6">
+                                                    <Label for="lockerUsage">Your Locker Usage</Label>
+                                                    <Input 
+                                                        type="text" 
+                                                        id="lockerUsage" 
+                                                        placeholder="Quota" 
+                                                        value={bookingPackage.lockerCount + "/" + bookingPackageModel.quota}
+                                                    />
+                                                </FormGroup>
+                                            </Row>
+                                            <Row>
+                                                <FormGroup className="col-md-6">
+                                                    <Label for="packageStart">Date Bought</Label>
+                                                    <Input 
+                                                        type="text" 
+                                                        id="packageStart" 
+                                                        placeholder="Start Date" 
+                                                        value={formatDate(bookingPackage.startDate)}
+                                                    />
+                                                </FormGroup>
+                                                <FormGroup className="col-md-6">
+                                                    <Label for="packageExpiry">Expiry Date</Label>
+                                                    <Input 
+                                                        type="text" 
+                                                        id="packageExpiry" 
+                                                        placeholder="Expiry Date" 
+                                                        value={formatDate(bookingPackage.endDate)}
+                                                    />
+                                                </FormGroup>
+                                            </Row>
                                         </fieldset>
                                     </form>
                                 </ModalBody>
