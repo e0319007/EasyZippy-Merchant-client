@@ -11,7 +11,7 @@ import {
     Row,
     Col,
     Input,
-    CardHeader, FormGroup, Label, Button, Alert
+    CardHeader, FormGroup, Label, Button, Alert, Table
 } from "reactstrap";
 import { Form } from "components/UseForm";
 import Orders from "./Orders";
@@ -32,9 +32,15 @@ function OrderDetails() {
 
     const orderId = JSON.parse(localStorage.getItem('orderToView'))
     console.log("order id: " + orderId)
-    const [data, setData] = useState([])
+
+    const [order, setOrder] = useState([])
+    const [items, setItems] = useState([])
+
     const [customers, setCustomers] = useState([])
-    const [promotions, setPromotions] = useState([])    
+    const [promotions, setPromotions] = useState([])
+
+    const [orderStatusEnum, setOrderStatusEnum] = useState(order.orderStatusEnum)
+    const [orderStatusesEnum, setOrderStatusesEnum] = useState([])
 
     const [error, setError] = useState('')
     const [err, isError] = useState(false)
@@ -42,52 +48,57 @@ function OrderDetails() {
     const [successful, isSuccessful] = useState(false)
     const [successMsg, setMsg] = useState('')
 
-    const [orderStatusEnum, setOrderStatusEnum] = useState(data.orderStatusEnum)
-    const [orderStatusesEnum, setOrderStatusesEnum] = useState([])
 
     useEffect(() => {
-        axios.get(`/order/${orderId}`, 
+        axios.get(`/order/${orderId}`,
         {
             headers: {
                 AuthToken: authToken
             }
         }).then(res => {
-            setData(res.data[0])
-            setOrderStatusEnum(res.data[0].orderStatusEnum)
-            console.log("axios call order")
-            console.log("current status: ")
-            console.log(res.data[0].orderStatusEnum)
-            //console.log(res.data)
-            //console.log(res.data[0].customerId)
-           
+            setOrder(res.data.order)
+            setOrderStatusEnum(res.data.order.orderStatusEnum)
+            setItems(res.data.items)
 
-            axios.get("/customers", {
-                headers: {
-                    AuthToken: authToken
-                }
-            }).then(res => {
-                setCustomers(res.data)   
-            }).catch(err => console.error(err))
-
-            axios.get("/promotions", {
-                headers: {
-                    AuthToken: authToken
-                }
-            }).then (res => {
-                setPromotions(res.data)
-            }).catch(err => console.error(err))
+            // console.log("items: ")
+            // console.log(res.data.items)
+            // console.log("order status: ")
+            // console.log(res.data.order.orderStatusEnum)
+            // console.log("data: ")
+            // console.log(res.data)
+            // console.log(res.data.order)
+            // console.log("id: ")
+            // console.log(res.data.order.id)
         }).catch(err => console.error(err))
-           
-        
-        axios.get("/order/orderStatus", {
+
+        axios.get("/order/orderStatus", 
+        {
             headers: {
                 AuthToken: authToken
             }
         }).then(res => {
             setOrderStatusesEnum(res.data)
-            console.log("get all order status enum axios")
-            console.log("retrieving order status: " + res.data[2])
-        }).catch(err => console.error(err))
+            console.log("axios get all order status: ")
+            console.log(res.data)
+        }).catch(err => console.log(err))
+
+        axios.get("/customers", 
+        {
+            headers: {
+                AuthToken: authToken
+            }
+        }).then(res => {
+            setCustomers(res.data)
+        }).catch(err => console.log(err))
+
+        axios.get("/promotions",
+        {
+            headers: {
+                AuthToken: authToken
+            }
+        }).then(res => {
+            setPromotions(res.data)
+        }).catch(err => console.log(err))
     },[])
 
     const onChangeOrderStatusEnum = e => {
@@ -107,21 +118,15 @@ function OrderDetails() {
                 AuthToken: authToken
             }
         }).then(res => {
-            console.log("update order status axios went through")
-            setOrderStatusEnum(res.data[0].orderStatusEnum)
-            //setOrderStatusEnum(res.data[0].orderStatusEnum)
-            console.log("order status: ")
-            console.log(res.data[1][0].orderStatusEnum) 
-            setData(res.data[0])
-            console.log("res.data: ")
-            console.log(res.data[1][0])
+            setOrderStatusEnum(res.data.orderStatusEnum)
+            setOrder(res.data)
             isError(false)
             isSuccessful(true)
             setMsg("Order status updated successfully!")
         }).catch(function(error) {
-            console.log(error.response.data)
+            console.log(error)
             isError(true)
-            setError(error.response.data)
+            setError(error)
             isSuccessful(false)
         })
     }
@@ -135,7 +140,6 @@ function OrderDetails() {
             }
         }
     }
-
     //match promoIdUsed to promocode 
     function getPromoCode(id) {
         console.log("promo code id: " + id)
@@ -145,6 +149,10 @@ function OrderDetails() {
             }
         }
     }
+
+  
+
+   
 
     // to use when viewing 
     function formatDate(d) {
@@ -180,19 +188,19 @@ function OrderDetails() {
                             <Card className="card-name">
                                 <CardHeader>
                                     <div className="form-row">
-                                    <CardTitle className="col-md-10" tag="h5">Order Details (ID: {data.id})</CardTitle>
+                                    <CardTitle className="col-md-10" tag="h5">Order Details (ID: {order.id})</CardTitle>
                                     </div>
                                 </CardHeader>
                                 <CardBody>
                                     <form>
-                                        <fieldset disabled> 
+                                        <fieldset disabled>
                                             <FormGroup>
                                                 <Label for="inputName">Customer Name</Label>
                                                 <Input
                                                     type="text"
                                                     id="inputName"
                                                     placeholder="-"
-                                                    value={getCustomerName(data.customerId)}
+                                                    value={getCustomerName(order.customerId)}
                                                 />
                                             </FormGroup>
                                             <FormGroup>
@@ -201,7 +209,7 @@ function OrderDetails() {
                                                     type="text"
                                                     id="inputPromoCode"
                                                     placeholder="-"
-                                                    value={getPromoCode(data.promoIdUsed)}
+                                                    value={getPromoCode(order.promoIdUsed)}
                                                 />
                                             </FormGroup>
                                             <FormGroup>
@@ -210,7 +218,7 @@ function OrderDetails() {
                                                     type="text"
                                                     id="inputTotalAmount"
                                                     placeholder="-"
-                                                    value={data.totalAmount}
+                                                    value={order.totalAmount}
                                                 />
                                             </FormGroup>
                                             <FormGroup>
@@ -219,21 +227,37 @@ function OrderDetails() {
                                                     type="text"
                                                     id="inputOrderDate"
                                                     placeholder="-"
-                                                    value={formatDate(data.orderDate)}
-                                                    //value={data.orderDate}
+                                                    value={formatDate(order.orderDate)}
                                                 />
                                             </FormGroup>
-                                                <FormGroup>
-                                                    <Label for="inputCollectionMethod">Collection Method</Label>
-                                                    <Input
-                                                        type="text"
-                                                        id="inputCollectionMethod"
-                                                        placeholder="-"
-                                                        value={data.collectionMethodEnum}
-                                                    />
-                                                </FormGroup>
-                                            </fieldset>
-                                            <fieldset>
+                                            <FormGroup>
+                                                <Label for="inputCollectionMethod">Collection Method</Label>
+                                                <Input
+                                                    type="text"
+                                                    id="inputCollectionMethod"
+                                                    placeholder="-"
+                                                    value={order.collectionMethodEnum}
+                                                />
+                                            </FormGroup>
+                                        </fieldset>
+                                        <Table hover responsive>
+                                            <thead>
+                                                <th>Product Name</th>
+                                                <th>Price ($)</th>
+                                                <th>Quantity</th>
+                                            </thead>
+                                            <tbody>
+                                                {items.length > 0 && items.map((item,i) => (
+                                                    // item.product ? console.log(item.product.name) : console.log(item.productVariation.name)
+                                                    <tr>      
+                                                        <td>{item.product ? item.product.name : item.productVariation.name}</td>
+                                                        <td>{item.product ? item.product.unitPrice : item.productVariation.unitPrice}</td>
+                                                        <td>{item.quantity}</td>
+                                                    </tr>
+                                                ))}         
+                                            </tbody>
+                                        </Table>
+                                        <fieldset>
                                                 <FormGroup>
                                                     <Label for="inputOrderStatus">Order Status</Label>
                                                     <Input
@@ -271,6 +295,8 @@ function OrderDetails() {
                                         </Row> 
                                     </form>
                                 </CardBody>
+                                
+                          
                             </Card>
                         </Col>
                     </Row>

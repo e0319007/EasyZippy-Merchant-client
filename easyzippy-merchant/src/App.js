@@ -25,7 +25,6 @@ import ChooseBookingPackageModel from "views/Booking/ChooseBookingPackageModel.j
 import BookingPackageDetails from "views/BookingPackage/BookingPackageDetails..js";
 import AllBookingDetails from "views/Booking/AllBookingDetails.js";
 import CurrentBookingDetails from "views/Booking/CurrentBookingDetails.js";
-import OrderDetails2 from "views/Order/OrderDetails2.js";
 
 const hist = createBrowserHistory();
 
@@ -57,8 +56,6 @@ function App(props) {
                 <Route exact path="/admin/advertisementDetails" component={AdvertisementDetails}/>
                 <Route exact path="/admin/promotionDetails" component={PromotionDetails}/>
                 <Route exact path="/admin/orderDetails" component={OrderDetails}/>
-                <Route exact path="/admin/orderDetails" component={OrderDetails2}/>
-
                 <Route exact path="/admin/chooseBookingPackageModel" component={ChooseBookingPackageModel}/>
                 <Route exact path="/admin/bookingPackageDetails" component={BookingPackageDetails}/>
                 <Route exact path="/admin/allBookingsDetails" component={AllBookingDetails}/>
