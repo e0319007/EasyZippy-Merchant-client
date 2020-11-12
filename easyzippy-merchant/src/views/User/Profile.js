@@ -32,7 +32,7 @@ function Profile() {
 
     const history = useHistory()
 
-    const merchant = localStorage.getItem('currentMerchant')
+    const merchant = JSON.parse(localStorage.getItem('currentMerchant'))
 
     const merchantid = parseInt(Cookies.get('merchantUser'))
 
@@ -826,16 +826,19 @@ function Profile() {
                             </CardHeader>
                             <CardBody className='text-center'>
                                 <p>{' '}</p>
-                                <div>
-                                    <CardImg src={creditLogo} style={{width:"5rem"}} top alt='...'/>
+                                <div style={{fontSize:"2rem"}}>
+                                    <i className="fas fa-dollar-sign"/>
+                                    {' '}
+                                    {parseFloat(merchant.creditBalance).toFixed(2)}
                                 </div>
                                 <p>&nbsp;</p>
+                                <p><i>Top-up or Withdraw Credits via PayPal</i></p>
                                 <Button onClick={togglePressed} style={{fontSize:"0.7rem"}}>
-                                    Top-up Credits
+                                    Top-up
                                 </Button>
                                 &nbsp;&nbsp;&nbsp;
-                                <Button onClick={togglePressed} style={{fontSize:"0.7rem"}}>
-                                    Withdraw Credits
+                                <Button style={{fontSize:"0.7rem"}}>
+                                    Withdraw
                                 </Button>
                                 {!pressed && 
                                 <p>&nbsp;</p>
@@ -910,6 +913,7 @@ function Profile() {
                                                     id="packageName" 
                                                     placeholder="Name" 
                                                     value={bookingPackageModel.name}
+                                                    readOnly
                                                 />
                                             </FormGroup>
                                             <FormGroup>
@@ -919,6 +923,7 @@ function Profile() {
                                                     id="packageDescription" 
                                                     placeholder="Description" 
                                                     value={bookingPackageModel.description}
+                                                    readOnly
                                                 />
                                             </FormGroup>
                                             <FormGroup>
@@ -929,6 +934,7 @@ function Profile() {
                                                     id="packageKiosk" 
                                                     placeholder="kiosk" 
                                                     value={kioskAddress}
+                                                    readOnly
                                                 />
                                                 </FormGroup>
                                             </FormGroup>
@@ -940,6 +946,7 @@ function Profile() {
                                                         id="packageQuota" 
                                                         placeholder="Quota" 
                                                         value={bookingPackageModel.quota}
+                                                        readOnly
                                                     />
                                                 </FormGroup>
                                                 <FormGroup className="col-md-6">
@@ -949,6 +956,7 @@ function Profile() {
                                                         id="lockerUsage" 
                                                         placeholder="Quota" 
                                                         value={bookingPackage.lockerCount + "/" + bookingPackageModel.quota}
+                                                        readOnly
                                                     />
                                                 </FormGroup>
                                             </Row>
@@ -960,6 +968,7 @@ function Profile() {
                                                         id="packageStart" 
                                                         placeholder="Start Date" 
                                                         value={formatDate(bookingPackage.startDate)}
+                                                        readOnly
                                                     />
                                                 </FormGroup>
                                                 <FormGroup className="col-md-6">
@@ -969,6 +978,7 @@ function Profile() {
                                                         id="packageExpiry" 
                                                         placeholder="Expiry Date" 
                                                         value={formatDate(bookingPackage.endDate)}
+                                                        readOnly
                                                     />
                                                 </FormGroup>
                                             </Row>
