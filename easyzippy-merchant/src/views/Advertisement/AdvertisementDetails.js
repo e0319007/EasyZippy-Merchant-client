@@ -66,24 +66,6 @@ function AdvertisementDetails() {
             setDisabled(res.data.disabled)
             console.log("fetch disabled: " + res.data.disabled)
 
-            // axios.get(`/assets/${res.data.image}`, {
-            //     responseType: 'blob'
-            // }, 
-            // {
-            //     headers: {
-            //         AuthToken: authToken,
-            //         'Content-Type': 'application/json'
-            //     }
-            // }).then (response => {
-            //     console.log('axios images thru')
-            //     var file = new File([response.data], {type:"image/png"})
-            //     let image = URL.createObjectURL(file)
-
-            //     setImage(image)
-            // }).catch (function(error) {
-            //     console.log(error.response.data)
-            // })
-
         }).catch (function(error) {
             console.log(error.response.data)
         })

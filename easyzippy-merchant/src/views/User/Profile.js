@@ -3,7 +3,8 @@ import { useHistory } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import defaultLogo from '../../assets/img/user.png';
-import creditLogo from '../../assets/img/dollar-symbol.png';
+import {PayPalScriptProvider, PayPalButtons} from "@paypal/react-paypal-js";
+
 
 import {
     Card,
@@ -82,9 +83,12 @@ function Profile() {
     const [bookingPackageDetailsModal, setBookingPackageDetailsModal] = useState(false)
     const toggleBookingPackageDetails = () => setBookingPackageDetailsModal(!bookingPackageDetailsModal)
 
-    //for the credits input field
+    //for the buy package to choose kiosk
     const [pressed, setPressed] = useState(false) 
     const togglePressed = () => setPressed(!pressed)
+    const [kiosksToBuy, setKiosksToBuy] = useState([])
+    const [buyPackageKioskId, setBuyPackageKioskId] = useState('')
+    const [buyPackageKiosk, setBuyPackageKiosk] = useState('')
 
     const [topUpAmount, setTopUpAmount] = useState('')
     const [inCredit, setInCredit] = useState(false)
@@ -179,7 +183,16 @@ function Profile() {
                     console.log(error)
                 })
             }
-            
+
+            axios.get('/kiosks', {
+                headers: {
+                    AuthToken: authToken
+                }
+            }).then (r => {
+                setKiosksToBuy(r.data)
+            }).catch(function (error) {
+                console.log(error)
+            })
         }).catch(function (error) {
             console.log(error)
         })
@@ -516,20 +529,18 @@ function Profile() {
 
         if (topUpAmount === undefined || topUpAmount === "") {
             return
-        }
+        }   
 
         setLoading(true)
-
-        axios.get(`/pay/${merchantid}/${topUpAmount}`, {
+        console.log("/pay/merchant/" + merchantid + "/" + topUpAmount)
+        axios.get(`/pay/merchant/${merchantid}/${topUpAmount}`, {
             headers: {
                 AuthToken: authToken,
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': 'application/xml',
-                'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token',
-                'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, POST, DELETE, OPTIONS',
-
             }
         }).then (res => {
+            let url = res.data
+            console.log(url)
+            window.location.href = url
             setLoading(false)
         }).catch(function(error) {
             setLoading(false)
@@ -538,8 +549,24 @@ function Profile() {
             isError(true)
             console.log(error)
         })
-        
-        
+    }
+
+    const onChangePackageKiosk = e => {
+        const kiosk = e.target.value;
+        let id = '';
+
+        for (var i in kiosksToBuy) {
+            let k = kiosksToBuy[i]
+            if (k.address === kiosk) {
+                id = k.id
+                break;
+            }
+        }
+
+        console.log("kiosk id: " + id)
+
+        setBuyPackageKioskId(id)
+        setBuyPackageKiosk(kiosk)
     }
 
     function formatDate(d) {
@@ -822,49 +849,65 @@ function Profile() {
                         <Card className="card-name">
                             <CardHeader>
                                 <div className="form-row">
-                                    <CardTitle className="col-md-10" tag="h5"><small>Credit</small></CardTitle>
+                                    <CardTitle className="col-md-5" tag="h5"><small>Credit</small></CardTitle>
                                 </div>
                             </CardHeader>
                             <CardBody className='text-center'>
-                                {/* <p>{' '}</p> */}
                                 <div style={{fontSize:"1.2rem"}}>Current Balance: </div>
                                 <div style={{fontSize:"2rem"}}>  
                                     $ {parseFloat(merchant.creditBalance).toFixed(2)}
                                 </div>
-                                <p>{' '}</p>
-                                <p><i>Top-up or Withdraw Credits via PayPal</i></p>
-                                <Button onClick={togglePressed} style={{fontSize:"0.7rem"}}>
-                                    Top-up
-                                </Button>
-                                &nbsp;&nbsp;&nbsp;
-                                <Button style={{fontSize:"0.7rem"}}>
-                                    Withdraw
-                                </Button>
-                                {!pressed && 
-                                <p>&nbsp;</p>
-                                }
-                                {pressed && 
-                                <form>
+                                <PayPalScriptProvider options ={{"client-id": "sb"}}>
                                     <FormGroup className='w-50 ml-auto mr-auto'>
                                         <Label for="inputTopUpAmount"></Label>
                                             <Input 
                                                 type="text" 
                                                 id="inputTopUpAmount" 
-                                                placeholder="Enter Amount to Top Up" 
+                                                placeholder="Enter Top-up Amount" 
                                                 value={topUpAmount}
                                                 onChange={onChangeTopUpAmount}
+                                                style={{...padding(5, 5, 5, 5), fontSize:"0.7rem"}}
                                                 />
                                     </FormGroup>
-                                    <Button color="primary" onClick={topUpCredits}>
-                                        Pay By Paypal &nbsp;
-                                        <i className="fas fa-arrow-right"/>
-                                    </Button>{' '}
-                                    {loading &&
-                                    <Spinner size="sm" color="primary" />
-                                    }
-                                    { inCredit && !inModal && err &&<UncontrolledAlert color="danger">{error}</UncontrolledAlert> }
-                                </form>
-                                }
+                                    <div style={{...padding(0,80,0,80)}}>
+                                        <PayPalButtons style={{layout: "horizontal", shape:'pill', size: 'small', label: 'pay'}}
+                                            currency = 'SGD' //doesn't work
+                                            createOrder={function (data, actions) {
+                                                return actions.order.create({
+                                                    purchase_units: [{
+                                                        amount: {
+                                                            value: topUpAmount,
+                                                            currency: 'SGD'
+                                                        },
+                                                    }]
+                                                });
+                                            }}
+                                            onClick={function() {
+                                                if (topUpAmount === undefined || topUpAmount === "" || isNaN(topUpAmount)) {
+                                                    setInCredit(true)
+                                                    setError('Please input a valid price amount.')
+                                                    isError(true)
+                                                } 
+                                            }}
+                                            onError={function() {
+                                                setInCredit(true)
+                                                setError('Something went wrong, unable to top up credits')
+                                                isError(true)
+                                            }}
+                                            onApprove={function() {
+                                                setInCredit(true)
+                                                isSuccessful(true)
+                                                setMsg('Credits topped-up successfully!')
+                                            }}
+                                        />
+                                    </div>
+                                </PayPalScriptProvider>
+                                &nbsp;&nbsp;&nbsp;
+                                {/* <Button style={{fontSize:"0.7rem"}}>
+                                    Withdraw
+                                </Button> */}
+                                { inCredit && !inModal && err &&<UncontrolledAlert color="danger">{error}</UncontrolledAlert> }
+                                { inCredit && !inModal && successful &&<Alert color="success">{successMsg}</Alert> }
                             </CardBody>
                         </Card>
                         <Card className="card-name">
@@ -893,11 +936,42 @@ function Profile() {
                                                 <i className="nc-icon nc-box fa-4x"/>
                                             </div> {' '} 
                                             <p className="mt-10"></p>
-                                            <p><i>A Booking Package gives you unlimited locker usage for a period of time.</i></p>
-                                            <Button color="info" onClick={() => {
-                                                history.push('/admin/chooseBookingPackageModel')
-                                            }}>Buy Package</Button>
-                                            <p>&nbsp;</p>
+                                            {!pressed &&
+                                                <>
+                                                    <p><i><small>A Booking Package gives you unlimited locker usage for a period of time.</small></i></p>
+                                                    <Button color="info" onClick={togglePressed}>Buy Package</Button>
+                                                </>
+                                            }
+                                            {pressed && 
+                                            <form>
+                                                <FormGroup className="col-md-8 mr-auto ml-auto">
+                                                    <Label for="inputKioskForPackage">Select Kiosk</Label>
+                                                    <Input
+                                                        type="select"
+                                                        id="inputKioskForPackage"
+                                                        value={buyPackageKiosk}
+                                                        onChange={onChangePackageKiosk}
+                                                    >
+                                                        <option>[select]</option>
+                                                        {
+                                                            kiosksToBuy.map(kiosk => (
+                                                                <option key={kiosk.id}>{kiosk.address}</option>
+                                                            ))
+                                                        }
+                                                    </Input>
+                                                </FormGroup>  
+                                                <Button color="primary"  onClick={() => {
+                                                    if (buyPackageKioskId !== ""){
+                                                        localStorage.setItem('buyPackageKioskId', buyPackageKioskId)
+                                                        history.push('/admin/chooseBookingPackageModel')
+                                                    }
+                                                }}>
+                                                    Continue &nbsp;
+                                                    <i className="fas fa-arrow-right"/>
+                                                </Button>                         
+                                            </form>
+                                            }
+                                            <p>{' '}</p>
                                         </CardBody>
                                     </div>
                                 </CardHeader>

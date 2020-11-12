@@ -146,7 +146,7 @@ var routes = [
   },
   {
     path: "/chooseBookingPackageModel",
-    name: "Choose Booking Package Model",
+    name: "Buy Booking Package",
     icon: "nc-icon nc-image",
     component: ChooseBookingPackageModel,
     layout: "/admin",
