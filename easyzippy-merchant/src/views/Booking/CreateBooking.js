@@ -27,7 +27,8 @@ import {
     CardText,
     Breadcrumb,
     BreadcrumbItem,
-    Alert
+    Alert,
+    UncontrolledAlert
 } from "reactstrap";
 
 const theme = createMuiTheme({
@@ -47,6 +48,8 @@ function CreateBooking() {
     const merchant = JSON.parse(localStorage.getItem('currentMerchant'))
     const merchantid = parseInt(Cookies.get('merchantUser'))
 
+    var today = new Date()
+
     const [page, setPage] = useState(1)
 
     const [kiosks, setKiosks] = useState([])
@@ -59,13 +62,19 @@ function CreateBooking() {
     const [bookingPackageModel, setBookingPackageModel] = useState(null)
 
     const [startDate, setStartDate] = useState(new Date())
-    const [startTime, setStartTime] = useState(new Date())
+    const [startTime, setStartTime] = useState(new Date(2020,11,5,0,0,0))
     const [startDateTime, setStartDateTime] = useState(new Date())
     const [endDateTime, setEndDateTime] = useState(new Date())
 
     const [validBookingPackage, setValidBookingPackage] = useState(true)
     const [quotaNotReached, setQuotaNotReached] = useState(true)
     const [lockerTypeDifferent, setLockerTypeDifferent] = useState(false)
+
+    const [totalPrice, setTotalPrice] = useState(null)
+    const [minutesChargeable, setMinutesChargeable] = useState(null)
+
+    const [error, setError] = useState('')
+    const [isError, setIsError] = useState(false)
 
     //booking source enum is 'Web'
 
@@ -99,6 +108,7 @@ function CreateBooking() {
         }).then(res => {
             setBookingPackage(res.data)
             let bookingPackage = res.data
+            console.log(res.data.lockerCount)
             if (bookingPackage !== null) {
                 axios.get(`/bookingPackageModel/${res.data.bookingPackageModelId}`, {
                     headers: {
@@ -145,6 +155,15 @@ function CreateBooking() {
     //e.g. Fri Nov 20 2020 13:35:00 GMT+0800 (Singapore Standard Time)
     const onChangeStartDate = date => {
         console.log(date)
+        var d = new Date(date)
+        if (d < today) {
+            setError("You cannot choose a date that has passed.")
+            isError(true)
+        } else if (d > today.getDate() + 14) {
+            setError("You cannot choose a date that is more than 2 weeks in the future.")
+            isError(true)
+        } 
+
         configureStartDateTime()
         setStartDate(date)
     }
@@ -198,20 +217,22 @@ function CreateBooking() {
             if (!bookingPackageEnd < endDate) {
                 setValidBookingPackage(false)
                 console.log(validBookingPackage)
+                console.log(endDate - bookingPackageEnd)
             } else {
                 setValidBookingPackage(true)
             }
         }
-
     }
 
     const transitionPageThree = e => {
         e.preventDefault()
         calculateTotalCost()
+
+        changePageThree()
     }
 
     const calculateTotalCost = e => {
-        e.preventDefault()
+
         axios.get(`/lockerType/${lockerTypeId}`, {
             headers: {
                 AuthToken: authToken
@@ -221,22 +242,61 @@ function CreateBooking() {
             let pricePerMin = parseFloat((res.data.pricePerHalfHour)/30).toFixed(2)
             console.log(pricePerMin)
 
-            //package ends before booking end time
-            if (!validBookingPackage) {
+            let totalPrice = 0
 
-            } else {
-                //only need to calculate default 48 h
+            //package ends before booking end time
+            if (!validBookingPackage && quotaNotReached && !lockerTypeDifferent) { 
                 let start = new Date(startDateTime)
                 console.log(start)
                 let end = new Date(endDateTime)
                 console.log(end)
+                let bookingPackageEnd = new Date(bookingPackage.endDate)
+                console.log(bookingPackageEnd)
+                let milliscs = Math.abs(end - bookingPackageEnd)
+                console.log(milliscs)
+                var diffMins = Math.floor(milliscs / 60000);
+                console.log(diffMins)
+                setMinutesChargeable(diffMins)
+                totalPrice = parseFloat(diffMins*pricePerMin).toFixed(2)
+                console.log(totalPrice)
+                setTotalPrice(totalPrice)
+            } else if (validBookingPackage && quotaNotReached && !lockerTypeDifferent) { //cost covered, $0
+                setMinutesChargeable(2880)
+                console.log(totalPrice)
+                setTotalPrice(totalPrice)
+            } else {
+                //only need to calculate default 48 h
+                totalPrice = parseFloat(48*60*pricePerMin).toFixed(2)
+                console.log(totalPrice)
+                setMinutesChargeable(2880)
+                setTotalPrice(totalPrice)
             }
 
-            
+            axios.post('/checkBookingAllowed', {
+                startDate: startDateTime,
+                endDate: endDateTime,
+                lockerTypeId: lockerTypeId,
+                kioskId: kioskId
+            },
+            {
+                headers: {
+                    AuthToken: authToken
+                }
+            }).then(res => {
+                console.log("check booking allowed axios through")
+                if (res.data === true) {
+                    changePageThree()
+                } else {
+                    setError('No lockers are available from your specified Start Date to the End Date 48 hours later')
+                    isError(true)
+                } 
+            }).catch (function(error) {
+                console.log(error)
+            })
 
 
-
-
+        }).catch (function(error) {
+            console.log(error)
         })
     }
 
@@ -265,7 +325,6 @@ function CreateBooking() {
                 setLockerTypeDifferent(true)
             }
         }
-
         changePageTwo()
     }
 
@@ -304,7 +363,7 @@ function CreateBooking() {
                             } 
                             {page === 2 || page === 1
                                 ? <BreadcrumbItem active>Step 3</BreadcrumbItem>
-                                : <BreadcrumbItem><a onClick={changePageTwo} href='#'>Steps 3</a></BreadcrumbItem>
+                                : <BreadcrumbItem><a onClick={changePageTwo} href='#'>Step 3</a></BreadcrumbItem>
                             }
                             {page === 3 || (page === 1 || page ===2 )
                                 ? <BreadcrumbItem active>Step 4</BreadcrumbItem>
@@ -453,6 +512,7 @@ function CreateBooking() {
                                                     </MuiPickersUtilsProvider>
                                                 </Row>
                                             </div>
+                                            { isError &&<UncontrolledAlert color="danger">{error}</UncontrolledAlert> }
                                             <p>{' '}</p>
                                             <Button className="text-center mr-auto ml-auto" onClick={e => transitionPageThree(e)}>
                                                 Next &nbsp;
@@ -473,6 +533,7 @@ function CreateBooking() {
                                             <p>&nbsp;</p>
                                             <div className="form-row text-center">
                                                 <CardTitle className="col-md-12" tag="h5"><small>Step 4: Checkout</small></CardTitle>
+                                                <CardText tag="h5">New Booking</CardText>
                                             </div>
                                         </CardHeader>
                                         <CardBody>
@@ -480,7 +541,7 @@ function CreateBooking() {
                                                 <CardImg style={{width:"15rem"}} top src={Checkout} alt='...'/>
                                             </div>
                                             <p>{' '}</p>
-
+                                            
                                         </CardBody>
                                     </Card>
                                 </Col>
