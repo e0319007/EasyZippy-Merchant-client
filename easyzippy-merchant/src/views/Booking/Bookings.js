@@ -33,7 +33,9 @@ function Bookings() {
         {title: "Locker Type", field: "lockerTypeId", editable: "never", 
             customFilterAndSearch: (term, rowData) => getLockerType(rowData.lockerTypeId).toLowerCase().includes(term.toLowerCase()),
             render: row => <span>{getLockerType(row["lockerTypeId"])}</span>},    
-        {title: "Price", field: "bookingPrice"},
+        {title: "Price", field: "bookingPrice",
+            render: row => <span>{formatPrice(row["bookingPrice"])}</span>
+        },
         {title: "Booking Source", field: "bookingSourceEnum", lookup:{Mobile: "Mobile", Kiosk: "Kiosk", Web: "Web"}},
         {title: "Status", field: "bookingStatusEnum", lookup:{Unfulfilled: "Unfulfilled", Fulfilled: "Fulfilled", Active: "Active", Cancelled: "Cancelled"}},
         {title: "Start Date", field: "startDate", 
@@ -49,7 +51,8 @@ function Bookings() {
         {title: "Locker Type", field: "lockerTypeId", editable: "never", 
             customFilterAndSearch: (term, rowData) => getLockerType(rowData.lockerTypeId).toLowerCase().includes(term.toLowerCase()),
             render: row => <span>{getLockerType(row["lockerTypeId"])}</span>},    
-        {title: "Price", field: "bookingPrice"},
+        {title: "Price", field: "bookingPrice",
+            render: row => <span>{formatPrice(row["bookingPrice"])}</span>},
         {title: "Booking Source", field: "bookingSourceEnum", lookup:{Mobile: "Mobile", Kiosk: "Kiosk", Web: "Web"}},
         {title: "Status", field: "bookingStatusEnum", lookup:{Unfulfilled: "Unfulfilled", Fulfilled: "Fulfilled", Active: "Active", Cancelled: "Cancelled"}},
         {title: "Start Date", field: "startDate", 
@@ -125,6 +128,14 @@ function Bookings() {
             if (lockerTypes[i].id === id) {
                 return lockerTypes[i].name
             }
+        }
+    }
+
+    function formatPrice(price) {
+        if (price === null) {
+            return null
+        } else {
+            return parseFloat(price).toFixed(2)
         }
     }
 

@@ -184,7 +184,6 @@ function CurrentBookingDetails() {
 
     //match booking package id to booking package name
     function getBookingPackage(id) {
-        console.log("booking package id: " + id)
         for (var i in bookingPackages) {
             if (bookingPackages[i].id === id) {
                 return bookingPackages[i].name

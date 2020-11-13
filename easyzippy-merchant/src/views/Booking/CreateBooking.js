@@ -283,7 +283,7 @@ function CreateBooking() {
                 setMinutesChargeable(diffMins)
                 totalPrice = parseFloat((diffMins-30)*pricePerMin).toFixed(2)
                 console.log(totalPrice)
-                setTotalPrice(totalPrice.toFixed(2))
+                setTotalPrice(parseFloat(totalPrice).toFixed(2))
             } else if (validBookingPackage && (new Date(startDateTime).setSeconds(0,0) > new Date(bookingPackage.endDate).setSeconds(0,0))){ //booking package has expired
                 console.log('second case')
                 totalPrice = parseFloat(2850*pricePerMin).toFixed(2)
@@ -376,7 +376,7 @@ function CreateBooking() {
             }
         }).then (res => {
 
-            merchant.creditBalance = parseFloat(merchant.creditBalance) - totalPrice
+            merchant.creditBalance = parseFloat(merchant.creditBalance) - parseFloat(totalPrice).toFixed(2)
             localStorage.setItem('currentMerchant', JSON.stringify(merchant))
 
             axios.put('/tagOrderToBooking', {

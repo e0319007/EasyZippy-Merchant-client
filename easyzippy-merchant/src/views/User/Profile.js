@@ -4,7 +4,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import defaultLogo from '../../assets/img/user.png';
 import {PayPalScriptProvider, PayPalButtons} from "@paypal/react-paypal-js";
-
+import TransactionHistory from '../User/TransactionHistory';
 
 import {
     Card,
@@ -98,6 +98,9 @@ function Profile() {
     const [withdrawAmount, setWithdrawAmount] = useState('')
     const [inWithdraw, setInWithdraw] = useState(false)
     const [paypalEmail, setPaypalEmail] = useState('')
+
+    const [transactionModal, setTransactionModal] = useState(false)
+    const toggleTransaction = () => setTransactionModal(!transactionModal)
 
     const [bookingPackage, setBookingPackage] = useState('')
     const [bookingPackageModel, setBookingPackageModel] = useState('')
@@ -622,7 +625,7 @@ function Profile() {
                                 <CardTitle className="col-md-10" tag="h5">
                                     <small>Edit Profile</small>
                                     &nbsp;
-                                    <span>
+                                    <span onClick={toggleTransaction}>
                                         <i class="fas fa-file-invoice-dollar"/>
                                     </span>
                                     </CardTitle>
@@ -1139,6 +1142,12 @@ function Profile() {
                                     <Button color="primary" onClick={withdrawCredits}>Withdraw</Button>{' '}
                                 </ModalFooter>
                                 { inModal && !inWithdraw && err &&<Alert color="danger">{error}</Alert> }
+                            </Modal>
+                            <Modal isOpen={transactionModal} toggle={toggleTransaction} size="lg">
+                                <ModalHeader toggle={toggleTransaction}>View Transaction History</ModalHeader>
+                                <ModalBody>
+                                    <TransactionHistory/>
+                                </ModalBody>
                             </Modal>
                         </Card>
                     </Col>
