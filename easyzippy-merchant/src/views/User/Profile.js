@@ -570,7 +570,7 @@ function Profile() {
 
         axios.post(`/withdraw/${merchantid}`, {
             amount: withdrawAmount,
-            
+            paypalEmail: paypalEmail,
             headers: {
                 AuthToken: authToken,
             }
