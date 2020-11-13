@@ -875,7 +875,7 @@ function Profile() {
                                                 isError(true)
                                             }}
                                             onApprove={function() {
-                                                merchant.creditBalance = parseFloat(merchant.creditBalance + parseFloat(topUpAmount))
+                                                merchant.creditBalance = parseFloat(merchant.creditBalance) + parseFloat(topUpAmount)
                                                 localStorage.setItem('currentMerchant', JSON.stringify(merchant))
                                                 axios.post(`/externalPaymentRecord/${merchantid}`, {
                                                     externalId: '56y789fh',
