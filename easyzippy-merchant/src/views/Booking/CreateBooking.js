@@ -28,7 +28,8 @@ import {
     Breadcrumb,
     BreadcrumbItem,
     Alert,
-    UncontrolledAlert
+    UncontrolledAlert,
+    Table
 } from "reactstrap";
 
 const theme = createMuiTheme({
@@ -43,7 +44,6 @@ function CreateBooking() {
     
     const history = useHistory()
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
-    console.log(authToken)
 
     const merchant = JSON.parse(localStorage.getItem('currentMerchant'))
     const merchantid = parseInt(Cookies.get('merchantUser'))
@@ -55,8 +55,10 @@ function CreateBooking() {
     const [kiosks, setKiosks] = useState([])
     const [kiosk, setKiosk] = useState('')
     const [kioskId, setKioskId] = useState('')
+    const [kioskAddress, setKioskAddress] = useState()
     const [lockerTypes, setLockerTypes] = useState([])
     const [lockerTypeId, setLockerTypeId] = useState(null)
+    const [lockerTypeName, setLockerTypeName] = useState(null)
 
     const [bookingPackage, setBookingPackage] = useState(null)
     const [bookingPackageModel, setBookingPackageModel] = useState(null)
@@ -65,6 +67,7 @@ function CreateBooking() {
     const [startTime, setStartTime] = useState(new Date(2020,11,5,0,0,0))
     const [startDateTime, setStartDateTime] = useState(new Date())
     const [endDateTime, setEndDateTime] = useState(new Date())
+    const [check, setCheck] = useState(null)
 
     const [validBookingPackage, setValidBookingPackage] = useState(true)
     const [quotaNotReached, setQuotaNotReached] = useState(true)
@@ -72,9 +75,13 @@ function CreateBooking() {
 
     const [totalPrice, setTotalPrice] = useState(null)
     const [minutesChargeable, setMinutesChargeable] = useState(null)
+    const [pricePerMin, setPricePerMin] = useState(null)
 
     const [error, setError] = useState('')
     const [isError, setIsError] = useState(false)
+
+    const [modal, setModal] = useState(false)
+    const toggle = () => setModal(!modal);
 
     //booking source enum is 'Web'
 
@@ -108,7 +115,6 @@ function CreateBooking() {
         }).then(res => {
             setBookingPackage(res.data)
             let bookingPackage = res.data
-            console.log(res.data.lockerCount)
             if (bookingPackage !== null) {
                 axios.get(`/bookingPackageModel/${res.data.bookingPackageModelId}`, {
                     headers: {
@@ -122,8 +128,10 @@ function CreateBooking() {
         }).catch (function(error) {
             console.log(error)
         })
+                
+        configureStartDateTime()
 
-    }, [kioskId, page, startDate])
+    }, [kioskId, page, startDate, startTime])
 
     const onChangeKiosk = e => {
         const kiosk = e.target.value
@@ -133,6 +141,7 @@ function CreateBooking() {
         for (var i in kiosks) {
             if (kiosks[i].address === kiosk) {
                 id = kiosks[i].id
+                setKioskAddress(kiosk)
                 console.log(id)
                 break;
             }
@@ -149,23 +158,27 @@ function CreateBooking() {
     }
 
     const changePageThree = e => {
+        console.log("start dt: " + startDateTime)
+        console.log("end dt : " + endDateTime)
         setPage(3)
     }
 
     //e.g. Fri Nov 20 2020 13:35:00 GMT+0800 (Singapore Standard Time)
     const onChangeStartDate = date => {
         console.log(date)
-        var d = new Date(date)
-        if (d < today) {
-            setError("You cannot choose a date that has passed.")
-            isError(true)
-        } else if (d > today.getDate() + 14) {
-            setError("You cannot choose a date that is more than 2 weeks in the future.")
-            isError(true)
-        } 
-
-        configureStartDateTime()
         setStartDate(date)
+        setCheck(date)
+
+        var d = new Date(date)
+        if (new Date(d) < new Date(today)) {
+            setError("You cannot choose a date that has passed.")
+            setIsError(true)
+        } else if (d > today.setDate(today.getDate() + 14)) {
+            setError("You cannot choose a date that is more than 2 weeks in the future.")
+            setIsError(true)
+        } else {
+            setIsError(false)
+        }
     }
     //e.g. Wed Jan 01 2020 04:34:00 GMT+0800 (Singapore Standard Time)
     const onChangeStartTime = (e, date) => {
@@ -183,14 +196,17 @@ function CreateBooking() {
         let time = startTime.toLocaleTimeString('en-SG')
         console.log(time)
         console.log(startTime)
-
-        configureStartDateTime()
-
         setStartTime(startTime)
     }
 
     const configureStartDateTime = e => {
+
+        console.log("start datetime: " + startDateTime)
+        console.log("end datetime: " + endDateTime)
+        console.log("check: " + check)
+
         //configure start datetime
+        console.log(startDate)
         let datePart = new Date(startDate)
         let year = datePart.getFullYear()
         let month = datePart.getMonth() 
@@ -198,27 +214,30 @@ function CreateBooking() {
 
         let timePart = new Date(startTime)
         let timeArr = (timePart.toLocaleTimeString('en-SG')).split(':')
-
         let combinedStartDate = new Date(year, month, day, timeArr[0], timeArr[1], 0)
         console.log(combinedStartDate)
-        setStartDateTime(combinedStartDate)
+        setStartDateTime(combinedStartDate.setSeconds(0,0))
 
         //calculate end time (48 hours)
-        let endDate = combinedStartDate
-        endDate.setDate(endDate.getDate() + 2)
+        let endDate = new Date(combinedStartDate)
+        endDate.setDate(combinedStartDate.getDate() + 2)
+        endDate = endDate.setSeconds(0,0)
         console.log(endDate)
         setEndDateTime(endDate)
 
         if (bookingPackage !== null) {
-            //CHECK IF booking package ends before the end time
             let bookingPackageEnd = new Date(bookingPackage.endDate)
-            console.log(bookingPackage.endDate)
-            console.log(bookingPackageEnd < endDate)
-            if (!bookingPackageEnd < endDate) {
+            bookingPackageEnd = bookingPackageEnd.setSeconds(0,0)
+            console.log("booking package end: " + bookingPackageEnd)
+            console.log("end date: " + endDate)
+            //CHECK IF booking package ends before the end time 
+            if (bookingPackageEnd < endDate) {
                 setValidBookingPackage(false)
-                console.log(validBookingPackage)
-                console.log(endDate - bookingPackageEnd)
-            } else {
+                //BUT set booking package to valid if start date is after it expires
+                if (combinedStartDate.setSeconds(0,0) > bookingPackageEnd) {
+                    setValidBookingPackage(true)
+                }
+            } else{
                 setValidBookingPackage(true)
             }
         }
@@ -241,32 +260,45 @@ function CreateBooking() {
             console.log("get locker type by id axios thru")
             let pricePerMin = parseFloat((res.data.pricePerHalfHour)/30).toFixed(2)
             console.log(pricePerMin)
+            setPricePerMin(pricePerMin)
 
             let totalPrice = 0
 
+            console.log("start date time: " + new Date(startDateTime).setSeconds(0,0))
+            console.log("booking package end date: " + new Date(bookingPackage.endDate).setSeconds(0,0))
+
             //package ends before booking end time
             if (!validBookingPackage && quotaNotReached && !lockerTypeDifferent) { 
+                console.log('first case')
                 let start = new Date(startDateTime)
                 console.log(start)
                 let end = new Date(endDateTime)
                 console.log(end)
-                let bookingPackageEnd = new Date(bookingPackage.endDate)
+                let bookingPackageEnd = new Date((bookingPackage.endDate).setSeconds(0,0))
                 console.log(bookingPackageEnd)
                 let milliscs = Math.abs(end - bookingPackageEnd)
                 console.log(milliscs)
                 var diffMins = Math.floor(milliscs / 60000);
                 console.log(diffMins)
                 setMinutesChargeable(diffMins)
-                totalPrice = parseFloat(diffMins*pricePerMin).toFixed(2)
+                totalPrice = parseFloat((diffMins-30)*pricePerMin).toFixed(2)
                 console.log(totalPrice)
                 setTotalPrice(totalPrice)
-            } else if (validBookingPackage && quotaNotReached && !lockerTypeDifferent) { //cost covered, $0
+            } else if (validBookingPackage && (new Date(startDateTime).setSeconds(0,0) > new Date(bookingPackage.endDate).setSeconds(0,0))){ //booking package has expired
+                console.log('second case')
+                totalPrice = parseFloat(2850*pricePerMin).toFixed(2)
+                console.log(totalPrice)
+                setMinutesChargeable(2880)
+                setTotalPrice(totalPrice)
+            } else if (validBookingPackage && quotaNotReached && !lockerTypeDifferent ) { //cost covered, $0
+                console.log('third case')
                 setMinutesChargeable(2880)
                 console.log(totalPrice)
                 setTotalPrice(totalPrice)
             } else {
+                console.log('fourth case')
                 //only need to calculate default 48 h
-                totalPrice = parseFloat(48*60*pricePerMin).toFixed(2)
+                totalPrice = parseFloat(2850*pricePerMin).toFixed(2)
                 console.log(totalPrice)
                 setMinutesChargeable(2880)
                 setTotalPrice(totalPrice)
@@ -286,9 +318,9 @@ function CreateBooking() {
                 console.log("check booking allowed axios through")
                 if (res.data === true) {
                     changePageThree()
-                } else {
-                    setError('No lockers are available from your specified Start Date to the End Date 48 hours later')
-                    isError(true)
+                } else if (res.data === false || res.data.length === 0) {
+                    setError('No lockers are available from your specified Start Date to the End Date 48 hours later. Please pick another date.')
+                    setIsError(true)
                 } 
             }).catch (function(error) {
                 console.log(error)
@@ -300,11 +332,12 @@ function CreateBooking() {
         })
     }
 
-    const transitionPageTwo = (e, id) => {
+    const transitionPageTwo = (e, id, name) => {
         e.preventDefault()
         console.log("locker type id: " + id)
-
+        console.log("locker type name: " + name)
         setLockerTypeId(id)
+        setLockerTypeName(name)
 
         console.log('booking package model locker type id: ' + bookingPackageModel.lockerTypeId)
         //if merchant has booking package
@@ -328,13 +361,48 @@ function CreateBooking() {
         changePageTwo()
     }
 
+    const buyBooking = e => {
+        axios.post(`/booking/merchant`, {
+            startDate: startDateTime,
+            endDate: endDateTime,
+            bookingSourceEnum: 'Web',
+            merchantId: merchantid,
+            lockerTypeId: lockerTypeId,
+            kioskId: kioskId,
+        },
+        {
+            headers: {
+                AuthToken: authToken
+            }
+        }).then (res => {
+
+            merchant.creditBalance = parseFloat(merchant.creditBalance) - totalPrice
+            localStorage.setItem('currentMerchant', JSON.stringify(merchant))
+
+            axios.put('tagOrderToBooking', {
+                bookingId: res.data.id,
+                orderId: JSON.parse(localStorage.getItem('orderToView')),
+            }, 
+            {
+                headers: {
+                    AuthToken: authToken
+                }
+            }).then (response => {
+                history.push('/admin/bookings')
+            }).catch(function (error) {
+                console.log(error)
+            })
+        }).catch(function (error) {
+            console.log(error.response.data)
+        })  
+    }
+
     function formatDate(d) {
         if (d === undefined){
             d = (new Date()).toISOString()
             console.log(undefined)
         }
         let currDate = new Date(d);
-        console.log("currDate: " + currDate)
         let year = currDate.getFullYear();
         let month = currDate.getMonth() + 1;
         let dt = currDate.getDate();
@@ -423,7 +491,7 @@ function CreateBooking() {
                                             {
                                                 lockerTypes.map(lockerType => (
                                                     <div className="text-center" key={lockerType.id}>
-                                                        <Button className="btn-link" color="primary" onClick={e => transitionPageTwo(e, lockerType.id)}>{lockerType.name}</Button>
+                                                        <Button className="btn-link" color="primary" onClick={e => transitionPageTwo(e, lockerType.id, lockerType.name)}>{lockerType.name}</Button>
                                                     </div>
                                                 ))
                                             }
@@ -449,12 +517,12 @@ function CreateBooking() {
                                             <p>{' '}</p>
                                             <div>
                                                 <Row className="text-center">
-                                                    {!validBookingPackage && bookingPackage.kioskId === kioskId && quotaNotReached && !lockerTypeDifferent &&
+                                                    {!validBookingPackage && bookingPackage.kioskId === kioskId && quotaNotReached && !lockerTypeDifferent && check !== null &&
                                                     <Alert color="info" className="text-center mr-auto ml-auto" style={{...padding(10,5,0,5)}}>
                                                         <span>
                                                             <p>
                                                             <i className="nc-icon nc-alert-circle-i"/>&nbsp;
-                                                            <small>Your Booking Package expires before the Booking End Time at {formatDate(bookingPackage.endDate)}. <br/> You will have to pay for the excess time beyond that.</small></p>
+                                                            <small>Your Booking Package expires before the Booking End Time. Expiry Date: {formatDate(bookingPackage.endDate)}. <br/> You will have to pay for the excess time beyond that.</small></p>
                                                         </span>
                                                     </Alert>
                                                     }
@@ -533,16 +601,85 @@ function CreateBooking() {
                                             <p>&nbsp;</p>
                                             <div className="form-row text-center">
                                                 <CardTitle className="col-md-12" tag="h5"><small>Step 4: Checkout</small></CardTitle>
-                                                <CardText tag="h5">New Booking</CardText>
                                             </div>
                                         </CardHeader>
                                         <CardBody>
-                                            <div className="text-center">
-                                                <CardImg style={{width:"15rem"}} top src={Checkout} alt='...'/>
-                                            </div>
+                                            <Row>
+                                                <Col md='6'>
+                                                    <div className="text-center">
+                                                        <CardImg style={{width:"15rem"}} top src={Checkout} alt='...'/>
+                                                    </div>
+                                                </Col>
+                                                <Col md='6'>
+                                                    <div className="text-center">
+                                                        <p>&nbsp;</p>
+                                                        <CardText tag='h6'>
+                                                            New Booking
+                                                        </CardText>
+                                                        <p>{' '}</p>
+                                                        <CardText>Kiosk: {kioskAddress}</CardText>
+                                                        <CardText>Locker Type: {lockerTypeName}</CardText>
+                                                        <CardText>Start: {formatDate(startDateTime).toString()}</CardText>
+                                                        <CardText>End: {formatDate(endDateTime).toString()}</CardText>
+                                                    </div>
+                                                </Col>
+                                            </Row>
+                                            <p>&nbsp;</p>
+                                            <Row>
+                                                <div className="text-center mr-auto ml-auto">
+                                                    <CardText style={{color:'grey'}}>Cost Summary</CardText>
+                                                    <Table size="sm" borderless>  
+                                                        <tbody>
+                                                            <tr>
+                                                                <td style={{textAlign:'left'}}>Minutes Chargeable: </td>
+                                                                <td style={{textAlign:'right'}}>{minutesChargeable} - 30 (Free) = {parseInt(minutesChargeable-30)}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td style={{textAlign:'left'}}>Locker Cost/min:</td>
+                                                                <td style={{textAlign:'right'}}>$ {pricePerMin}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th style={{textAlign:'left'}} scope="row"></th>
+                                                                <td style={{textAlign:'right'}}><b>Total: $ {totalPrice}</b></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </Table>
+                                                    <CardText className="text-center mr-auto ml-auto" style={{color:'grey'}}>Payment</CardText>
+                                                    <Table size="sm" borderless>  
+                                                        <tbody>
+                                                            <tr>
+                                                                <th style={{textAlign:'left'}} scope="row"></th>
+                                                                <td style={{textAlign:'right'}}>Account Credit: $ {parseFloat(merchant.creditBalance).toFixed(2)}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th style={{textAlign:'left'}} scope="row"></th>
+                                                                <td style={{textAlign:'right'}}>Price: -$ {totalPrice}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th style={{textAlign:'left'}} scope="row"></th>
+                                                                <td style={{textAlign:'right'}}><b>Account Balance: $ {(parseFloat(merchant.creditBalance).toFixed(2) - totalPrice).toFixed(2)}</b></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </Table>
+                                                </div>
+                                            </Row>
                                             <p>{' '}</p>
-                                            
+                                            <div className='text-center'>
+                                                <Button disabled={parseFloat(merchant.creditBalance).toFixed(2) < totalPrice} onClick={toggle}>Checkout</Button>
+                                                {parseFloat(merchant.creditBalance).toFixed(2) < totalPrice &&
+                                                    <p style={{color: 'red'}}><i><small>You do not have enough credits to purchase this booking. Please go to your profile to top-up.</small></i></p>
+                                                }   
+                                            </div>
                                         </CardBody>
+                                        <Modal isOpen={modal} toggle={toggle}>
+                                            <ModalHeader toggle={toggle}>Confirm Booking?</ModalHeader>
+                                                <ModalBody>
+                                                    Payment will be made in credits.
+                                                </ModalBody>
+                                            <ModalFooter>
+                                                <Button color="info" onClick={(e) => {buyBooking(e)}}>Confirm</Button>{' '}
+                                            </ModalFooter>
+                                        </Modal>
                                     </Card>
                                 </Col>
                             </>

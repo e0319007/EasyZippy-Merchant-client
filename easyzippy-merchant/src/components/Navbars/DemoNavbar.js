@@ -130,11 +130,8 @@ class Header extends React.Component {
   }
   componentDidMount() {
     window.addEventListener("resize", this.updateColor.bind(this));
-    console.log("mounted")
-    console.log(parseInt(Cookies.get('merchantUser')))
     console.log(JSON.parse(Cookies.get('authToken')))
     const merc = JSON.parse(localStorage.getItem('currentMerchant'))
-    console.log(merc.creditBalance)
     // GET NOTIFICATIONS
     axios.get(`/notification/merchant/${parseInt(Cookies.get('merchantUser'))}`, 
     {
@@ -143,11 +140,9 @@ class Header extends React.Component {
       }
     }).then((res) => {
       const notifs = res.data
-      console.log("mount notifs length: " + notifs.length)
       this.setState({notifications: notifs})
       let n = this.state.notifications;
       for(var i in n) {
-        console.log(n[i].read)
         if (n[i].read === false) {
           this.setState({
             notifBadgeVisible: true
@@ -169,7 +164,7 @@ class Header extends React.Component {
       const anncemts = res.data
       this.setState({announcements: anncemts})
     }).catch (function(error){
-      console.log(error.response.data)
+      console.log(error)
     })
 
     
@@ -177,7 +172,6 @@ class Header extends React.Component {
   }
 
   componentDidUpdate(e) {
-    console.log("update")
     if (
       window.innerWidth < 993 &&
       e.history.location.pathname !== e.location.pathname &&
@@ -189,7 +183,6 @@ class Header extends React.Component {
   }
 
   componentWillReceiveProps(e) {
-    console.log("component will receive props")
     //if this isn't the first render, then keep updating when re-render
     if (this.state.notifications.length != 0) {
       axios.get(`/notification/merchant/${parseInt(Cookies.get('merchantUser'))}`, 
@@ -199,8 +192,6 @@ class Header extends React.Component {
         }
       }).then((res) => {
         const notifs = res.data
-        console.log("notifs length: " + notifs.length)
-        console.log("state notifs: " + this.state.notifications.length)
         //checking if there are new notifications
         if (notifs.length > this.state.notifications.length) {
           this.setState({
@@ -240,10 +231,8 @@ class Header extends React.Component {
   formatDate(d) {
     if (d === undefined){
         d = (new Date()).toISOString()
-        console.log(undefined)
     }
     let currDate = new Date(d);
-    console.log("currDate: " + currDate)
     let year = currDate.getFullYear();
     let month = currDate.getMonth() + 1;
     let dt = currDate.getDate();
