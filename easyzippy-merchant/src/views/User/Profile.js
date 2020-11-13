@@ -93,7 +93,11 @@ function Profile() {
     const [topUpAmount, setTopUpAmount] = useState('')
     const [inCredit, setInCredit] = useState(false)
 
-    const [loading, setLoading] = useState()
+    const [withdrawModal, setWithdrawModal] = useState(false)
+    const toggleWithdraw = () => setWithdrawModal(!withdrawModal)
+    const [withdrawAmount, setWithdrawAmount] = useState('')
+    const [inWithdraw, setInWithdraw] = useState(false)
+    const [paypalEmail, setPaypalEmail] = useState('')
 
     const [bookingPackage, setBookingPackage] = useState('')
     const [bookingPackageModel, setBookingPackageModel] = useState('')
@@ -525,6 +529,17 @@ function Profile() {
         setTopUpAmount(topUpAmount)
     }
 
+    const onChangeWithdrawAmount = e => {
+        const withdrawAmount = e.target.value
+        console.log(withdrawAmount)
+        setWithdrawAmount(withdrawAmount)
+    }
+
+    const onChangePaypalEmail = e => {
+        const email = e.target.value
+        setPaypalEmail(email)
+    }
+
     const onChangePackageKiosk = e => {
         const kiosk = e.target.value;
         let id = '';
@@ -541,6 +556,37 @@ function Profile() {
 
         setBuyPackageKioskId(id)
         setBuyPackageKiosk(kiosk)
+    }
+
+    const withdrawCredits = e => {
+        var nums = /^\d+(,\d{3})*(\.\d{1,2})?$/gm
+        if (withdrawAmount === undefined || withdrawAmount === "" || !withdrawAmount.match(nums) ||
+        withdrawAmount.indexOf('$') > 0) {    
+            isInModal(true)                                           
+            setInWithdraw(true)
+            setError('Please input a valid price amount (e.g. 9.50).')
+            isError(true)
+            }
+
+        axios.post(`/withdraw/${merchantid}`, {
+            amount: withdrawAmount,
+            
+            headers: {
+                AuthToken: authToken,
+            }
+        }).then(res => {
+            merchant.creditBalance = (parseFloat(merchant.creditBalance) - withdrawAmount)
+            localStorage.setItem('currentMerchant', JSON.stringify(merchant))
+            console.log("withdraw went through")
+            window.location.reload()
+        }).catch(function(error) {
+            isInModal(true)                                           
+            setInWithdraw(true)
+            setError('Something went wrong, unable to withdraw credits.')
+            isError(true)
+            console.log(error)
+        })
+        
     }
 
     function formatDate(d) {
@@ -573,7 +619,13 @@ function Profile() {
                         <Card className="card-name">
                             <CardHeader>
                                 <div className="form-row">
-                                <CardTitle className="col-md-10" tag="h5"><small>Edit Profile</small></CardTitle>
+                                <CardTitle className="col-md-10" tag="h5">
+                                    <small>Edit Profile</small>
+                                    &nbsp;
+                                    <span>
+                                        <i class="fas fa-file-invoice-dollar"/>
+                                    </span>
+                                    </CardTitle>
                                 </div>
                             </CardHeader>
                             <CardBody>
@@ -823,7 +875,13 @@ function Profile() {
                         <Card className="card-name">
                             <CardHeader>
                                 <div className="form-row">
-                                    <CardTitle className="col-md-5" tag="h5"><small>Credit</small></CardTitle>
+                                    <CardTitle className="col-md-5" tag="h5">
+                                        <small>Credit</small>
+                                        <span>&nbsp;</span>
+                                        <span onClick={toggleWithdraw}>
+                                            <i class="fas fa-wallet"/>
+                                        </span>
+                                    </CardTitle>
                                 </div>
                             </CardHeader>
                             <CardBody className='text-center'>
@@ -865,9 +923,6 @@ function Profile() {
                                                     setError('Please input a valid price amount (e.g. 9.50).')
                                                     isError(true)
                                                     }
-
-
-
                                             }}
                                             onError={function() {
                                                 setInCredit(true)
@@ -1051,6 +1106,39 @@ function Profile() {
                                         </fieldset>
                                     </form>
                                 </ModalBody>
+                            </Modal>
+                            <Modal isOpen={withdrawModal} toggle={toggleWithdraw}>
+                                <ModalHeader toggle={toggleWithdraw}>Withdraw Credits</ModalHeader>
+                                <ModalBody className='text-center'>
+                                    <div style={{fontSize:"1rem"}}>Current Balance: $ {parseFloat(merchant.creditBalance).toFixed(2)}</div>
+                                    <form className='text-center'>
+                                        <FormGroup className='w-50 mr-auto ml-auto text-center'>
+                                            <Label for="inputPaypalEmail"></Label>
+                                                <Input 
+                                                    type="text" 
+                                                    id="inputPaypalEmail" 
+                                                    placeholder="Enter PayPal Email" 
+                                                    value={paypalEmail}
+                                                    onChange={onChangePaypalEmail}
+                                                    style={{...padding(5, 5, 5, 5), fontSize:"0.7rem"}}
+                                                    />
+                                        </FormGroup>
+                                        <FormGroup className='w-50 mr-auto ml-auto text-center'>
+                                                <Input 
+                                                    type="text" 
+                                                    id="inputWithdrawAmount" 
+                                                    placeholder="Enter Withdraw Amount" 
+                                                    value={withdrawAmount}
+                                                    onChange={onChangeWithdrawAmount}
+                                                    style={{...padding(5, 5, 5, 5), fontSize:"0.7rem"}}
+                                                    />
+                                        </FormGroup>
+                                    </form>
+                                </ModalBody>
+                                <ModalFooter>
+                                    <Button color="primary" onClick={withdrawCredits}>Withdraw</Button>{' '}
+                                </ModalFooter>
+                                { inModal && !inWithdraw && err &&<Alert color="danger">{error}</Alert> }
                             </Modal>
                         </Card>
                     </Col>

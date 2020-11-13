@@ -344,14 +344,13 @@ function CurrentBookingDetails() {
                                                 <Button color="danger" size="sm" onClick={toggle}>Cancel Booking</Button>                                              
                                             </div>
                                         </Row>
-  
-                                       
                                         <Row>
                                             <Col md="12">
                                                 <div className="form-add">
                                                     <Button onClick={() => {
                                                         history.push('/admin/Bookings')
                                                         localStorage.removeItem('bookingToView')
+                                                        localStorage.removeItem('qrCode')
                                                     }}> back
                                                     </Button>
                                                 </div>
