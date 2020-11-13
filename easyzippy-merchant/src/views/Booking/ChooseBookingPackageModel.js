@@ -83,7 +83,7 @@ function ChooseBookingPackageModel() {
 
     const buyBookingPackage = (e, id) => {
         e.preventDefault()
-
+        localStorage.removeItem('buyPackageKioskId')
         axios.post(`/merchantBookingPackage`, {
             merchantId: merchantid,
             bookingPackageModelId: id, 
@@ -96,7 +96,7 @@ function ChooseBookingPackageModel() {
         }).then (res => {
             history.push('/admin/profile')
         }).catch(function (error) {
-            console.log(error.response.data)
+            console.log(error)
         })   
 
     }
@@ -128,7 +128,9 @@ function ChooseBookingPackageModel() {
             <div className="content">
                 <div>
                     <Breadcrumb>
-                        <BreadcrumbItem><a href='/admin/profile'>Profile</a></BreadcrumbItem>
+                        <BreadcrumbItem onClick={function() {
+                            localStorage.removeItem('buyPackageKioskId')
+                        }}><a href='/admin/profile'>Profile</a></BreadcrumbItem>
                         <BreadcrumbItem active>Buy Booking Package</BreadcrumbItem>
                     </Breadcrumb>
                 </div>
@@ -143,7 +145,7 @@ function ChooseBookingPackageModel() {
                                             <CardTitle className="h6">{model.name}</CardTitle>
                                             <CardText><i>{model.description}</i></CardText>
                                             <CardText>
-                                                <small>Valid from now till {formatDate(new Date(Date.now() + parseInt(model.duration) * 24 * 60 * 60 * 1000))}</small>
+                                                <small>Valid from Time of Payment until {formatDate(new Date(Date.now() + parseInt(model.duration) * 24 * 60 * 60 * 1000))}</small>
                                             </CardText>
                                             <CardText><small>Locker Quota: {model.quota} {getLockerTypeName(model.lockerTypeId)} Locker</small></CardText>
                                         </CardBody>

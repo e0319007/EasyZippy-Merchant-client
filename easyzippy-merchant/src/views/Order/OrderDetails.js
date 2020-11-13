@@ -48,6 +48,7 @@ function OrderDetails() {
     const [successful, isSuccessful] = useState(false)
     const [successMsg, setMsg] = useState('')
 
+    const [canCreateBooking, setCanCreateBooking] = useState(false)
 
     useEffect(() => {
         axios.get(`/order/${orderId}`,
@@ -59,6 +60,10 @@ function OrderDetails() {
             setOrder(res.data.order)
             setOrderStatusEnum(res.data.order.orderStatusEnum)
             setItems(res.data.items)
+
+            if (res.data.order.orderStatusEnum === "Processing") {
+                setCanCreateBooking(true)
+            }
 
             // console.log("items: ")
             // console.log(res.data.items)
@@ -150,10 +155,6 @@ function OrderDetails() {
         }
     }
 
-  
-
-   
-
     // to use when viewing 
     function formatDate(d) {
         if (d === undefined){
@@ -179,6 +180,10 @@ function OrderDetails() {
         
     }
 
+    const redirect = e => {
+        history.push('/admin/createBooking')
+    }
+
     return(
         <>
             <ThemeProvider theme={theme}>
@@ -188,7 +193,20 @@ function OrderDetails() {
                             <Card className="card-name">
                                 <CardHeader>
                                     <div className="form-row">
-                                    <CardTitle className="col-md-10" tag="h5">Order Details (ID: {order.id})</CardTitle>
+                                    <CardTitle className="col-md-10" tag="h5">Order Details (ID: {order.id})
+                                        {canCreateBooking &&
+                                            <>
+                                                <span>&nbsp;&nbsp;&nbsp;</span>
+                                                <Button 
+                                                    className="btn-round" 
+                                                    color="info" 
+                                                    outline 
+                                                    style={{...padding(5,7,5,7), fontSize:'1rem'}}
+                                                    onClick={redirect}
+                                                ><small>Create Booking</small></Button>
+                                            </>
+                                        }
+                                    </CardTitle>
                                     </div>
                                 </CardHeader>
                                 <CardBody>
@@ -258,22 +276,22 @@ function OrderDetails() {
                                             </tbody>
                                         </Table>
                                         <fieldset>
-                                                <FormGroup>
-                                                    <Label for="inputOrderStatus">Order Status</Label>
-                                                    <Input
-                                                        type="select"
-                                                        name="select"
-                                                        id="inputOrderStatus"
-                                                        value={orderStatusEnum}
-                                                        onChange={onChangeOrderStatusEnum}
-                                                    >
-                                                        {
-                                                            orderStatusesEnum.map(orderStatusEnum => (
-                                                                <option key={orderStatusEnum.id}>{orderStatusEnum}</option>
-                                                            ))
-                                                        }
-                                                    </Input>
-                                                </FormGroup>  
+                                            <FormGroup>
+                                                <Label for="inputOrderStatus">Order Status</Label>
+                                                <Input
+                                                    type="select"
+                                                    name="select"
+                                                    id="inputOrderStatus"
+                                                    value={orderStatusEnum}
+                                                    onChange={onChangeOrderStatusEnum}
+                                                >
+                                                    {
+                                                        orderStatusesEnum.map(orderStatusEnum => (
+                                                            <option key={orderStatusEnum.id}>{orderStatusEnum}</option>
+                                                        ))
+                                                    }
+                                                </Input>
+                                            </FormGroup> 
                                         </fieldset>
                                         <Row>
                                             <div className="update ml-auto mr-auto" >
@@ -295,8 +313,6 @@ function OrderDetails() {
                                         </Row> 
                                     </form>
                                 </CardBody>
-                                
-                          
                             </Card>
                         </Col>
                     </Row>
@@ -305,5 +321,15 @@ function OrderDetails() {
         </>
     );
 }
+
+function padding(a, b, c, d) {
+    return {
+        paddingTop: a,
+        paddingRight: b ? b : a,
+        paddingBottom: c ? c : a,
+        paddingLeft: d ? d : (b ? b : a)
+    }
+}
+
 
 export default OrderDetails;

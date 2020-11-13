@@ -18,6 +18,7 @@ import BookingPackages from "views/BookingPackage/BookingPackages";
 import BookingPackageDetails from "views/BookingPackage/BookingPackageDetails.";
 import AllBookingDetails from "views/Booking/AllBookingDetails";
 import CurrentBookingDetails from "views/Booking/CurrentBookingDetails";
+import CreateBooking from "views/Booking/CreateBooking";
 
 var routes = [
   {
@@ -162,6 +163,15 @@ var routes = [
     component: ChooseBookingPackageModel,
     layout: "/admin",
     invisible: true
+  },
+  {
+    path: "/createBooking",
+    name: "Create Booking",
+    icon: "nc-icon nc-image",
+    component: CreateBooking,
+    layout: "/admin",
+    invisible: true
   }
 ];
+
 export default routes;

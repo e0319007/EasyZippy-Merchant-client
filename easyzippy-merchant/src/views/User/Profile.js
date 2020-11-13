@@ -525,32 +525,6 @@ function Profile() {
         setTopUpAmount(topUpAmount)
     }
 
-    const topUpCredits = e => {
-
-        if (topUpAmount === undefined || topUpAmount === "") {
-            return
-        }   
-
-        setLoading(true)
-        console.log("/pay/merchant/" + merchantid + "/" + topUpAmount)
-        axios.get(`/pay/merchant/${merchantid}/${topUpAmount}`, {
-            headers: {
-                AuthToken: authToken,
-            }
-        }).then (res => {
-            let url = res.data
-            console.log(url)
-            window.location.href = url
-            setLoading(false)
-        }).catch(function(error) {
-            setLoading(false)
-            setInCredit(true)
-            setError('Something went wrong, unable to top up credits')
-            isError(true)
-            console.log(error)
-        })
-    }
-
     const onChangePackageKiosk = e => {
         const kiosk = e.target.value;
         let id = '';
@@ -745,7 +719,7 @@ function Profile() {
                                                 />
                                         </FormGroup>
                                     </div>             
-                                    <p>&nbsp;</p>         
+                                    {/* <p>&nbsp;</p>*/}
                                     <Row>
                                         <div className="update ml-auto mr-auto" >
                                             <Button color="success" size="sm" type="submit" onClick={updateProfile}>Update Profile</Button>
@@ -877,17 +851,23 @@ function Profile() {
                                                     purchase_units: [{
                                                         amount: {
                                                             value: topUpAmount,
-                                                            currency: 'SGD'
+                                                            currency: 'SGD',
+                                                            // currency_code: 'SGD'
                                                         },
                                                     }]
                                                 });
                                             }}
                                             onClick={function() {
-                                                if (topUpAmount === undefined || topUpAmount === "" || isNaN(topUpAmount)) {
+                                                var nums = /^\d+(,\d{3})*(\.\d{1,2})?$/gm
+                                                if (topUpAmount === undefined || topUpAmount === "" || !topUpAmount.match(nums) ||
+                                                topUpAmount.indexOf('$') > 0) {                                               
                                                     setInCredit(true)
-                                                    setError('Please input a valid price amount.')
+                                                    setError('Please input a valid price amount (e.g. 9.50).')
                                                     isError(true)
-                                                } 
+                                                    }
+
+
+
                                             }}
                                             onError={function() {
                                                 setInCredit(true)
@@ -895,29 +875,30 @@ function Profile() {
                                                 isError(true)
                                             }}
                                             onApprove={function() {
-                                                setInCredit(true)
-                                                isSuccessful(true)
-                                                setMsg('Credits topped-up successfully!')
-                                                merchant.creditBalance = parseFloat(merchant.creditBalance - parseFloat(topUpAmount))
+                                                merchant.creditBalance = parseFloat(merchant.creditBalance + parseFloat(topUpAmount))
                                                 localStorage.setItem('currentMerchant', JSON.stringify(merchant))
-                                                // var xhr = new XMLHttpRequest();
-                                                // xhr.onreadystatechange = function() {
-                                                //     if (xhr.readyState === 4) {
-                                                //         let resp = JSON.parse(JSON.parse(xhr.responseText))
-                                                //         console.log(resp)
-                                                //     }
-                                                // }
-                                                window.location.reload()
+                                                axios.post(`/externalPaymentRecord/${merchantid}`, {
+                                                    externalId: '56y789fh',
+                                                    amount: topUpAmount
+                                                },{
+                                                    headers: {
+                                                        AuthToken: authToken
+                                                    }
+                                                }).then(res => {
+                                                    setInCredit(true)
+                                                    isSuccessful(true)
+                                                    setMsg('Credits topped-up successfully!')
+                                                    window.location.reload()
+                                                }).catch(function (error) {
+                                                    console.log(error)
+                                                })  
                                             }}
                                         />
                                     </div>
                                 </PayPalScriptProvider>
-                                &nbsp;&nbsp;&nbsp;
-                                {/* <Button style={{fontSize:"0.7rem"}}>
-                                    Withdraw
-                                </Button> */}
                                 { inCredit && !inModal && err &&<UncontrolledAlert color="danger">{error}</UncontrolledAlert> }
-                                { inCredit && !inModal && successful &&<Alert color="success">{successMsg}</Alert> }
+                                { inCredit && !inModal && successful &&<UncontrolledAlert color="success">{successMsg}</UncontrolledAlert> }
+                                &nbsp;&nbsp;&nbsp;
                             </CardBody>
                         </Card>
                         <Card className="card-name">

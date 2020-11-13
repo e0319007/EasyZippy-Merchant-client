@@ -349,8 +349,8 @@ function CurrentBookingDetails() {
                                 <Modal isOpen={modal} toggle={toggle}>
                                     <ModalHeader toggle={toggle}>Are you sure you want to cancel this booking?</ModalHeader>
                                     <ModalFooter style={{display: "flex",
-                                          justifyContent: "center",
-                                          alignItems: "center"}}>
+                                        justifyContent: "center",
+                                        alignItems: "center"}}>
                                             <Button color="danger" onClick={cancelBooking}>Yes</Button>
                                             {'  '}
                                             <Button color="secondary" onClick={toggle}>No</Button>
