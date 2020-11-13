@@ -167,7 +167,7 @@ function Login() {
     return (
         <>
         
-        <div style={{height:'100vh', backgroundImage:`url(${require("../../background2.png")})`, backgroundPosition: 'center',
+        <div style={{backgroundImage:`url(${require("../../background2.png")})`, backgroundPosition: 'center',
               backgroundSize: 'cover',
               backgroundRepeat: 'no-repeat',
               opacity:'1'}}>

@@ -48,7 +48,7 @@ function ProductDetails() {
     const merchantId = product.merchantId
     const [name, setName] = useState(product.name)
     const [description, setDescription] = useState(product.description)
-    const [unitPrice, setUnitPrice] = useState(parseInt(product.unitPrice))
+    const [unitPrice, setUnitPrice] = useState(parseFloat(product.unitPrice).toFixed(2))
     const [category, setCategory] = useState(product.category)
     const [quantityAvailable, setQuantityAvailable] = useState(product.quantityAvailable)
     const [disabled, setDisabled] = useState('')

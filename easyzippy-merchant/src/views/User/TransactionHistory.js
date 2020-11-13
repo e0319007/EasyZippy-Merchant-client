@@ -32,7 +32,8 @@ function TransactionHistory() {
         {title: "Transaction Date", field: "createdAt", 
             customFilterAndSearch: (term, rowData) => formatDate(rowData.createdAt).toLowerCase().includes(term.toLowerCase()),
             render: row => <span>{ formatDate(row["createdAt"]) }</span>},
-        {title: "Amount", field: "amount"}, 
+        {title: "Amount", field: "amount", 
+            render: row => <span>{ parseFloat(row["amount"]).toFixed(2) }</span>},
         {title: "Credit Payment Type", field:"creditPaymentTypeEnum"},
         {title: "Referral Credit Used", field:"referralCreditUsed"}          
     ]
