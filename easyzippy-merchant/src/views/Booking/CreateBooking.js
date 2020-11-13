@@ -274,7 +274,7 @@ function CreateBooking() {
                 console.log(start)
                 let end = new Date(endDateTime)
                 console.log(end)
-                let bookingPackageEnd = new Date((bookingPackage.endDate).setSeconds(0,0))
+                let bookingPackageEnd = new Date((bookingPackage.endDate)).setSeconds(0,0)
                 console.log(bookingPackageEnd)
                 let milliscs = Math.abs(end - bookingPackageEnd)
                 console.log(milliscs)
@@ -283,7 +283,7 @@ function CreateBooking() {
                 setMinutesChargeable(diffMins)
                 totalPrice = parseFloat((diffMins-30)*pricePerMin).toFixed(2)
                 console.log(totalPrice)
-                setTotalPrice(totalPrice)
+                setTotalPrice(totalPrice.toFixed(2))
             } else if (validBookingPackage && (new Date(startDateTime).setSeconds(0,0) > new Date(bookingPackage.endDate).setSeconds(0,0))){ //booking package has expired
                 console.log('second case')
                 totalPrice = parseFloat(2850*pricePerMin).toFixed(2)
@@ -379,7 +379,7 @@ function CreateBooking() {
             merchant.creditBalance = parseFloat(merchant.creditBalance) - totalPrice
             localStorage.setItem('currentMerchant', JSON.stringify(merchant))
 
-            axios.put('tagOrderToBooking', {
+            axios.put('/tagOrderToBooking', {
                 bookingId: res.data.id,
                 orderId: JSON.parse(localStorage.getItem('orderToView')),
             }, 
@@ -665,8 +665,8 @@ function CreateBooking() {
                                             </Row>
                                             <p>{' '}</p>
                                             <div className='text-center'>
-                                                <Button disabled={parseFloat(merchant.creditBalance).toFixed(2) < totalPrice} onClick={toggle}>Checkout</Button>
-                                                {parseFloat(merchant.creditBalance).toFixed(2) < totalPrice &&
+                                                <Button disabled={parseFloat(merchant.creditBalance) < totalPrice} onClick={toggle}>Checkout</Button>
+                                                {parseFloat(merchant.creditBalance) < totalPrice &&
                                                     <p style={{color: 'red'}}><i><small>You do not have enough credits to purchase this booking. Please go to your profile to top-up.</small></i></p>
                                                 }   
                                             </div>

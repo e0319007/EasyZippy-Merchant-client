@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 import { useHistory } from 'react-router-dom';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
+import { useQRCode } from 'react-hook-qrcode';
 import {
     Card,
     CardBody,
@@ -11,7 +12,8 @@ import {
     Row,
     Col,
     Input,
-    CardHeader, FormGroup, Label, Button, Modal, ModalHeader, ModalFooter, ModalBody
+    CardHeader, FormGroup, Label, Button, Modal, ModalHeader, ModalFooter, ModalBody,
+    CardImg
 } from "reactstrap";
 
 const theme = createMuiTheme({
@@ -27,6 +29,10 @@ function CurrentBookingDetails() {
     const history = useHistory()
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
     console.log(authToken)
+    
+    const [qrCodeString, setQrCodeString] = useState(JSON.parse(localStorage.getItem('qrCode'))) 
+    var React = require('react');
+    var QRCode = require('qrcode.react');
 
     const bookingId = JSON.parse(localStorage.getItem('bookingToView'))
     const [data, setData] = useState([])
@@ -49,6 +55,8 @@ function CurrentBookingDetails() {
             }
         }).then(res => {
             setData(res.data)
+            setQrCodeString(res.data.qrCode)
+            console.log(res.data.qrCode)
 
             axios.get("/customers", {
                 headers: {
@@ -202,6 +210,11 @@ function CurrentBookingDetails() {
                                     <div className="form-row">
                                     <CardTitle className="col-md-10" tag="h5">Booking Details: {data.id} </CardTitle>
                                     </div>
+                                    {qrCodeString !== null &&
+                                        <div className='text-center'>
+                                            <QRCode style={{height:'10rem', width: '10rem'}} value={qrCodeString} />
+                                        </div>
+                                    }
                                 </CardHeader>
                                 <CardBody>
                                     <form>

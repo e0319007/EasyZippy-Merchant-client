@@ -45,7 +45,7 @@ function AllBookingDetails() {
             }
         }).then(res => {
             setData(res.data)
-
+            
             axios.get("/customers", {
                 headers: {
                     AuthToken: authToken
@@ -173,7 +173,7 @@ function AllBookingDetails() {
                             <Card className="card-name">
                                 <CardHeader>
                                     <div className="form-row">
-                                    <CardTitle className="col-md-10" tag="h5">Booking Details: {data.id} </CardTitle>
+                                        <CardTitle className="col-md-10" tag="h5">Booking Details: {data.id} </CardTitle>
                                     </div>
                                 </CardHeader>
                                 <CardBody>

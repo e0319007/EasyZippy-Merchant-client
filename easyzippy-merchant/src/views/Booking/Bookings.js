@@ -34,7 +34,7 @@ function Bookings() {
             customFilterAndSearch: (term, rowData) => getLockerType(rowData.lockerTypeId).toLowerCase().includes(term.toLowerCase()),
             render: row => <span>{getLockerType(row["lockerTypeId"])}</span>},    
         {title: "Price", field: "bookingPrice"},
-        {title: "Booking Source", field: "bookingSourceEnum", lookup:{Mobile: "Mobile", Kiosk: "Kiosk"}},
+        {title: "Booking Source", field: "bookingSourceEnum", lookup:{Mobile: "Mobile", Kiosk: "Kiosk", Web: "Web"}},
         {title: "Status", field: "bookingStatusEnum", lookup:{Unfulfilled: "Unfulfilled", Fulfilled: "Fulfilled", Active: "Active", Cancelled: "Cancelled"}},
         {title: "Start Date", field: "startDate", 
             customFilterAndSearch: (term, rowData) => formatDate(rowData.startDate).toLowerCase().includes(term.toLowerCase()),
@@ -50,7 +50,7 @@ function Bookings() {
             customFilterAndSearch: (term, rowData) => getLockerType(rowData.lockerTypeId).toLowerCase().includes(term.toLowerCase()),
             render: row => <span>{getLockerType(row["lockerTypeId"])}</span>},    
         {title: "Price", field: "bookingPrice"},
-        {title: "Booking Source", field: "bookingSourceEnum", lookup:{Mobile: "Mobile", Kiosk: "Kiosk"}},
+        {title: "Booking Source", field: "bookingSourceEnum", lookup:{Mobile: "Mobile", Kiosk: "Kiosk", Web: "Web"}},
         {title: "Status", field: "bookingStatusEnum", lookup:{Unfulfilled: "Unfulfilled", Fulfilled: "Fulfilled", Active: "Active", Cancelled: "Cancelled"}},
         {title: "Start Date", field: "startDate", 
             customFilterAndSearch: (term, rowData) => formatDate(rowData.startDate).toLowerCase().includes(term.toLowerCase()),
@@ -178,6 +178,7 @@ function Bookings() {
                                     tooltip: "View Booking Details",
                                     onClick: (event, rowData) => {
                                         history.push('/admin/currentBookingDetails')
+                                        localStorage.setItem('qrCode', JSON.stringify(rowData.qrCode))
                                         localStorage.setItem('bookingToView', JSON.stringify(rowData.id))
                                     }
                                 },
