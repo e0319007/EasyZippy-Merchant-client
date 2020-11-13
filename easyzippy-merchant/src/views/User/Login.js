@@ -16,7 +16,13 @@ import {
     NavItem,
     NavbarText,
     NavbarToggler,
-    Collapse
+    Collapse,
+    Card,
+    Row,
+    Col,
+    CardHeader,
+    CardBody,
+    CardTitle
 } from "reactstrap";
 
 function Login() {
@@ -156,10 +162,15 @@ function Login() {
 
 
     };
-
+ 
 
     return (
-        <div style={{backgroundColor:'#f4f3ef', height:'100vh'}}>
+        <>
+        
+        <div style={{height:'100vh', backgroundImage:`url(${require("../../background2.png")})`, backgroundPosition: 'center',
+              backgroundSize: 'cover',
+              backgroundRepeat: 'no-repeat',
+              opacity:'1'}}>
             <Navbar expand="lg" color="dark">
                 <NavbarBrand>
                     &nbsp;&nbsp;
@@ -196,45 +207,71 @@ function Login() {
                     </Nav>
                 </Collapse>
             </Navbar>
-            <form style={{...padding(65, 77, 0, 77)}}>
-                <FormGroup>
-                    <p className="h3" style={{textAlign: 'center'}}>
-                        Welcome to Ez2Keep Merchant Application
-                    </p>
-                </FormGroup>
-                <FormGroup>
-                    <Label for="email">Email address</Label>
-                    <Input
-                    type="email"
-                    name="email"
-                    id="email"
-                    placeholder="Enter email"
-                    value={email}
-                    onChange={onChangeEmail}
-                    required
-                    />
-                </FormGroup>
-                <FormGroup>
-                    <Label for="password">Password</Label>
-                    <Input
-                    type="password"
-                    name="password"
-                    id="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={onChangePassword}
-                    required
-                    />
-                </FormGroup>
-                <Button color="primary" type="submit" onClick={postLogin} > 
-                    Log In
-                </Button>
-                <FormGroup> 
-                    <Link onClick={forgotPassword}>Forgot Password?</Link>
-                </FormGroup>
-                { err &&<Alert color="danger">{error}</Alert> }
-            </form>
+            <div className="content" style={{marginTop:"5rem"}}>
+                {/* <form> */}
+                    <Row 
+                    style={{display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center", 
+                          }}
+                          >
+                        <Col md="5">
+                            <Card className="card-name">
+                                    <CardHeader className="h3" style={{textAlign: 'center'}}>
+                                        <div className="form-row">
+                                        <CardTitle className="col-md-12" tag="h5"><small>Welcome to Ez2Keep Merchant Portal</small></CardTitle>
+                                        </div>
+                                    </CardHeader>
+                            
+                                <CardBody>
+                                    <FormGroup>
+                                    <Label for="email">Email address</Label>
+                                    <Input
+                                    type="email"
+                                    name="email"
+                                    id="email"
+                                    placeholder="Enter email"
+                                    value={email}
+                                    onChange={onChangeEmail}
+                                    required
+                                    />
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label for="password">Password</Label>
+                                    <Input
+                                    type="password"
+                                    name="password"
+                                    id="password"
+                                    placeholder="Password"
+                                    value={password}
+                                    onChange={onChangePassword}
+                                    required
+                                    />
+                                </FormGroup>
+                                <FormGroup style={{display: "flex",
+                                      justifyContent: "center",
+                                      alignItems: "center"}}>
+                                    <Button color="primary" type="submit" onClick={postLogin} style={{width: "60rem"}}> 
+                                        Log In
+                                    </Button>
+
+                                </FormGroup>
+                                <FormGroup style={{display: "flex",
+                                      justifyContent: "center",
+                                      alignItems: "center"}}> 
+                                    <Link onClick={forgotPassword}>Forgot Password?</Link>
+                                </FormGroup>
+                                { err &&<Alert color="danger">{error}</Alert> }
+                                </CardBody>
+                            </Card>
+                        </Col>
+                    </Row>
+                   
+                {/* </form> */}
+
+            </div>
         </div>
+        </>
     );
 }
 
