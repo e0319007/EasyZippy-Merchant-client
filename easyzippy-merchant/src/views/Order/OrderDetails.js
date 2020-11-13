@@ -13,8 +13,7 @@ import {
     Input,
     CardHeader, FormGroup, Label, Button, Alert, Table
 } from "reactstrap";
-import { Form } from "components/UseForm";
-import Orders from "./Orders";
+
 
 const theme = createMuiTheme({
     typography: {
@@ -276,22 +275,24 @@ function OrderDetails() {
                                             </tbody>
                                         </Table>
                                         <fieldset>
-                                            <FormGroup>
-                                                <Label for="inputOrderStatus">Order Status</Label>
-                                                <Input
-                                                    type="select"
-                                                    name="select"
-                                                    id="inputOrderStatus"
-                                                    value={orderStatusEnum}
-                                                    onChange={onChangeOrderStatusEnum}
-                                                >
-                                                    {
-                                                        orderStatusesEnum.map(orderStatusEnum => (
-                                                            <option key={orderStatusEnum.id}>{orderStatusEnum}</option>
-                                                        ))
-                                                    }
-                                                </Input>
-                                            </FormGroup> 
+                                                <FormGroup>
+                                                    <Label for="inputOrderStatus">Order Status</Label>
+                                                    <Input
+                                                        type="select"
+                                                        name="select"
+                                                        id="inputOrderStatus"
+                                                        value={orderStatusEnum}
+                                                        onChange={onChangeOrderStatusEnum}
+                                                    >
+                                                        {/* {
+                                                            orderStatusesEnum.map(orderStatusEnum => (
+                                                                <option key={orderStatusEnum.id}>{orderStatusEnum}</option>
+                                                            ))
+                                                        } */}
+                                                        <option>Processing</option>
+                                                        <option>Ready For Collection</option>
+                                                    </Input>
+                                                </FormGroup>  
                                         </fieldset>
                                         <Row>
                                             <div className="update ml-auto mr-auto" >

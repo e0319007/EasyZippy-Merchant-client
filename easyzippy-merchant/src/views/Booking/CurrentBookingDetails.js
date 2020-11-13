@@ -13,7 +13,8 @@ import {
     Col,
     Input,
     CardHeader, FormGroup, Label, Button, Modal, ModalHeader, ModalFooter, ModalBody,
-    CardImg
+    CardImg, Alert
+
 } from "reactstrap";
 
 const theme = createMuiTheme({
@@ -28,19 +29,29 @@ function CurrentBookingDetails() {
 
     const history = useHistory()
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
-    console.log(authToken)
     
     const [qrCodeString, setQrCodeString] = useState(JSON.parse(localStorage.getItem('qrCode'))) 
     var React = require('react');
     var QRCode = require('qrcode.react');
+    //console.log(authToken)
 
     const bookingId = JSON.parse(localStorage.getItem('bookingToView'))
+    console.log("booking id: " + bookingId)
     const [data, setData] = useState([])
     const [customers, setCustomers] = useState([])
     const [merchants, setMerchants] = useState([])
     const [bookingPackages, setBookingPackages] = useState([])
     const [lockerTypes, setLockerTypes] = useState([])
     const [kiosks, setKiosks] = useState([])
+
+    const [startDate, setStartDate] = useState('')
+    const [endDate, setEndDate] = useState('')
+
+    const [error, setError] = useState('')
+    const [err, isError] = useState(false)
+
+    const [successful, isSuccessful] = useState(false)
+    const [successMsg, setMsg] = useState('')
 
     //for delete confirmation
     const [modal, setModal] = useState(false)
@@ -57,6 +68,8 @@ function CurrentBookingDetails() {
             setData(res.data)
             setQrCodeString(res.data.qrCode)
             console.log(res.data.qrCode)
+
+            setStartDate(res.data.startDate)
 
             axios.get("/customers", {
                 headers: {
@@ -109,9 +122,28 @@ function CurrentBookingDetails() {
     const cancelBooking = e => {
         e.preventDefault()
 
-        const bookingId = localStorage.getItem('bookingId')
-        console.log("booking id: " + bookingId)
+        //const bookingId = localStorage.getItem('bookingId')
+        console.log("booking id in cancel booking method: " + bookingId)
 
+    
+
+        var currentDate = new Date()
+        var currentTime = currentDate.getTime()
+        console.log("currentTime: " + currentTime)
+
+        var startd = new Date(startDate)
+        var startTime = startd.getTime()
+        console.log("startTime: " + startTime)
+
+        var diffTime = startTime - currentTime 
+        console.log("diff: " + diffTime)
+
+        if (diffTime <= 1800000) {
+            isError(true)
+            setError("Unable to cancel booking less than 30 minutes before the start of booking start time")
+            isSuccessful(false)
+            return;
+        }
 
         axios.put(`/booking/${bookingId}`, 
         {
@@ -123,7 +155,10 @@ function CurrentBookingDetails() {
             }
         }).then(res => {
             console.log("axios cancel booking went through")
-            window.location.reload()
+            //window.location.reload()
+            isError(false)
+            isSuccessful(true)
+            setMsg("Booking successfully cancelled!")
         }).catch(function (error) {
             console.log(error)
         })
@@ -179,10 +214,11 @@ function CurrentBookingDetails() {
     function formatDate(d) {
         if (d === undefined){
             d = (new Date()).toISOString()
-            console.log(undefined)
+            //console.log(undefined)
         }
         let currDate = new Date(d);
-        console.log("currDate: " + currDate)
+        //console.log("currDate: " + currDate)
+
         let year = currDate.getFullYear();
         let month = currDate.getMonth() + 1;
         let dt = currDate.getDate();
@@ -368,6 +404,8 @@ function CurrentBookingDetails() {
                                             <Button color="secondary" onClick={toggle}>No</Button>
                                     </ModalFooter>
                                 </Modal>
+                                { err &&<Alert color="danger">{error}</Alert> }
+                                { successful &&<Alert color="success">{successMsg}</Alert>} 
                                 
                             </Card>         
                         </Col>
