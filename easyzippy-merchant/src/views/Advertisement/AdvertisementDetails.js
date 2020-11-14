@@ -162,7 +162,6 @@ function AdvertisementDetails() {
         axios.put(`/advertisement/${ad.id}`, {
             title: title,
             description: description,
-            image: image,
             advertiserUrl: advertiserUrl,
             startDate: startDate,
             endDate: endDate,

@@ -60,7 +60,7 @@ function OrderDetails() {
             setOrderStatusEnum(res.data.order.orderStatusEnum)
             setItems(res.data.items)
 
-            if (res.data.order.orderStatusEnum === "Processing") {
+            if (res.data.order.orderStatusEnum === "Processing" && res.data.order.collectionMethodEnum === "Kiosk") {
                 setCanCreateBooking(true)
             }
 

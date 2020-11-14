@@ -58,6 +58,8 @@ function Advertisements() {
     useEffect(() => {
         //retrieving all ads
         axios.get(`/advertisement/merchant/${merchantId}`, {
+            id:'id'
+        },{
             headers: {
                 AuthToken: authToken
             }
