@@ -115,7 +115,8 @@ function CreateBooking() {
         }).then(res => {
             setBookingPackage(res.data)
             let bookingPackage = res.data
-            if (bookingPackage !== null) {
+            console.log(typeof res.data)
+            if (bookingPackage !== '') {
                 axios.get(`/bookingPackageModel/${res.data.bookingPackageModelId}`, {
                     headers: {
                         AuthToken: authToken
@@ -339,9 +340,8 @@ function CreateBooking() {
         setLockerTypeId(id)
         setLockerTypeName(name)
 
-        console.log('booking package model locker type id: ' + bookingPackageModel.lockerTypeId)
         //if merchant has booking package
-        if (bookingPackage !== null) {
+        if (bookingPackage !== '') {
             //check if locker type is same as selected
             if (bookingPackageModel.lockerTypeId === id) {
                 console.log('booking package locker type id: ' + bookingPackageModel.lockerTypeId)
