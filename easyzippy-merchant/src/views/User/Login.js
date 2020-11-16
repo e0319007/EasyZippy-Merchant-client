@@ -167,10 +167,15 @@ function Login() {
     return (
         <>
         
-        <div style={{height: "100vh", backgroundImage:`url(${require("../../background2.png")})`, backgroundPosition: 'center',
-              backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat',
-              opacity:'1'}}>
+        <div style={{
+             height: '100vh', 
+            width:'100%', 
+            backgroundImage:`url(${require("../../background2.png")})`, 
+            backgroundPosition: 'center',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
+            }}>
             <Navbar expand="lg" color="dark">
                 <NavbarBrand>
                     &nbsp;&nbsp;
@@ -207,16 +212,17 @@ function Login() {
                     </Nav>
                 </Collapse>
             </Navbar>
-            <div className="content" style={{marginTop:"5rem"}}>
-                {/* <form> */}
+            <div style={{marginTop:"5rem", overflow:'hidden'}}>
+        
                     <Row 
-                    style={{display: "flex",
+                    style={{
+                         display: "flex",
                           justifyContent: "center",
                           alignItems: "center", 
                           }}
                           >
                         <Col md="5">
-                            <Card className="card-name">
+                            <Card>
                                     <CardHeader className="h3" style={{textAlign: 'center'}}>
                                         <div className="form-row">
                                         <CardTitle className="col-md-12" tag="h5"><small>Welcome to Ez2Keep Merchant Portal</small></CardTitle>
@@ -248,9 +254,11 @@ function Login() {
                                     required
                                     />
                                 </FormGroup>
-                                <FormGroup style={{display: "flex",
+                                <FormGroup style={{
+                                      display: "flex",
                                       justifyContent: "center",
-                                      alignItems: "center"}}>
+                                      alignItems: "center"
+                                      }}>
                                     <Button color="primary" type="submit" onClick={postLogin} style={{width: "60rem"}}> 
                                         Log In
                                     </Button>
@@ -266,8 +274,7 @@ function Login() {
                             </Card>
                         </Col>
                     </Row>
-                   
-                {/* </form> */}
+       
 
             </div>
         </div>
