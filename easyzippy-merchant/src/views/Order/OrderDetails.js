@@ -48,6 +48,7 @@ function OrderDetails() {
     const [successMsg, setMsg] = useState('')
 
     const [canCreateBooking, setCanCreateBooking] = useState(false)
+    const [canChangeOrderStatus, setCanChangeOrderStatus] = useState(false)
 
     useEffect(() => {
         axios.get(`/order/${orderId}`,
@@ -62,6 +63,10 @@ function OrderDetails() {
 
             if (res.data.order.orderStatusEnum === "Processing" && res.data.order.collectionMethodEnum === "Kiosk") {
                 setCanCreateBooking(true)
+            }
+
+            if (res.data.order.collectionMethodEnum === "In Store") {
+                setCanChangeOrderStatus(true)
             }
 
             // console.log("items: ")
@@ -247,6 +252,7 @@ function OrderDetails() {
                                                     value={formatDate(order.orderDate)}
                                                 />
                                             </FormGroup>
+                                        
                                             <FormGroup>
                                                 <Label for="inputCollectionMethod">Collection Method</Label>
                                                 <Input
@@ -274,31 +280,47 @@ function OrderDetails() {
                                                 ))}         
                                             </tbody>
                                         </Table>
-                                        <fieldset>
+                                        {canChangeOrderStatus && 
+                                            <fieldset>
+                                                    <FormGroup>
+                                                        <Label for="inputOrderStatus">Order Status</Label>
+                                                        <Input
+                                                            type="select"
+                                                            name="select"
+                                                            id="inputOrderStatus"
+                                                            value={orderStatusEnum}
+                                                            onChange={onChangeOrderStatusEnum}
+                                                        >
+                                                            {/* {
+                                                                orderStatusesEnum.map(orderStatusEnum => (
+                                                                    <option key={orderStatusEnum.id}>{orderStatusEnum}</option>
+                                                                ))
+                                                            } */}
+                                                            <option>Processing</option>
+                                                            <option>Ready For Collection</option>
+                                                        </Input>
+                                                    </FormGroup>  
+                                            </fieldset>                         
+                                        }
+                                        {!canChangeOrderStatus && 
+                                            <fieldset disabled>
                                                 <FormGroup>
                                                     <Label for="inputOrderStatus">Order Status</Label>
-                                                    <Input
-                                                        type="select"
-                                                        name="select"
+                                                    <Input 
+                                                        type="text"
                                                         id="inputOrderStatus"
                                                         value={orderStatusEnum}
-                                                        onChange={onChangeOrderStatusEnum}
-                                                    >
-                                                        {/* {
-                                                            orderStatusesEnum.map(orderStatusEnum => (
-                                                                <option key={orderStatusEnum.id}>{orderStatusEnum}</option>
-                                                            ))
-                                                        } */}
-                                                        <option>Processing</option>
-                                                        <option>Ready For Collection</option>
-                                                    </Input>
-                                                </FormGroup>  
-                                        </fieldset>
-                                        <Row>
-                                            <div className="update ml-auto mr-auto" >
-                                                <Button color="success" size="sm" type="submit" onClick={updateOrderStatus}>Update</Button>
-                                            </div>
-                                        </Row>
+                                                        />
+                                                </FormGroup>
+                                            </fieldset>
+                                        }
+                                        {canChangeOrderStatus && 
+                                            <Row>
+                                                <div className="update ml-auto mr-auto" >
+                                                    <Button color="success" size="sm" type="submit" onClick={updateOrderStatus}>Update</Button>
+                                                </div>
+                                            </Row>
+                                        }
                                         {err &&<Alert color="danger">{error}</Alert> }
                                         {successful &&<Alert color="success">{successMsg}</Alert>} 
                                         <Row>
