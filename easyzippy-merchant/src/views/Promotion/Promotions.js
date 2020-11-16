@@ -519,7 +519,6 @@ function Promotions() {
                         </div>
                         <div className="form-row">
                             <FormGroup className="col-md-12">
-                                <Label for="inputDiscount"></Label>
                                     <Input 
                                         type="text" 
                                         id="inputDiscount" 

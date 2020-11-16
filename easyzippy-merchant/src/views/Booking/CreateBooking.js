@@ -151,6 +151,8 @@ function CreateBooking() {
     }
 
     const changePageOne = e => {
+        setQuotaNotReached(true)
+        setLockerTypeDifferent(true)
         setPage(1)
     }
 
@@ -357,7 +359,7 @@ function CreateBooking() {
             } else {
                 setLockerTypeDifferent(true)
             }
-        }
+        } 
         changePageTwo()
     }
 
@@ -526,7 +528,7 @@ function CreateBooking() {
                                                         </span>
                                                     </Alert>
                                                     }
-                                                    {!quotaNotReached && bookingPackage.kioskId === kioskId &&
+                                                    {!quotaNotReached && bookingPackage.kioskId === kioskId && 
                                                     <Alert color="info" className="text-center mr-auto ml-auto" style={{...padding(10,5,0,5)}}>
                                                         <span>
                                                             <p>
@@ -535,7 +537,7 @@ function CreateBooking() {
                                                         </span>
                                                     </Alert>
                                                     }
-                                                    {lockerTypeDifferent && bookingPackage.kioskId === kioskId &&
+                                                    {lockerTypeDifferent && bookingPackage.kioskId === kioskId && quotaNotReached &&
                                                     <Alert color="info" className="text-center mr-auto ml-auto" style={{...padding(10,5,0,5)}}>
                                                         <span>
                                                             <p>
