@@ -83,6 +83,8 @@ function CreateBooking() {
     const [modal, setModal] = useState(false)
     const toggle = () => setModal(!modal);
 
+    const [isInModal, setIsInModal] = useState(false)
+
     //booking source enum is 'Web'
 
     useEffect(() => {
@@ -151,16 +153,19 @@ function CreateBooking() {
     }
 
     const changePageOne = e => {
+        setIsInModal(false)
         setQuotaNotReached(true)
         setLockerTypeDifferent(true)
         setPage(1)
     }
 
     const changePageTwo = e => {
+        setIsInModal(false)
         setPage(2)
     }
 
     const changePageThree = e => {
+        setIsInModal(false)
         console.log("start dt: " + startDateTime)
         console.log("end dt : " + endDateTime)
         setPage(3)
@@ -206,20 +211,37 @@ function CreateBooking() {
 
         console.log("start datetime: " + startDateTime)
         console.log("end datetime: " + endDateTime)
+        console.log("today: " + new Date())
         console.log("check: " + check)
 
+        let datePart = ''
+
+        if (check === null) { //if date field untouched,
+            datePart = new Date()
+            console.log("check null")
+        } else { //if touched
+            console.log(startDate)
+            datePart = new Date(startDate)
+        }
+
         //configure start datetime
-        console.log(startDate)
-        let datePart = new Date(startDate)
         let year = datePart.getFullYear()
         let month = datePart.getMonth() 
         let day = datePart.getDate()
+        console.log(year + "/" + month + "/" + day)
 
         let timePart = new Date(startTime)
+        console.log(timePart)
         let timeArr = (timePart.toLocaleTimeString('en-SG')).split(':')
-        let combinedStartDate = new Date(year, month, day, timeArr[0], timeArr[1], 0)
-        console.log(combinedStartDate)
-        setStartDateTime(combinedStartDate.setSeconds(0,0))
+        let base = 0
+        if (timeArr[2].includes('pm')) {
+            base = 12 
+        } else if (timeArr[0] === "12" && timeArr[2].includes('am')) {
+            base = -12
+        } 
+        console.log(timeArr)
+        let combinedStartDate = new Date(year, month, day, parseInt(timeArr[0]) + base, parseInt(timeArr[1]), 0)
+        setStartDateTime(new Date(combinedStartDate).setSeconds(0,0))
 
         //calculate end time (48 hours)
         let endDate = new Date(combinedStartDate)
@@ -248,13 +270,14 @@ function CreateBooking() {
 
     const transitionPageThree = e => {
         e.preventDefault()
+        setIsInModal(false)
         calculateTotalCost()
 
         changePageThree()
     }
 
     const calculateTotalCost = e => {
-
+        setIsInModal(false)
         axios.get(`/lockerType/${lockerTypeId}`, {
             headers: {
                 AuthToken: authToken
@@ -337,6 +360,7 @@ function CreateBooking() {
 
     const transitionPageTwo = (e, id, name) => {
         e.preventDefault()
+        setIsInModal(false)
         console.log("locker type id: " + id)
         console.log("locker type name: " + name)
         setLockerTypeId(id)
@@ -364,6 +388,18 @@ function CreateBooking() {
     }
 
     const buyBooking = e => {
+
+        if (new Date(startDateTime) < new Date(today)) {
+            console.log(new Date(startDateTime))
+            setIsInModal(true)
+            setError("You cannot choose a date that has passed.")
+            setIsError(true)
+            return
+        } else {
+            setIsInModal(false)
+            setError(false)
+        }
+
         axios.post(`/booking/merchant`, {
             startDate: startDateTime,
             endDate: endDateTime,
@@ -678,9 +714,10 @@ function CreateBooking() {
                                                 <ModalBody>
                                                     Payment will be made in credits.
                                                 </ModalBody>
+                                                { isInModal && isError &&<UncontrolledAlert color="danger">{error}</UncontrolledAlert> }
                                             <ModalFooter>
                                                 <Button color="info" onClick={(e) => {buyBooking(e)}}>Confirm</Button>{' '}
-                                            </ModalFooter>
+                                            </ModalFooter>   
                                         </Modal>
                                     </Card>
                                 </Col>
