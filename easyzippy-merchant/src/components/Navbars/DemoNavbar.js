@@ -67,7 +67,6 @@ class Header extends React.Component {
     //once dropdown, then mark all notifications as read 
     console.log("inside notifications dropdown toggle")
     let n = this.state.notifications;
-    console.log("0" + n[0].read)
     for (var i in n) {
       console.log("n index read: " + n[i].read)
       if (n[i].read === false) {
