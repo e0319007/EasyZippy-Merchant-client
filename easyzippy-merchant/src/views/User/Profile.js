@@ -98,6 +98,7 @@ function Profile() {
     const [withdrawAmount, setWithdrawAmount] = useState('')
     const [inWithdraw, setInWithdraw] = useState(false)
     const [paypalEmail, setPaypalEmail] = useState('')
+    const [creditBalance, setCreditBalance] = useState(0)
 
     const [transactionModal, setTransactionModal] = useState(false)
     const toggleTransaction = () => setTransactionModal(!transactionModal)
@@ -105,6 +106,9 @@ function Profile() {
     const [bookingPackage, setBookingPackage] = useState('')
     const [bookingPackageModel, setBookingPackageModel] = useState('')
     const [kioskAddress, setKioskAddress] = useState('')
+
+    //to stop people from clicking the withdraw button twice
+    const [withdrawDisabled, setWithdrawDisabled] = useState(false)
 
     useEffect(() => {
 
@@ -124,6 +128,11 @@ function Profile() {
             setFloor(response.data.floor)
             setUnitNumber(response.data.unitNumber)
             setPostalCode(response.data.postalCode)
+            setCreditBalance(response.data.creditBalance)
+            console.log(response.data.creditBalance)
+            merchant.creditBalance = (parseFloat(response.data.creditBalance).toFixed(2))
+            localStorage.setItem('currentMerchant', JSON.stringify(merchant))
+            
 
             axios.get(`/merchantBookingPackages/${merchantid}`, {
                 headers: {
@@ -352,6 +361,10 @@ function Profile() {
             setFloor(response.data.floor)
             setUnitNumber(response.data.unitNumber)
             setPostalCode(response.data.postalCode)
+            setCreditBalance(response.data.creditBalance)
+            console.log(response.data.creditBalance)
+            merchant.creditBalance = (parseFloat(response.data.creditBalance).toFixed(2))
+            localStorage.setItem('currentMerchant', JSON.stringify(merchant))
             
             isInModal(false)
             isError(false)
@@ -562,6 +575,19 @@ function Profile() {
     }
 
     const withdrawCredits = e => {
+
+        if (withdrawDisabled) {
+            return
+        }
+
+        if (withdrawAmount > creditBalance) {
+            isInModal(true)                                           
+            setInWithdraw(true)
+            setError('Not enough credits to withdraw.')
+            isError(true)
+            return
+        }
+
         var nums = /^\d+(,\d{3})*(\.\d{1,2})?$/gm
         if (withdrawAmount === undefined || withdrawAmount === "" || !withdrawAmount.match(nums) ||
         withdrawAmount.indexOf('$') > 0) {    
@@ -578,8 +604,7 @@ function Profile() {
                 AuthToken: authToken,
             }
         }).then(res => {
-            merchant.creditBalance = (parseFloat(merchant.creditBalance) - withdrawAmount)
-            localStorage.setItem('currentMerchant', JSON.stringify(merchant))
+            setWithdrawDisabled(true)
             console.log("withdraw went through")
             window.location.reload()
         }).catch(function(error) {
@@ -589,7 +614,6 @@ function Profile() {
             isError(true)
             console.log(error)
         })
-        
     }
 
     function formatDate(d) {
@@ -890,7 +914,7 @@ function Profile() {
                             <CardBody className='text-center'>
                                 <div style={{fontSize:"1.2rem"}}>Current Balance: </div>
                                 <div style={{fontSize:"2rem"}}>  
-                                    $ {parseFloat(merchant.creditBalance).toFixed(2)}
+                                    $ {parseFloat(creditBalance).toFixed(2)}
                                 </div>
                                 <PayPalScriptProvider options ={{"client-id": "sb"}}>
                                     <FormGroup className='w-50 ml-auto mr-auto'>
@@ -1113,7 +1137,7 @@ function Profile() {
                             <Modal isOpen={withdrawModal} toggle={toggleWithdraw}>
                                 <ModalHeader toggle={toggleWithdraw}>Withdraw Credits</ModalHeader>
                                 <ModalBody className='text-center'>
-                                    <div style={{fontSize:"1rem"}}>Current Balance: $ {parseFloat(merchant.creditBalance).toFixed(2)}</div>
+                                    <div style={{fontSize:"1rem"}}>Current Balance: $ {parseFloat(creditBalance).toFixed(2)}</div>
                                     <form className='text-center'>
                                         <FormGroup className='w-50 mr-auto ml-auto text-center'>
                                             <Label for="inputPaypalEmail"></Label>
@@ -1139,7 +1163,7 @@ function Profile() {
                                     </form>
                                 </ModalBody>
                                 <ModalFooter>
-                                    <Button color="primary" onClick={withdrawCredits}>Withdraw</Button>{' '}
+                                    <Button color="primary" disabled={withdrawDisabled} onClick={withdrawCredits}>Withdraw</Button>{' '}
                                 </ModalFooter>
                                 { inModal && !inWithdraw && err &&<Alert color="danger">{error}</Alert> }
                             </Modal>
