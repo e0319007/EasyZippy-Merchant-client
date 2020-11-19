@@ -117,7 +117,6 @@ function CreateBooking() {
         }).then(res => {
             setBookingPackage(res.data)
             let bookingPackage = res.data
-            console.log(typeof res.data)
             if (bookingPackage !== '') {
                 axios.get(`/bookingPackageModel/${res.data.bookingPackageModelId}`, {
                     headers: {
@@ -294,7 +293,7 @@ function CreateBooking() {
             console.log("booking package end date: " + new Date(bookingPackage.endDate).setSeconds(0,0))
 
             //package ends before booking end time
-            if (!validBookingPackage && quotaNotReached && !lockerTypeDifferent) { 
+            if (bookingPackage !== '' && !validBookingPackage && quotaNotReached && !lockerTypeDifferent) { 
                 console.log('first case')
                 let start = new Date(startDateTime)
                 console.log(start)
@@ -310,13 +309,13 @@ function CreateBooking() {
                 totalPrice = parseFloat((diffMins-30)*pricePerMin).toFixed(2)
                 console.log(totalPrice)
                 setTotalPrice(parseFloat(totalPrice).toFixed(2))
-            } else if (validBookingPackage && (new Date(startDateTime).setSeconds(0,0) > new Date(bookingPackage.endDate).setSeconds(0,0))){ //booking package has expired
+            } else if (bookingPackage !== '' && validBookingPackage && (new Date(startDateTime).setSeconds(0,0) > new Date(bookingPackage.endDate).setSeconds(0,0))){ //booking package has expired
                 console.log('second case')
                 totalPrice = parseFloat(2850*pricePerMin).toFixed(2)
                 console.log(totalPrice)
                 setMinutesChargeable(2880)
                 setTotalPrice(totalPrice)
-            } else if (validBookingPackage && quotaNotReached && !lockerTypeDifferent ) { //cost covered, $0
+            } else if (bookingPackage !== '' && validBookingPackage && quotaNotReached && !lockerTypeDifferent ) { //cost covered, $0
                 console.log('third case')
                 setMinutesChargeable(2880)
                 console.log(totalPrice)
