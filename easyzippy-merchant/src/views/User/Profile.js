@@ -112,6 +112,8 @@ function Profile() {
 
     useEffect(() => {
 
+        setWithdrawDisabled(false)
+
         axios.get(`/merchant/${merchantid}`, {
             headers: {
                 AuthToken: authToken,
@@ -580,7 +582,11 @@ function Profile() {
             return
         }
 
-        if (withdrawAmount > creditBalance) {
+        console.log(withdrawDisabled)
+
+        if (parseFloat(withdrawAmount) > parseFloat(creditBalance)) {
+            console.log('withdrawAmount: ' + withdrawAmount)
+            console.log('creditBalance: ' + creditBalance)
             isInModal(true)                                           
             setInWithdraw(true)
             setError('Not enough credits to withdraw.')
@@ -595,6 +601,7 @@ function Profile() {
             setInWithdraw(true)
             setError('Please input a valid price amount (e.g. 9.50).')
             isError(true)
+            return
             }
 
         axios.post(`/withdraw/${merchantid}`, {
@@ -604,8 +611,8 @@ function Profile() {
                 AuthToken: authToken,
             }
         }).then(res => {
-            setWithdrawDisabled(true)
             console.log("withdraw went through")
+            setWithdrawDisabled(true)
             window.location.reload()
         }).catch(function(error) {
             isInModal(true)                                           
@@ -619,10 +626,8 @@ function Profile() {
     function formatDate(d) {
         if (d === undefined){
             d = (new Date()).toISOString()
-            console.log(undefined)
         }
         let currDate = new Date(d);
-        console.log("currDate: " + currDate)
         let year = currDate.getFullYear();
         let month = currDate.getMonth() + 1;
         let dt = currDate.getDate();
@@ -1163,7 +1168,7 @@ function Profile() {
                                     </form>
                                 </ModalBody>
                                 <ModalFooter>
-                                    <Button color="primary" disabled={withdrawDisabled} onClick={withdrawCredits}>Withdraw</Button>{' '}
+                                    <Button color="primary" onClick={withdrawCredits} disabled={withdrawDisabled} >Withdraw</Button>{' '}
                                 </ModalFooter>
                                 { inModal && !inWithdraw && err &&<Alert color="danger">{error}</Alert> }
                             </Modal>
