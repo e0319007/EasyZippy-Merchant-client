@@ -50,23 +50,19 @@ function TransactionHistory() {
             setMerchantData(res.data)
 
         }).catch(function (error) {
-            console.log(error)
         })
-    },[])
+    },[authToken, merchantId])
 
 
     // to use when viewing 
     function formatDate(d) {
-        //console.log(d)
         if (d === undefined){
             d = (new Date()).toISOString()
-            console.log(undefined)
         }
         let currDate = new Date(d);
         let year = currDate.getFullYear();
         let month = currDate.getMonth() + 1;
         let dt = currDate.getDate();
-        //let time = currDate.toLocaleTimeString('en-SG')
 
         if (dt < 10) {
             dt = '0' + dt;

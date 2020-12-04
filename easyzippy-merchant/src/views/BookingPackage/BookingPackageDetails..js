@@ -13,7 +13,7 @@ import {
     Input,
     CardHeader, FormGroup, Label, Button
 } from "reactstrap";
-import { Form } from "components/UseForm";
+
 
 const theme = createMuiTheme({
     typography: {
@@ -27,7 +27,6 @@ function BookingPackageDetails() {
 
     const history = useHistory()
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
-    console.log(authToken)
 
     const bookingPackageId = JSON.parse(localStorage.getItem('bookingPackageToView'))
     const [data, setData] = useState([])
@@ -44,7 +43,6 @@ function BookingPackageDetails() {
             }
         }).then(res => {
             setData(res.data)
-            console.log(res.data)
 
             if (res.data.expired) {
                 setExpireMsg(" : Expired")
@@ -56,9 +54,9 @@ function BookingPackageDetails() {
                 }
             }).then(res => {
                 setKiosks(res.data)       
-            }).catch(err => console.error(err))
+            }).catch()
         }).catch(function (error) {
-            console.log(error)
+
         })
         
         axios.get("/bookingPackageModels", {
@@ -68,9 +66,9 @@ function BookingPackageDetails() {
         }).then(res => {
             setBookingPackages(res.data)
         }).catch(function (error) {
-            console.log(error)
+
         })
-    },[])
+    },[authToken,bookingPackageId])
 
     //match kiosk id to kiosk name
     function getKioskName(id) {
@@ -94,10 +92,8 @@ function BookingPackageDetails() {
     function formatDate(d) {
         if (d === undefined){
             d = (new Date()).toISOString()
-            console.log(undefined)
         }
         let currDate = new Date(d);
-        console.log("currDate: " + currDate)
         let year = currDate.getFullYear();
         let month = currDate.getMonth() + 1;
         let dt = currDate.getDate();
@@ -111,7 +107,6 @@ function BookingPackageDetails() {
         }
 
         return dt + "/" + month + "/" + year + " " + time ;
-        //return dt + "/" + month + "/" + year;
         
     }
 

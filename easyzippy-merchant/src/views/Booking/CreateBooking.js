@@ -14,7 +14,6 @@ import {
     KeyboardTimePicker,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
-import TextField from '@material-ui/core/TextField';
 import {
     Card,
     CardBody,
@@ -96,7 +95,6 @@ function CreateBooking() {
         }).then (r => {
             setKiosks(r.data)
         }).catch(function (error) {
-            console.log(error)
         })
         if (kioskId !== '') {
             axios.get(`/lockerType/kiosk/${kioskId}`, {
@@ -106,7 +104,6 @@ function CreateBooking() {
             }).then(res => {
                 setLockerTypes(res.data)
             }).catch (function(error) {
-                console.log(error)
             })
         }
         
@@ -128,23 +125,20 @@ function CreateBooking() {
             }
 
         }).catch (function(error) {
-            console.log(error)
         })
                 
         configureStartDateTime()
 
-    }, [kioskId, page, startDate, startTime])
+    }, [kioskId, page, startDate, startTime, authToken,merchantid])
 
     const onChangeKiosk = e => {
         const kiosk = e.target.value
-        console.log(kiosk)
         setKiosk(kiosk)
         let id = ''
         for (var i in kiosks) {
             if (kiosks[i].address === kiosk) {
                 id = kiosks[i].id
                 setKioskAddress(kiosk)
-                console.log(id)
                 break;
             }
         }
@@ -165,14 +159,12 @@ function CreateBooking() {
 
     const changePageThree = e => {
         setIsInModal(false)
-        console.log("start dt: " + startDateTime)
-        console.log("end dt : " + endDateTime)
+      
         setPage(3)
     }
 
     //e.g. Fri Nov 20 2020 13:35:00 GMT+0800 (Singapore Standard Time)
     const onChangeStartDate = date => {
-        console.log(date)
         setStartDate(date)
         setCheck(date)
 
@@ -189,37 +181,25 @@ function CreateBooking() {
     }
     //e.g. Wed Jan 01 2020 04:34:00 GMT+0800 (Singapore Standard Time)
     const onChangeStartTime = (e, date) => {
-        console.log(date)
         let amOrPm = (date.split(' ')[1])
-        console.log(amOrPm)
         let baseHour = 0
         if (amOrPm === "PM") {
             baseHour = 12
         }
         let timeArray = (date.split(' '))[0].split(':')
-        console.log(timeArray)
         let hour = baseHour + parseInt(timeArray[0])
         let startTime = new Date(2020, 0, 1, hour, parseInt(timeArray[1]), 0)
-        let time = startTime.toLocaleTimeString('en-SG')
-        console.log(time)
-        console.log(startTime)
+   
         setStartTime(startTime)
     }
 
     const configureStartDateTime = e => {
 
-        console.log("start datetime: " + startDateTime)
-        console.log("end datetime: " + endDateTime)
-        console.log("today: " + new Date())
-        console.log("check: " + check)
-
         let datePart = ''
 
         if (check === null) { //if date field untouched,
             datePart = new Date()
-            console.log("check null")
         } else { //if touched
-            console.log(startDate)
             datePart = new Date(startDate)
         }
 
@@ -227,10 +207,8 @@ function CreateBooking() {
         let year = datePart.getFullYear()
         let month = datePart.getMonth() 
         let day = datePart.getDate()
-        console.log(year + "/" + month + "/" + day)
 
         let timePart = new Date(startTime)
-        console.log(timePart)
         let timeArr = (timePart.toLocaleTimeString('en-SG')).split(':')
         let base = 0
         if (timeArr[2].includes('pm')) {
@@ -238,7 +216,6 @@ function CreateBooking() {
         } else if (timeArr[0] === "12" && timeArr[2].includes('am')) {
             base = -12
         } 
-        console.log(timeArr)
         let combinedStartDate = new Date(year, month, day, parseInt(timeArr[0]) + base, parseInt(timeArr[1]), 0)
         setStartDateTime(new Date(combinedStartDate).setSeconds(0,0))
 
@@ -246,14 +223,12 @@ function CreateBooking() {
         let endDate = new Date(combinedStartDate)
         endDate.setDate(combinedStartDate.getDate() + 2)
         endDate = endDate.setSeconds(0,0)
-        console.log(endDate)
         setEndDateTime(endDate)
 
         if (bookingPackage !== null) {
             let bookingPackageEnd = new Date(bookingPackage.endDate)
             bookingPackageEnd = bookingPackageEnd.setSeconds(0,0)
-            console.log("booking package end: " + bookingPackageEnd)
-            console.log("end date: " + endDate)
+       
             //CHECK IF booking package ends before the end time 
             if (bookingPackageEnd < endDate) {
                 setValidBookingPackage(false)
@@ -282,49 +257,31 @@ function CreateBooking() {
                 AuthToken: authToken
             }
         }).then(res => {
-            console.log("get locker type by id axios thru")
             let pricePerMin = parseFloat((res.data.pricePerHalfHour)/30).toFixed(2)
-            console.log(pricePerMin)
             setPricePerMin(pricePerMin)
 
             let totalPrice = 0
 
-            console.log("start date time: " + new Date(startDateTime).setSeconds(0,0))
-            console.log("booking package end date: " + new Date(bookingPackage.endDate).setSeconds(0,0))
 
             //package ends before booking end time
             if (bookingPackage !== '' && !validBookingPackage && quotaNotReached && !lockerTypeDifferent) { 
-                console.log('first case')
-                let start = new Date(startDateTime)
-                console.log(start)
                 let end = new Date(endDateTime)
-                console.log(end)
                 let bookingPackageEnd = new Date((bookingPackage.endDate)).setSeconds(0,0)
-                console.log(bookingPackageEnd)
                 let milliscs = Math.abs(end - bookingPackageEnd)
-                console.log(milliscs)
                 var diffMins = Math.floor(milliscs / 60000);
-                console.log(diffMins)
                 setMinutesChargeable(diffMins)
                 totalPrice = parseFloat((diffMins-30)*pricePerMin).toFixed(2)
-                console.log(totalPrice)
                 setTotalPrice(parseFloat(totalPrice).toFixed(2))
             } else if (bookingPackage !== '' && validBookingPackage && (new Date(startDateTime).setSeconds(0,0) > new Date(bookingPackage.endDate).setSeconds(0,0))){ //booking package has expired
-                console.log('second case')
                 totalPrice = parseFloat(2850*pricePerMin).toFixed(2)
-                console.log(totalPrice)
                 setMinutesChargeable(2880)
                 setTotalPrice(totalPrice)
             } else if (bookingPackage !== '' && validBookingPackage && quotaNotReached && !lockerTypeDifferent ) { //cost covered, $0
-                console.log('third case')
                 setMinutesChargeable(2880)
-                console.log(totalPrice)
                 setTotalPrice(totalPrice)
             } else {
-                console.log('fourth case')
                 //only need to calculate default 48 h
                 totalPrice = parseFloat(2850*pricePerMin).toFixed(2)
-                console.log(totalPrice)
                 setMinutesChargeable(2880)
                 setTotalPrice(totalPrice)
             }
@@ -340,7 +297,6 @@ function CreateBooking() {
                     AuthToken: authToken
                 }
             }).then(res => {
-                console.log("check booking allowed axios through")
                 if (res.data === true) {
                     changePageThree()
                 } else if (res.data === false || res.data.length === 0) {
@@ -348,20 +304,17 @@ function CreateBooking() {
                     setIsError(true)
                 } 
             }).catch (function(error) {
-                console.log(error)
             })
 
 
         }).catch (function(error) {
-            console.log(error)
         })
     }
 
     const transitionPageTwo = (e, id, name) => {
         e.preventDefault()
         setIsInModal(false)
-        console.log("locker type id: " + id)
-        console.log("locker type name: " + name)
+
         setLockerTypeId(id)
         setLockerTypeName(name)
 
@@ -369,7 +322,6 @@ function CreateBooking() {
         if (bookingPackage !== '') {
             //check if locker type is same as selected
             if (bookingPackageModel.lockerTypeId === id) {
-                console.log('booking package locker type id: ' + bookingPackageModel.lockerTypeId)
                 setLockerTypeDifferent(false)
                 //check if booking package is valid to be used:
                 //if quota reached
@@ -389,7 +341,6 @@ function CreateBooking() {
     const buyBooking = e => {
 
         if (new Date(startDateTime) < new Date(today)) {
-            console.log(new Date(startDateTime))
             setIsInModal(true)
             setError("You cannot choose a date that has passed.")
             setIsError(true)
@@ -427,17 +378,14 @@ function CreateBooking() {
             }).then (response => {
                 history.push('/admin/bookings')
             }).catch(function (error) {
-                console.log(error)
             })
         }).catch(function (error) {
-            console.log(error.response.data)
         })  
     }
 
     function formatDate(d) {
         if (d === undefined){
             d = (new Date()).toISOString()
-            console.log(undefined)
         }
         let currDate = new Date(d);
         let year = currDate.getFullYear();

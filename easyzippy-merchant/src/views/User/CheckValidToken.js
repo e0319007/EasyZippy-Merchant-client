@@ -26,7 +26,7 @@ function CheckValidToken() {
     const onChangeToken = e => {
         const token = e.target.value;
         setEmailToken(token.trim())
-        if (token.trim().length == 0) {
+        if (token.trim().length === 0) {
             setError("Please enter your token")
             isError(true)
         } else {
@@ -35,10 +35,9 @@ function CheckValidToken() {
     }
 
 const checkTokenValidity = e => {
-    console.log("in check token validity method")
     e.preventDefault()
 
-    if (emailToken.trim().length == 0) {
+    if (emailToken.trim().length === 0) {
         isError(true)
         setError("Please enter your token")
         return;
@@ -48,7 +47,6 @@ const checkTokenValidity = e => {
         token: emailToken,
         email: email
     }).then (() => {
-        console.log("axios call went through")
         localStorage.setItem('emailToken', emailToken)
 
         history.push('/resetPassword')

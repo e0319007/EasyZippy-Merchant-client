@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from 'js-cookie';
 import { useHistory } from 'react-router-dom';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
-import { useQRCode } from 'react-hook-qrcode';
 import {
     Card,
     CardBody,
@@ -12,8 +11,8 @@ import {
     Row,
     Col,
     Input,
-    CardHeader, FormGroup, Label, Button, Modal, ModalHeader, ModalFooter, ModalBody,
-    CardImg, Alert
+    CardHeader, FormGroup, Label, Button, Modal, ModalHeader, ModalFooter,
+    Alert
 
 } from "reactstrap";
 
@@ -33,19 +32,14 @@ function CurrentBookingDetails() {
     const [qrCodeString, setQrCodeString] = useState(JSON.parse(localStorage.getItem('qrCode'))) 
     var React = require('react');
     var QRCode = require('qrcode.react');
-    //console.log(authToken)
 
     const bookingId = JSON.parse(localStorage.getItem('bookingToView'))
-    console.log("booking id: " + bookingId)
     const [data, setData] = useState([])
-    const [customers, setCustomers] = useState([])
-    const [merchants, setMerchants] = useState([])
     const [bookingPackages, setBookingPackages] = useState([])
     const [lockerTypes, setLockerTypes] = useState([])
     const [kiosks, setKiosks] = useState([])
 
     const [startDate, setStartDate] = useState('')
-    const [endDate, setEndDate] = useState('')
 
     const [error, setError] = useState('')
     const [err, isError] = useState(false)
@@ -67,25 +61,8 @@ function CurrentBookingDetails() {
         }).then(res => {
             setData(res.data)
             setQrCodeString(res.data.qrCode)
-            console.log(res.data.qrCode)
 
             setStartDate(res.data.startDate)
-
-            axios.get("/customers", {
-                headers: {
-                    AuthToken: authToken
-                }
-            }).then(res => {
-                setCustomers(res.data)
-            }).catch(err => console.error(err))
-
-            axios.get("/merchants", {
-                headers: {
-                    AuthToken: authToken
-                }
-            }).then(res => {
-                setMerchants(res.data)
-            }).catch(err => console.error(err))
 
             axios.get("/bookingPackageModels", 
             {
@@ -94,7 +71,7 @@ function CurrentBookingDetails() {
                 }
             }).then(res => {
                 setBookingPackages(res.data)
-            }).catch (err => console.error(err))
+            }).catch ()
 
             axios.get("/lockerTypes", 
             {
@@ -103,7 +80,7 @@ function CurrentBookingDetails() {
                 }
             }).then(res => {
                 setLockerTypes(res.data)
-            }).catch(err => console.error(err))
+            }).catch()
 
             axios.get("/kiosks", 
             {
@@ -112,31 +89,22 @@ function CurrentBookingDetails() {
                 }
             }).then(res => {
                 setKiosks(res.data)
-            }).catch(err => console.error(err))
+            }).catch()
 
         }).catch (function(error) {
-            console.log(error.response.data)
         })
-    },[])
+    },[authToken,bookingId])
 
     const cancelBooking = e => {
         e.preventDefault()
-
-        //const bookingId = localStorage.getItem('bookingId')
-        console.log("booking id in cancel booking method: " + bookingId)
-
     
-
         var currentDate = new Date()
         var currentTime = currentDate.getTime()
-        console.log("currentTime: " + currentTime)
 
         var startd = new Date(startDate)
         var startTime = startd.getTime()
-        console.log("startTime: " + startTime)
 
         var diffTime = startTime - currentTime 
-        console.log("diff: " + diffTime)
 
         if (diffTime <= 1800000) {
             isError(true)
@@ -154,33 +122,14 @@ function CurrentBookingDetails() {
                 AuthToken: authToken
             }
         }).then(res => {
-            console.log("axios cancel booking went through")
-            //window.location.reload()
+        
             isError(false)
             isSuccessful(true)
             setMsg("Booking successfully cancelled!")
         }).catch(function (error) {
-            console.log(error)
         })
     }
 
-    //match customer id to customer name 
-    function getCustomerName(id) {
-        for (var i in customers) {
-            if (customers[i].id === id) {
-                return customers[i].firstName + " " + customers[i].lastName
-            }
-        }
-    }
-
-    //match merchant id to merchant name 
-    function getMerchantName(id) {
-        for (var i in merchants) {
-            if (merchants[i].id === id) {
-                return merchants[i].name
-            }
-        }
-    }
 
     //match booking package id to booking package name
     function getBookingPackage(id) {
@@ -213,10 +162,10 @@ function CurrentBookingDetails() {
     function formatDate(d) {
         if (d === undefined){
             d = (new Date()).toISOString()
-            //console.log(undefined)
+      
         }
         let currDate = new Date(d);
-        //console.log("currDate: " + currDate)
+  
 
         let year = currDate.getFullYear();
         let month = currDate.getMonth() + 1;

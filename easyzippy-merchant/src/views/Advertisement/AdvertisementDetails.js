@@ -30,16 +30,13 @@ function AdvertisementDetails() {
 
     const history = useHistory()
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
-    console.log(authToken)
 
     const ad = JSON.parse(localStorage.getItem('advertisementToView'))
 
     const [data, setData] = useState([])
 
     const id = ad.id
-    // const image = ad.image
-    const approved = ad.approved
-    const expired = ad.expired
+    
     const amountPaid = ad.amountPaid
     const [title, setTitle] = useState(ad.title)
     const [description, setDescription] = useState(ad.description)
@@ -64,18 +61,13 @@ function AdvertisementDetails() {
         }).then(res => {
             setData(res.data)
             setDisabled(res.data.disabled)
-            console.log("fetch disabled: " + res.data.disabled)
 
         }).catch (function(error) {
-            console.log(error.response.data)
         })
-    }, [])
+    }, [authToken,id])
 
-    let enabled = !data.disabled
-    console.log("Enabled: " + enabled)
 
     const handleChange = (event) => {
-        console.log("event.target.checked: " + event.target.checked)
         setDisabled(!event.target.checked)
 
         axios.put(`/advertisement/toggleDisable/${ad.id}`, {
@@ -86,12 +78,10 @@ function AdvertisementDetails() {
                 AuthToken: authToken
             }
         }).then(res => {
-            console.log("axios call to toggle disable went through")
             setMsg("success!")
             isSuccessful(true)
             isError(false)
         }).catch (function(error) {
-            console.log(error.response.data)
             setError(error.response.data)
             isError(true)
             isSuccessful(false)
@@ -100,31 +90,26 @@ function AdvertisementDetails() {
 
     const onChangeTitle = e => {
         const title = e.target.value 
-        console.log(title)
         setTitle(title)
     }
 
     const onChangeDescription = e => {
         const description = e.target.value
-        console.log(description)
         setDescription(description)
     }
 
     const onChangeUrl = e => {
         const url = e.target.value
-        console.log(url)
         setUrl(url)
     }
 
     const onChangeStartDate = e => {
         const startDate = e.target.value
-        console.log(startDate)
         setStartDate(startDate)
     }
 
     const onChangeEndDate = e => {
         const endDate = e.target.value
-        console.log(endDate)
         setEndDate(endDate)
     }
 
@@ -166,33 +151,14 @@ function AdvertisementDetails() {
             startDate: startDate,
             endDate: endDate,
             amountPaid: amountPaid,
-            // advertiserMobile: null,
-            // advertiserEmail: null
+        
         }, 
         {
             headers: {
                 AuthToken: authToken,
             }
         }).then (res => {
-            console.log("axios call for update advertisement went through")
-
-            console.log(res.data[1][0].id)
-
-            // axios.get(`/assets/${res.data[1][0].image}`, {
-            //     responseType: 'blob'
-            // }, 
-            // {
-            //     headers: {
-            //         AuthToken: authToken,
-            //         'Content-Type': 'application/json'
-            //     }
-            // }).then (response => {
-            //     console.log('axios images thru')
-            //     var file = new File([response.data], {type:"image/png"})
-            //     let image = URL.createObjectURL(file)
-
-            //     setImage(image)
-
+ 
                 const newAd = {
                     id: res.data[1][0].id,
                     title: res.data[1][0].title,
@@ -206,18 +172,14 @@ function AdvertisementDetails() {
                     expired: res.data[1][0].expired
                 }
     
-                console.log("new product id: " + newAd.id)
                 localStorage.setItem('advertisementToView', JSON.stringify(newAd))
                 isError(false)
                 isSuccessful(true)
                 setMsg("Advertisement updated successfully!")
-            // }).catch (function(error) {
-            //     console.log(error.response.data)
-            // })
+        
 
             
         }).catch (function(error) {
-            console.log(error.response.data)
             isError(true)
             isSuccessful(false)
             setError(error.response.data)
@@ -258,27 +220,7 @@ function AdvertisementDetails() {
         checked: {},
         }))(Switch);
 
-        function formatDate(d) {
-            if (d === undefined){
-                d = (new Date()).toISOString()
-                console.log(undefined)
-            }
-            let currDate = new Date(d);
-            console.log("currDate: " + currDate)
-            let year = currDate.getFullYear();
-            let month = currDate.getMonth() + 1;
-            let dt = currDate.getDate();
-            let time = currDate.toLocaleTimeString('en-SG')
-    
-            if (dt < 10) {
-                dt = '0' + dt;
-            }
-            if (month < 10) {
-                month = '0' + month;
-            }
-    
-            return dt + "/" + month + "/" + year + " " + time ;
-        }
+      
 
     return (
         <>

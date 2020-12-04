@@ -1,6 +1,6 @@
-import React, {useState} from "react";
+import React from "react";
 import { createBrowserHistory } from "history";
-import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "assets/scss/paper-dashboard.scss?v=1.2.0";
@@ -30,9 +30,7 @@ import CreateBooking from "views/Booking/CreateBooking.js"
 const hist = createBrowserHistory();
 
 function App(props) {
-    console.log("initialising app")
-    console.log("merchantusercookie: " + document.cookie.indexOf('merchantUser'))
-    console.log("auth cookie: " + document.cookie.indexOf('authToken'))
+ 
     return (
         <Router history={hist}>
             <Switch>

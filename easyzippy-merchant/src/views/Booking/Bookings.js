@@ -78,9 +78,8 @@ function Bookings() {
             }
         }).then(res => {
             setAllBookingsData(res.data)
-            console.log("all bookings")
-            console.log(res.data)
-        }).catch(err => console.error(err))
+        
+        }).catch()
 
         axios.get(`/merchantBooking/upcoming/${merchantId}`, 
         {
@@ -89,8 +88,7 @@ function Bookings() {
             }
         }).then(res1 => {
             setUpcomingBookingsData(res1.data)
-            console.log("upcoming")
-            console.log(res1.data)
+     
 
             axios.get(`/merchantBooking/ongoing/${merchantId}`, 
                 {
@@ -99,16 +97,11 @@ function Bookings() {
                     }
                 }).then(res2 => {
                     setOngoingBookingsData(res2.data)
-                    console.log("ongoing")
-                    console.log(res2.data)
-                    //setCurrentBookingsData(...ongoingBookingsData, ...upcomingBookingsData)
-                    //setCurrentBookingsData(ongoingBookingsData.concat(upcomingBookingsData))
+      
                     setCurrentBookingsData(res1.data.concat(res2.data))
-                    console.log("current")
-                    //console.log(ongoingBookingsData.concat(upcomingBookingsData))
-                    console.log(res1.data.concat(res2.data))
+            
                     
-                }).catch(err => console.error(err))
+                }).catch()
             })
                     
         axios.get("/lockerTypes", 
@@ -118,9 +111,9 @@ function Bookings() {
             }
         }).then(res => {
             setLockerTypes(res.data)
-        }).catch(err => console.error(err))
+        }).catch()
 
-    },[])
+    },[authToken,merchantId])
 
     //match lockertype id to locker type name
     function getLockerType(id) {
@@ -143,10 +136,8 @@ function Bookings() {
     function formatDate(d) {
         if (d === undefined){
             d = (new Date()).toISOString()
-            console.log(undefined)
         }
         let currDate = new Date(d);
-        console.log("currDate: " + currDate)
         let year = currDate.getFullYear();
         let month = currDate.getMonth() + 1;
         let dt = currDate.getDate();

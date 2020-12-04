@@ -13,15 +13,11 @@ import {
 } from "reactstrap";
 
 function ListProduct() {
-    const merchant = JSON.parse(localStorage.getItem('currentMerchant'))
-    console.log("merchant name: " + merchant.name)
 
     const merchantid = parseInt(Cookies.get('merchantUser'))
-    console.log("merchant id: " + merchantid)
 
     const history = useHistory()
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
-    console.log(authToken)
 
     const [error, setError] = useState('')
     const [err, isError] = useState(false)
@@ -49,12 +45,10 @@ function ListProduct() {
                 AuthToken: authToken
             }
         }).then (res => {
-            console.log("successfully retrieve categories")
-            console.log(res.data[1])
+      
             setCategories(res.data)
-            console.log(categories.length)
-        }).catch(err => console.error(err))
-    },[])
+        }).catch()
+    },[authToken])
 
     const onChangeName = e => {
         const name = e.target.value;
@@ -104,7 +98,6 @@ function ListProduct() {
             }
         }
 
-        console.log("category id: " + id)
 
         setCategoryId(id)
         setCategory(category)
@@ -119,7 +112,6 @@ function ListProduct() {
             setError("Quantity Available has to be at least 1")
             isError(true)
         } else {
-            //make sure quantity available is a number
             var nums = /^[0-9]+$/
             if (!quantityAvailable.match(nums)) { //if not all numbers
                 setError("Please enter a valid quantity")
@@ -137,9 +129,7 @@ function ListProduct() {
             let filenames = []
             for (var i in e.target.files) {
                 filenames.push(e.target.files[i].name)
-                console.log(e.target.files[i].name)
             }
-            //popping last 2 elements cos idk why they add random stuff behind
             filenames.pop();
             filenames.pop();
             setImageName(filenames)
@@ -149,7 +139,6 @@ function ListProduct() {
     const createProduct = e => {
         e.preventDefault()
 
-        console.log("in create product method")
 
         if (name.length === 0 || unitPrice.length === 0 ||
             quantityAvailable.length === 0) {
@@ -158,17 +147,9 @@ function ListProduct() {
                 return;
             }
 
-        console.log("image uploading..")
         let formData = new FormData();
         for (var image in images) {
             formData.append(images[image].name, images[image])
-        }
-        // formData.append('images', images)
-        console.log(images[0])
-        console.log('****' + formData.has('images'))
-        console.log('form data values: ')
-        for (var v of formData.values()) {
-            console.log(v)
         }
 
         axios.post(`/product/addImage`, formData,
@@ -177,38 +158,21 @@ function ListProduct() {
                 AuthToken: authToken
             }
         }).then((res) => {
-            console.log("image upload axios call went through")
-            // isError(false)
-            // isSuccessful(true)
-            // setMsg("Image uploaded!")
-        
+   
             let arr = []
-            console.log("first: " + res.data[0])
-            console.log("second: " + res.data[1])
-            console.log("typeof: " + typeof(res.data[0]))
-            console.log("resdatatype: " + (typeof res.data))
-
+       
             for (var i in res.data) {
                 arr.push(res.data[i])
             }
 
-            // arr.push(res.data[0])
-            console.log(arr)
+ 
             try{
                 imageArr = arr
             } catch(err) {
-                console.log("set images err: " + err)
+     
             }
-            
-            console.log("name: " + name)
-            console.log("description: " + description)
-            console.log("unit price: " + unitPrice)
-            console.log("category id: " + categoryId)
-            console.log("quantity available: " + quantityAvailable)
-            for (var j in imageArr) {
-                console.log("images: " + imageArr[i])
-            }
-            console.log("merchant id: " + merchantid)
+       
+     
 
             //POST PRODUCT
             axios.post("/product", {
@@ -225,7 +189,6 @@ function ListProduct() {
                     AuthToken: authToken
                 }
             }).then(res=> {
-                console.log("create product axios call went through")
                 isError(false)
                 isSuccessful(true)
                 setMsg("Product successfully listed!")
@@ -233,12 +196,10 @@ function ListProduct() {
                 isSuccessful(false)
                 isError(true)
                 setError(error.response.data)
-                console.log(error.response.data)
             })
 
 
         }).catch(function(error){
-            console.log(error.response.data)
             isError(true)
             setError(error.response.data)
         })
@@ -296,7 +257,6 @@ function ListProduct() {
                                                         ))
                                                     }
                                                 </Label>
-                                                {/* <Button color="success" size="sm" onClick={imageUpload}>Upload Images</Button> */}
                                             </div>
                                     </FormGroup>
                                     <div className="form-row">

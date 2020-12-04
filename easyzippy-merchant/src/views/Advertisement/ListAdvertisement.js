@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
 import { useHistory } from 'react-router-dom';
 import axios from "axios";
 import Cookies from 'js-cookie';
@@ -14,15 +14,11 @@ import {
 
 function ListAdvertisement() {
 
-    const merchant = JSON.parse(localStorage.getItem('currentMerchant'))
-    console.log("merchant name: " + merchant.name)
 
     const merchantid = parseInt(Cookies.get('merchantUser'))
-    console.log("merchant id: " + merchantid)
 
     const history = useHistory()
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
-    console.log(authToken)
 
     const [error, setError] = useState('')
     const [err, isError] = useState(false)
@@ -60,10 +56,6 @@ function ListAdvertisement() {
         }
     }
 
-    const onChangeUrl = e => {
-        const url = e.target.value
-        setUrl(url)
-    }
 
     const onChangeStartDate = e => {
         const startDate = e.target.value
@@ -83,32 +75,23 @@ function ListAdvertisement() {
     }
 
     const createAdvertisement = e => {
-        console.log("in create ad function")
         e.preventDefault()
 
-        //need to post the image first
         let formData = new FormData();
         formData.append(image.name, image)
-        console.log('form data values: ')
-        for (var v of formData.values()) {
-            console.log(v)
-        }
+       
 
         axios.post("/advertisement/addImage", formData, {
 
         }).then (res => {
 
-            console.log("image upload axios call went through")
             var imgString = res.data
-            console.log("image string: " + imgString)
 
             var startd = startDate
             startd = startd.toString().replace('/-/g', '/')
-            console.log(startd)
 
             var enddate = endDate
             enddate = enddate.toString().replace('/-/g', '/')
-            console.log(enddate)
 
             if (title === undefined || title === "") {
                 isError(true)
@@ -165,7 +148,6 @@ function ListAdvertisement() {
                     AuthToken: authToken
                 }
             }).then(response => {
-                console.log("create ad axios call went through")
                 isError(false)
                 isSuccessful(true)
                 setMsg("Successfully applied for advertisement! Please wait for staff's approval.")
@@ -178,7 +160,6 @@ function ListAdvertisement() {
                 isSuccessful(false)
                 isError(true)
                 setError(errormsg)
-                console.log(error)
             })
         }).catch (function (error) {
             let errormsg = error.response.data;
@@ -189,7 +170,6 @@ function ListAdvertisement() {
             isSuccessful(false)
             isError(true)
             setError(errormsg)
-            console.log(error)
         })
 
     }

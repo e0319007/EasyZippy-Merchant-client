@@ -10,8 +10,6 @@ import {
     Label,
     Input,
     Navbar,
-    Row,
-    Col,
     Alert
 } from "reactstrap";
 
@@ -40,19 +38,14 @@ function FileUpload() {
     
     const fileUpload = e => {
 
-        console.log("in file upload method")
-        console.log("filename: " + filename)
-        console.log("file: " + file)
 
         e.preventDefault()
         let formData = new FormData();
 
         formData.append('file', file);
-        console.log('****' +formData.has('file'))
 
         axios.post(`/merchant/${merchantid}/uploadTenancyAgreement`, formData,
         ).then(() => {
-            console.log("file upload axios call went through")
             isError(false)
             isSuccessful(true)
             setMsg("File uploaded!")
@@ -65,7 +58,6 @@ function FileUpload() {
     }
 
     const hideAlert = () => {
-        console.log('Hiding alert...');
         setAlert(false)
     }
 

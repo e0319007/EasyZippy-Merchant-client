@@ -1,7 +1,6 @@
 import axios from 'axios';
 import React, {useState} from 'react';
-import Cookies from 'js-cookie';
-import { useHistory, Link } from 'react-router-dom';
+import { useHistory} from 'react-router-dom';
 import SweetAlert from 'react-bootstrap-sweetalert';
 
 import {
@@ -12,10 +11,8 @@ import {
     Button,
     Navbar,
     Row,
-    Col
 } from "reactstrap";
 
-//maybe can add another sweet alert after successful application
 
 function ApplyAdvertisement() {
 
@@ -53,26 +50,23 @@ function ApplyAdvertisement() {
 
     const onChangeStartDate = e => {
         const startDate = e.target.value;
-        console.log(startDate)
         setStartDate(startDate)
     }
 
     const onChangeEndDate = e => {
         const endDate = e.target.value;
-        console.log(endDate)
         setEndDate(endDate)
     }
 
     const onChangeUrl = e => {
         const url = e.target.value;
-        console.log(url)
         setUrl(url.trim())
     }
 
     const onChangeMobile = e=> {
         const mobile = e.target.value;
         
-        if (mobile.trim().length == 0) {
+        if (mobile.trim().length === 0) {
             setError("Mobile Number is a required field")
             isError(true)
         } else {
@@ -90,7 +84,6 @@ function ApplyAdvertisement() {
 
     const onChangeEmail = e => {
         const email = e.target.value;
-        console.log(email)
         setEmail(email.trim())
     }
 
@@ -102,7 +95,6 @@ function ApplyAdvertisement() {
     }
     
     const hideAlert = () => {
-        console.log('Hiding alert...');
         setAlert(false)
     }
 
@@ -112,31 +104,22 @@ function ApplyAdvertisement() {
     }
 
     const postApply = e => {
-        console.log("in post apply function")
         e.preventDefault()
 
-        //need to post the image first
         let formData = new FormData();
-        formData.append(image.name, image)
-        console.log('form data values: ')
-        for (var v of formData.values()) {
-            console.log(v)
-        }
+      
 
         axios.post("/advertisement/addImage", formData, {
 
         }).then (res => {
-            console.log("image upload axios call went through")
             var imgString = res.data
-            console.log("image string: " + imgString)
 
             var startd = startDate
             startd = startd.toString().replace('/-/g', '/')
-            console.log(startd)
+           
 
             var enddate = endDate
             enddate = enddate.toString().replace('/-/g', '/')
-            console.log(enddate)
 
             if (title === undefined || title === "") {
                 isError(true)
@@ -204,11 +187,8 @@ function ApplyAdvertisement() {
                 advertiserMobile: mobile,
                 advertiserEmail: email
             }).then (response => {
-                console.log("create ad axios call went through")
                 isError(false)
-                // isSuccessful(true)
                 setAlert(true)
-                // setMsg("Advertisement successfully created!")
             }).catch (function (error) {
                 let errormsg = error.response.data;
     
@@ -218,7 +198,6 @@ function ApplyAdvertisement() {
                 isSuccessful(false)
                 isError(true)
                 setError(errormsg)
-                console.log(error.response.data)
             })
         }).catch(function(error){
             let errormsg = error.response.data;
@@ -227,7 +206,6 @@ function ApplyAdvertisement() {
                 errormsg = "An unexpected error has occurred. The Advertisement cannot be deleted."
             }
             isSuccessful(false)
-            console.log(error.response.data)
             isError(true)
             setError(errormsg)
         })
@@ -370,9 +348,7 @@ function ApplyAdvertisement() {
             </SweetAlert>
             }
             
-            {/* <FormGroup> 
-                <Link onClick={redirect}>● Click here to return to login page.</Link>
-            </FormGroup> */}
+       
             { err &&<Alert color="danger">{error}</Alert> }
             { successful &&<Alert color="success">{successMsg}</Alert>}   
         </div>

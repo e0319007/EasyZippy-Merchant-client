@@ -1,7 +1,6 @@
-import React, {useState} from 'react';
+import React from 'react';
 import { BrowserRouter as Router, useHistory } from "react-router-dom";
-import AdminLayout from "../layouts/Admin.js";
-import Login from "./User/Login.js"
+
 
 import {
     Navbar
@@ -11,22 +10,6 @@ function Error() {
 
     const history = useHistory()
 
-    // const [signin, isSignin] = useState(null)
-
-    // if (document.cookie.indexOf('merchantUser') === -1 && document.cookie.indexOf('authToken') === -1) {
-    //     isSignin = false
-    //     console.log("is signed in")
-    // } else {
-    //     isSignin = true
-    //     console.log("is not signed in")
-    // }
-
-    // if (signin) {
-    //     history.push('/admin/dashboard')
-    // } else {
-    //     history.push('/login')
-    // }
-    console.log("init")
 
     return (
         <Router>

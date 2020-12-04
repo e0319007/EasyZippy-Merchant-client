@@ -25,7 +25,6 @@ import {
     UncontrolledPopover,
     PopoverBody,
     CardImg,
-    Spinner,
     UncontrolledAlert
 } from "reactstrap";
 
@@ -38,7 +37,6 @@ function Profile() {
     const merchantid = parseInt(Cookies.get('merchantUser'))
 
     const authToken = JSON.parse(Cookies.get('authToken'))
-    console.log(authToken)
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
@@ -50,10 +48,9 @@ function Profile() {
     const [unitNumber, setUnitNumber] = useState('')
     const [postalCode, setPostalCode] = useState('')
 
-    //in file alr not string
+    
     const [logoToView, setLogoToView] = useState(null)
-    //do like if logo to view = null then show the default photo
-    // src={'../../assets/img/user.png'} i think
+    
 
     const [logoToAdd, setLogoToAdd] = useState(null)
     const [logoToChange, setLogoToChange] = useState(null)
@@ -131,7 +128,6 @@ function Profile() {
             setUnitNumber(response.data.unitNumber)
             setPostalCode(response.data.postalCode)
             setCreditBalance(response.data.creditBalance)
-            console.log(response.data.creditBalance)
             merchant.creditBalance = (parseFloat(response.data.creditBalance).toFixed(2))
             localStorage.setItem('currentMerchant', JSON.stringify(merchant))
             
@@ -141,7 +137,6 @@ function Profile() {
                     AuthToken: authToken
                 }
             }).then (response => {
-                console.log('get booking package thru')
                 //if merchant has booking package
                 if (response.data !== undefined || response.data.length !== 0) {
                     for (var i in response.data) {
@@ -154,8 +149,7 @@ function Profile() {
                                     AuthToken: authToken
                                 }
                             }).then (r => {
-                                console.log('get kiosk address axios through')
-                                console.log(r.data.address)
+                        
                                 setKioskAddress(r.data.address)
                             })
     
@@ -164,12 +158,10 @@ function Profile() {
                                     AuthToken: authToken
                                 }
                             }).then( res => {
-                                console.log("get booking package model thru")
+                    
                                 setBookingPackageModel(res.data)
-                                console.log("Booking package model: ")
-                                console.log(res.data)
+                          
                             }).catch(function (error) {
-                                console.log(error)
                             })
     
                             break;
@@ -177,10 +169,8 @@ function Profile() {
                     }
                 }
             }).catch(function (error) {
-                console.log(error)
             })
 
-            console.log(response.data.merchantLogoImage)
 
             if (response.data.merchantLogoImage !== null) {
                 axios.get(`/assets/${response.data.merchantLogoImage}`, {
@@ -192,13 +182,10 @@ function Profile() {
                         'Content-Type': 'application/json'
                     }
                 }).then(res => {
-                    console.log('axios images thru')
                     var file = new File([res.data], {type:"image/png"})
                     let image = URL.createObjectURL(file)
-                    console.log(image)
                     setLogoToView(image)
                 }).catch(function (error) {
-                    console.log(error)
                 })
             }
 
@@ -209,17 +196,15 @@ function Profile() {
             }).then (r => {
                 setKiosksToBuy(r.data)
             }).catch(function (error) {
-                console.log(error)
             })
         }).catch(function (error) {
-            console.log(error)
         })
-    }, [])
+    }, [authToken, merchantid, merchant])
 
     const onChangeName = e => {
         const name = e.target.value;
         setName(name)
-        if (name.trim().length == 0) {
+        if (name.trim().length === 0) {
             setError("Name is a required field")
             isError(true)
         } else {
@@ -230,7 +215,7 @@ function Profile() {
     const onChangeEmail = e => {
         const email = e.target.value;
         setEmail(email.trim())
-        if (email.trim().length == 0) {
+        if (email.trim().length === 0) {
             setError("Email is a required field")
             isError(true)
         } else {
@@ -241,7 +226,7 @@ function Profile() {
     const onChangeMobile = e => {
         const mobileNumber = e.target.value;
         
-        if (mobileNumber.trim().length == 0) {
+        if (mobileNumber.trim().length === 0) {
             setError("Mobile Number is a required field")
             isError(true)
         } else {
@@ -282,7 +267,7 @@ function Profile() {
 
     const onChangeFloor = e => {
         const floor = e.target.value;
-        if (floor.trim().length == 0) {
+        if (floor.trim().length === 0) {
             setError("Floor is a required field")
             isError(true)
         } else {
@@ -299,7 +284,7 @@ function Profile() {
 
     const onChangeUnitNumber = e => {
         const unitNumber = e.target.value;
-        if (unitNumber.trim().length == 0) {
+        if (unitNumber.trim().length === 0) {
             setError("Unit number is a required field")
             isError(true)
         } else {
@@ -333,7 +318,6 @@ function Profile() {
 
     const updateProfile = e => {
         e.preventDefault()
-        console.log("in update profile")
 
         axios.put(`/merchant/${merchantid}`, {
             name: name,
@@ -342,7 +326,6 @@ function Profile() {
             pointOfContact: pointOfContact,
             blk: blk,
             street: street,
-            //fullUnitNum: fullUnitNum,
             floor: floor,
             unitNumber: unitNumber,
             postalCode: postalCode,
@@ -352,8 +335,7 @@ function Profile() {
                 AuthToken: authToken
             }
         }).then((response) => {
-            console.log("axios call went through")
-            // set response data to view
+
             setName(response.data.name)
             setEmail(response.data.email)
             setMobileNumber(response.data.mobileNumber)
@@ -364,7 +346,6 @@ function Profile() {
             setUnitNumber(response.data.unitNumber)
             setPostalCode(response.data.postalCode)
             setCreditBalance(response.data.creditBalance)
-            console.log(response.data.creditBalance)
             merchant.creditBalance = (parseFloat(response.data.creditBalance).toFixed(2))
             localStorage.setItem('currentMerchant', JSON.stringify(merchant))
             
@@ -388,7 +369,7 @@ function Profile() {
     const onChangeNewPassword = e => {
         const newPw = e.target.value;
 
-        var reg = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})")
+        var reg = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})")
         if (reg.test(newPw)) { //if valid
             isError(false)
             isSuccessful(false)
@@ -409,7 +390,6 @@ function Profile() {
 
     const updatePassword = e => {
         e.preventDefault()
-        console.log("inside update password")
 
         if (newPw !== newCfmPw) {
             isInModal(true)
@@ -434,7 +414,6 @@ function Profile() {
                 AuthToken: authToken
             }
         }).then((response) => {
-            console.log("axios call went through")
             isInModal(true)
             isError(false)
             isSuccessful(true)
@@ -443,7 +422,6 @@ function Profile() {
             setNewCfmPw('')
             setNewPw('')
         }).catch(function (error) {
-            console.log(error.response.data)
             isInModal(true)
             isError(true)
             setError(error.response.data)
@@ -453,7 +431,6 @@ function Profile() {
 
     const reset = e => {
         e.preventDefault()
-        console.log("inside reset form")
         setCurrentPw('')
         setNewPw('')
         setNewCfmPw('')
@@ -461,41 +438,31 @@ function Profile() {
 
     const addLogo = e => {
 
-        console.log("in add logo function")
         e.preventDefault()
 
         //need to post the image first
         let formData = new FormData();
         formData.append(logoToAdd.name, logoToAdd)
-        console.log('form data values: ')
-        for (var v of formData.values()) {
-            console.log(v)
-        }
+        
 
         axios.post(`/merchantUploadLogo/${merchantid}`, formData, {
 
         }).then (res => {
-            console.log("logo add axios call went through")
             var file = new File([res.data.merchantLogoImage], {type:"image/png"})
             let image = URL.createObjectURL(file)
             setLogoToView(image)
             window.location.reload()
         }).catch(function (error) {
-            console.log(error.response.data)
         })
     }
 
     const changeLogo = e => {
-        console.log("in change logo function")
         e.preventDefault()
 
         //need to post the image first
         let formData = new FormData();
         formData.append(logoToChange.name, logoToChange)
-        console.log('form data values: ')
-        for (var v of formData.values()) {
-            console.log(v)
-        }
+      
 
         axios.post(`/merchantChangeLogo/${merchantid}`, formData, {
             headers: {
@@ -503,29 +470,24 @@ function Profile() {
                 'Content-Type': 'application/json'
             }
         }).then (res => {
-            console.log("logo change axios call went through")
             var file = new File([res.data.merchantLogoImage], {type:"image/png"})
             let image = URL.createObjectURL(file)
             setLogoToView(image)
             window.location.reload()
         }).catch(function (error) {
-            console.log(error.response.data)
         })
     }
 
     const deleteLogo = e => {
         e.preventDefault()
-        console.log("in delete logo function")
 
         axios.post(`/merchantRemoveLogo/${merchantid}`, {
             headers: {
                 AuthToken: authToken,
             }
         }).then(res => {
-            console.log("logo successfully deleted")
             window.location.reload()
         }).catch(function(error) {
-            console.log(error)
         })
     }
 
@@ -543,13 +505,11 @@ function Profile() {
 
     const onChangeTopUpAmount = e => {
         const topUpAmount = e.target.value
-        console.log(topUpAmount)
         setTopUpAmount(topUpAmount)
     }
 
     const onChangeWithdrawAmount = e => {
         const withdrawAmount = e.target.value
-        console.log(withdrawAmount)
         setWithdrawAmount(withdrawAmount)
     }
 
@@ -570,7 +530,6 @@ function Profile() {
             }
         }
 
-        console.log("kiosk id: " + id)
 
         setBuyPackageKioskId(id)
         setBuyPackageKiosk(kiosk)
@@ -582,11 +541,9 @@ function Profile() {
             return
         }
 
-        console.log(withdrawDisabled)
 
         if (parseFloat(withdrawAmount) > parseFloat(creditBalance)) {
-            console.log('withdrawAmount: ' + withdrawAmount)
-            console.log('creditBalance: ' + creditBalance)
+     
             isInModal(true)                                           
             setInWithdraw(true)
             setError('Not enough credits to withdraw.')
@@ -611,7 +568,6 @@ function Profile() {
                 AuthToken: authToken,
             }
         }).then(res => {
-            console.log("withdraw went through")
             setWithdrawDisabled(true)
             window.location.reload()
         }).catch(function(error) {
@@ -619,7 +575,6 @@ function Profile() {
             setInWithdraw(true)
             setError('Something went wrong, unable to withdraw credits.')
             isError(true)
-            console.log(error)
         })
     }
 
@@ -977,7 +932,6 @@ function Profile() {
                                                     setMsg('Credits topped-up successfully!')
                                                     window.location.reload()
                                                 }).catch(function (error) {
-                                                    console.log(error)
                                                 })  
                                             }}
                                         />

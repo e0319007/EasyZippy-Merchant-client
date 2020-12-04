@@ -13,7 +13,6 @@ import {
     Input,
     CardHeader, FormGroup, Label, Button, Alert
 } from "reactstrap";
-import { data } from "jquery";
 
 const theme = createMuiTheme({
     typography: {
@@ -27,7 +26,6 @@ function PromotionDetails() {
 
     const history = useHistory()
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
-    console.log(authToken)
 
     const promotionId = JSON.parse(localStorage.getItem('promotionToView'))
     const [data, setData] = useState([])
@@ -51,7 +49,6 @@ function PromotionDetails() {
     const [endDate, setEndDate] = useState('')
     const [percentageDiscount, setPercentageDiscount] = useState('')
     const [flatDiscount, setFlatDiscount] = useState('')
-    const [discount, setDiscount] = useState('')
     const [usageLimit, setUsageLimit] = useState('')
     const [minimumSpend, setMinimumSpend] = useState('')
 
@@ -77,7 +74,6 @@ function PromotionDetails() {
             setEndDate((res.data.endDate).substr(0,10))
             setPercentageDiscount(res.data.percentageDiscount)
             setFlatDiscount(res.data.flatDiscount)
-            //setDiscount(res.data.discount)
             setUsageLimit(res.data.usageLimit)
             setMinimumSpend(res.data.minimumSpend)
 
@@ -92,11 +88,10 @@ function PromotionDetails() {
             }).then(res => {
                 setMerchants(res.data)
                
-            }).catch(err => console.error(err))
+            }).catch()
         }).catch (function (error) {
-            console.log(error.response.data)
         })
-    },[])
+    },[authToken,promotionId])
 
     const onChangeDescription = e => {
         const description = e.target.value
@@ -112,12 +107,10 @@ function PromotionDetails() {
         e.preventDefault()
         var startd = startDate
         startd = startd.toString().replace('/-/g', '/')
-        console.log("start: " + startd)
 
         var enddate = endDate
         enddate = enddate.toString().replace('/-/g', '/')
 
-        console.log("promo code: " + promoCode)
 
         axios.put(`/promotion/${promotionId}`, {
             promoCode: promoCode,
@@ -137,16 +130,7 @@ function PromotionDetails() {
                 AuthToken: authToken
             }
         }).then(res => {
-            // setPromoCode(res.data.promoCode)
-            // setTitle(res.data.title)
-            // setDescription(res.data.description)
-            // setTermsAndConditions(res.data.termsAndConditions)
-            // setStartDate((res.data.startDate).substr(0,10))
-            // setEndDate((res.data.endDate).substr(0,10))
-            // setPercentageDiscount(res.data.percentageDiscount)
-            // setFlatDiscount(res.data.flatDiscount)
-            // setUsageLimit(res.data.usageLimit)
-            // setMinimumSpend(res.data.minimumSpend)
+     
             setPromoCode(res.data[1][0].promoCode)
             setTitle(res.data[1][0].title)
             setDescription(res.data[1][0].description)
@@ -157,11 +141,6 @@ function PromotionDetails() {
             setFlatDiscount(res.data[1][0].flatDiscount)
             setUsageLimit(res.data[1][0].usageLimit)
             setMinimumSpend(res.data[1][0].minimumSpend)
-
-        
-
-            console.log("update promo axios call went through")
-            console.log("promo code: " + res.data[1][0].promoCode)
             
 
             isError(false)
@@ -171,7 +150,6 @@ function PromotionDetails() {
             isSuccessful(false)
             isError(true)
             setError(error)
-            console.log(error)
         })
     }
 
@@ -188,10 +166,8 @@ function PromotionDetails() {
     function formatDate(d) {
         if (d === undefined){
             d = (new Date()).toISOString()
-            console.log(undefined)
         }
         let currDate = new Date(d);
-        console.log("currDate: " + currDate)
         let year = currDate.getFullYear();
         let month = currDate.getMonth() + 1;
         let dt = currDate.getDate();

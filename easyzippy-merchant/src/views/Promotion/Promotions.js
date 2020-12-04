@@ -18,13 +18,9 @@ import {
     ModalBody,
     Label,
     FormGroup,
-    UncontrolledAlert,
     ModalFooter,
     Button,
-    CustomInput,
-    InputGroup,
-    InputGroupAddon,
-    InputGroupText
+ 
 } from "reactstrap";
 
 const theme = createMuiTheme({
@@ -58,7 +54,6 @@ function Promotions() {
     ]
 
     const [merchantData, setMerchantData] = useState([])
-    const [merchants, setMerchants] = useState([])
     
     const [promoCode, setPromoCode] = useState('')
     const [title, setTitle] = useState('')
@@ -97,32 +92,15 @@ function Promotions() {
             setMerchantData(res.data)
 
         }).catch(function (error) {
-            console.log(error.response.data)
         })
 
-        axios.get("/merchants", 
-        {
-            headers: {
-                AuthToken:authToken
-            }
-        }).then(res => {
-            setMerchants(res.data)
-        })
-    },[])
+    },[authToken, merchantId])
 
-    //match merchant id to merchant name
-    function getMerchantName(id) {
-        for (var i in merchants) {
-            if (merchants[i].id === id) {
-                return merchants[i].name
-            }
-        }
-    }
+   
 
     const addMerchantPromotion = e => {
         var startd = startDate
         startd = startd.toString().replace('/-/g', '/')
-        console.log("start: " + startd)
 
         var enddate = endDate
         enddate = enddate.toString().replace('/-/g', '/')
@@ -210,7 +188,6 @@ function Promotions() {
                 AuthToken: authToken
             }
         }).then(res => {
-            console.log("create promo axios call went through")
             isInModal(true)
             isError(false)
             isSuccessful(true)
@@ -221,7 +198,6 @@ function Promotions() {
             isSuccessful(false)
             isError(true)
             setError(error.response.data)
-            console.log(error.response.data)
         })
     }
 
@@ -306,14 +282,12 @@ function Promotions() {
 
     const onChangeRadioPercentage = e => {
         const checked = e.target.checked
-        console.log("percentage checked: " + checked)
         setIsPercentage(checked)
         setIsFlat(!checked)
     }
 
     const onChangeRadioFlat = e => {
         const checked = e.target.checked
-        console.log("flat checked: " + checked)
         setIsPercentage(!checked)
         setIsFlat(checked)
     }
@@ -327,7 +301,6 @@ function Promotions() {
             AuthToken: authToken
         }
     }).then(res => {
-            console.log("axios call went through")
             const dataDelete = [...merchantData];
             const index = oldData.tableData.id;
             dataDelete.splice(index, 1);
@@ -349,23 +322,19 @@ function Promotions() {
             isSuccessful(false)
             isError(true)
             setError(errormsg)
-            console.log(error.response.data)
             resolve()
         })
     }
 
     // to use when viewing 
     function formatDate(d) {
-        //console.log(d)
         if (d === undefined){
             d = (new Date()).toISOString()
-            console.log(undefined)
         }
         let currDate = new Date(d);
         let year = currDate.getFullYear();
         let month = currDate.getMonth() + 1;
         let dt = currDate.getDate();
-        //let time = currDate.toLocaleTimeString('en-SG')
 
         if (dt < 10) {
             dt = '0' + dt;

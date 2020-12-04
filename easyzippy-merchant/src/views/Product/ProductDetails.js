@@ -18,10 +18,9 @@ import {
     CardTitle,
     Row,
     Col,
-    CardHeader, FormGroup, Label, Input, Button, CardImg, Alert, CardSubtitle,
+    CardHeader, FormGroup, Label, Input, Button, CardImg, Alert, 
     Modal, ModalBody, ModalHeader, ModalFooter, Tooltip
 } from "reactstrap";
-import { idText } from "typescript";
 
 const theme = createMuiTheme({
     typography: {
@@ -35,7 +34,6 @@ function ProductDetails() {
 
     const history = useHistory()
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
-    console.log(authToken)
 
     const product = JSON.parse(localStorage.getItem('productToView'))
 
@@ -43,8 +41,8 @@ function ProductDetails() {
     const [variations, setVariations] = useState([])
 
     const id = product.id
-    const image = product.image //CHANGE LATER
-    const imageurl = product.imageurl //supposedly alr an array
+    const image = product.image 
+    const imageurl = product.imageurl 
     const merchantId = product.merchantId
     const [name, setName] = useState(product.name)
     const [description, setDescription] = useState(product.description)
@@ -82,7 +80,6 @@ function ProductDetails() {
     const [inVarDetailsModal, setInVarDetailsModal] = useState(false)
     const toggleVarDetailsModal = () => {
 
-        // var varToView = variations[variationId-1]
 
         var v = ''
 
@@ -108,12 +105,10 @@ function ProductDetails() {
                     'Content-Type': 'application/json'
                 }
             }).then(response => {
-                console.log('axios images thru')
                 var file = new File([response.data], {type:"image/png"})
                 let image = URL.createObjectURL(file)
                 setVarDetailsImage(image)
             }).catch (function (error) {
-                console.log(error)
             })
         }
 
@@ -146,7 +141,6 @@ function ProductDetails() {
     const toggleTooltipCreate = () => setTooltipCreate(!tooltipCreate);
 
     useEffect(() => {
-        console.log("axios use effect")
         axios.get(`/product/${product.id}`, 
         {
             headers: {
@@ -155,7 +149,6 @@ function ProductDetails() {
         }).then(res => {
             setData(res.data)
             setDisabled(res.data.disabled)
-            console.log("fetch disabled: " + res.data.disabled)
 
             for (var i in res.data.images) {
                 axios.get(`/assets/${res.data.images[i]}`, {
@@ -167,7 +160,6 @@ function ProductDetails() {
                         'Content-Type': 'application/json'
                     }
                 }).then(response => {
-                    console.log('axios images thru')
                     var file = new File([response.data], {type:"image/png"})
                     let image = URL.createObjectURL(file)
 
@@ -180,12 +172,10 @@ function ProductDetails() {
 
                     setImgArr(imgArr => [...imgArr, obj])
                 }).catch (function (error) {
-                    console.log(error.response.data)
                 })
             }
 
         }).catch (function(error) {
-            console.log(error.response.data)
         })
 
         axios.get('/categories', {
@@ -193,9 +183,8 @@ function ProductDetails() {
                 AuthToken: authToken
             }
         }).then(res => {
-            console.log("successfully retrieve categories")
             setCategories(res.data)
-        }).catch(err => console.error(err))
+        }).catch()
 
         axios.get(`/productVariationsIncludingDisabled/${product.id}`, {
             headers: {
@@ -203,15 +192,12 @@ function ProductDetails() {
             }
         }).then(res => {
             setVariations(res.data)
-        }).catch (err => console.error(err))
+        }).catch ()
 
-    },[])
+    },[authToken,product.id])
 
-    let enabled = !data.disabled
-    console.log("Enabled: " + enabled)
 
     const handleChange = (event) => {
-        console.log("event.target.checked: " + event.target.checked)
         setDisabled(!event.target.checked)
 
         axios.put(`/product/toggleDisable/${product.id}`, {
@@ -222,9 +208,7 @@ function ProductDetails() {
                 AuthToken: authToken
             }
         }).then(res => {
-            console.log("axios call to toggle disable went through")
         }).catch (function(error) {
-            console.log(error.response.data)
         })
     };
 
@@ -233,9 +217,7 @@ function ProductDetails() {
         setInVarDetailsModal(true)
 
         let varEnabled = !disabledVariation
-        console.log("Enabled: " + varEnabled)
 
-        console.log("event.target.checked: " + event.target.checked)
         setDisabledVariation(!event.target.checked)
 
         axios.put(`/productVariations/toggleDisable/${variationId}`, {
@@ -246,13 +228,11 @@ function ProductDetails() {
                 AuthToken: authToken
             }
         }).then( res => {
-            console.log("axios call to toggle variation disable went through")
             setMsg("success!")
             isSuccessful(true)
             isError(false)
             window.location.reload()
         }).catch (function(error) {
-            console.log(error.response.data)
             setError(error.response.data)
             isError(true)
             isSuccessful(false)
@@ -289,7 +269,7 @@ function ProductDetails() {
     const onChangeCategory = e => {
         const category = e.target.value;
         setCategory(category)
-        if (category.trim().length == 0) {
+        if (category.trim().length === 0) {
             setInModal(false)
             setError("Category is a required field")
             isError(true)
@@ -334,11 +314,7 @@ function ProductDetails() {
                 AuthToken: authToken,
             }
         }).then(res => {
-            console.log("axios call for update product went through")
-
-            console.log(res.data[0])
-            console.log(res.data[1][0].id)
-
+         
             for (var i in categories) {
                 if (res.data[1][0].categoryId === categories[i].id) {
                     setCategory(categories[i].name)
@@ -361,7 +337,7 @@ function ProductDetails() {
                 merchantId: res.data[1][0].merchantId
             }
 
-            console.log("new product id: " + newProduct.id)
+      
             localStorage.setItem('productToView', JSON.stringify(newProduct))
             setInModal(false)
             isError(false)
@@ -369,7 +345,7 @@ function ProductDetails() {
             setMsg("Product updated successfully!")
 
         }).catch (function(error) {
-            console.log(error.response.data)
+  
             setInModal(false)
             isError(true)
             isSuccessful(false)
@@ -414,10 +390,8 @@ function ProductDetails() {
     function formatDate(d) {
         if (d === undefined){
             d = (new Date()).toISOString()
-            console.log(undefined)
         }
         let currDate = new Date(d);
-        console.log("currDate: " + currDate)
         let year = currDate.getFullYear();
         let month = currDate.getMonth() + 1;
         let dt = currDate.getDate();
@@ -436,7 +410,6 @@ function ProductDetails() {
 
     const createProductVariation = e => {
         e.preventDefault()
-        //validation (also just make image compulsory)
         if (varName.length === 0 || varUnitPrice.length === 0 ||
             varQty.length === 0 || varImage === null) {
                 setError("Please fill in all fields")
@@ -444,22 +417,16 @@ function ProductDetails() {
                 return;
             }   
         
-        //need to post the image first
         let formData = new FormData();
-        formData.append(varImage.name, varImage)
-        console.log('form data values: ')
-        for (var v of formData.values()) {
-            console.log(v)
-        }
-
+   
         axios.post("/productVariation/addImage", formData, {
             headers: {
                 AuthToken: authToken,
             }
         }).then (res => {
-            console.log("image upload axios call went through")
+       
             var imgString = res.data
-            console.log("image string: " + imgString)
+   
 
             axios.post(`/productVariation`, {
                 name: varName, 
@@ -474,14 +441,12 @@ function ProductDetails() {
                     AuthToken: authToken,
                 }
             }).then(res => {
-                console.log("axios create product variation went through")
                 setInModal(true)
                 isError(false)
                 isSuccessful(true)
                 setMsg("Product Variation created successfully!")
                 window.location.reload()
             }).catch (function (error) {
-                console.log(error.response.data)
                 setInModal(true)
                 isError(true)
                 isSuccessful(false)
@@ -570,8 +535,7 @@ function ProductDetails() {
             }
         }
 
-        console.log("variation id: " + id)
-        console.log("variation: " + variation)
+
         setVariationId(id)
         // setVariation(variation)
     }
@@ -659,7 +623,6 @@ function ProductDetails() {
                 AuthToken: authToken,
             }
         }).then (res => {
-            console.log("update product variation went through")
             setVarDetailsName(res.data.name)
             setVarDetailsDescription(res.data.description)
             setVarDetailsUnitPrice(res.data.unitPrice)
@@ -670,7 +633,6 @@ function ProductDetails() {
             isSuccessful(true)
             setMsg("Product Variation successfully updated!")
         }).catch (function (error) {
-            console.log(error.response.data)
             setInVarDetailsModal(true)
             isError(true)
             isSuccessful(false)
@@ -690,13 +652,11 @@ function ProductDetails() {
                 AuthToken: authToken,
             }
         }).then (res => {
-            console.log("delete product variation axios went through")
             isError(false)
             isSuccessful(true)
             setMsg("Product Variation Deleted Successfully")
             window.location.reload()
         }).catch (function (error) {
-            console.log(error.response.data)
             isError(true)
             isSuccessful(false)
             setError(error.response.data)
@@ -736,7 +696,7 @@ function ProductDetails() {
                                             
                                         </div>
                                         <div className="text-center" style={{alignItems: "center"}}>
-                                            {variations.length != 0 && 
+                                            {variations.length !== 0 && 
                                                 <Button outline color="info" onClick={toggleVarModal}>View Variations</Button>
                                             }         
                                             <Button className="btn-icon btn-round ml-1" color="info" size="sm" id="createVariation" onClick={toggleCreate}>

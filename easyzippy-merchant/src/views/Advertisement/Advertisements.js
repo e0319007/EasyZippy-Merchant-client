@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import { useHistory } from 'react-router-dom';
 import axios from "axios";
 import Cookies from 'js-cookie';
-import {MDBCol, MDBIcon} from "mdbreact";
+import { MDBIcon} from "mdbreact";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 import {
@@ -15,20 +15,17 @@ import {
     Button, 
     CardHeader, 
     CardImg,
-    Input,
     FormGroup,
     Label,
     Modal,
     ModalHeader,
     ModalFooter,
-    ModalBody
 } from "reactstrap";
 
 function Advertisements() {
 
     const history = useHistory()
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
-    console.log(authToken)
 
     const merchantId = (JSON.parse(Cookies.get('merchantUser'))).toString()
 
@@ -43,7 +40,6 @@ function Advertisements() {
     //for delete confirmation
     const [modal, setModal] = useState(false)
     const toggleModal = id => {
-        console.log(id)
         localStorage.setItem('advertisementId', id)
         setModal(!modal);
 
@@ -65,7 +61,6 @@ function Advertisements() {
             advArr = res.data
             for (var i in advArr) {
                 let index = i
-                console.log(advArr[i])
 
                 axios.get(`/assets/${advArr[i].image}`, {
                     responseType: 'blob'
@@ -76,7 +71,6 @@ function Advertisements() {
                         'Content-Type': 'application/json'
                     }
                 }).then(r => {
-                    console.log("axios get image through: " + r.data)
                     var file = new File([r.data], {type:"image/png"})
                     let image = URL.createObjectURL(file)
 
@@ -153,12 +147,11 @@ function Advertisements() {
                     }
 
                     setSearchResults(resultArr)
-                }).catch (err => console.error(err))
+                }).catch ()
             }
-        }).catch (err => console.error(err))
+        }).catch ()
     },[searchTerm, lowToHigh, lowToHighEndDate])
 
-    //pass in advertisement id also
     const deleteAdvertisement = e => {
         e.preventDefault()
 
@@ -171,10 +164,8 @@ function Advertisements() {
                 AuthToken: authToken
             }
         }).then(res => {
-            console.log("axios delete ad went through")
             window.location.reload()
         }).catch(function (error) {
-            console.log(error.response.data)
         })
     }
 

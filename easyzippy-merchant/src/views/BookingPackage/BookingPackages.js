@@ -11,20 +11,7 @@ import {
     Row,
     Col,
     Card,
-    Alert,
-    Input,
-    Modal,
-    ModalHeader,
-    ModalBody,
-    Label,
-    FormGroup,
-    UncontrolledAlert,
-    ModalFooter,
-    Button,
-    CustomInput,
-    InputGroup,
-    InputGroupAddon,
-    InputGroupText
+ 
 } from "reactstrap";
 
 const theme = createMuiTheme({
@@ -79,7 +66,6 @@ function BookingPackages() {
             setData(res.data)
 
         }).catch(function (error) {
-            console.log(error)
         })
 
         axios.get("/kiosks", 
@@ -90,7 +76,6 @@ function BookingPackages() {
         }).then(res => {
             setKiosks(res.data)
         }).catch(function (error) {
-            console.log(error)
         })
 
         axios.get("/bookingPackageModels", 
@@ -101,9 +86,8 @@ function BookingPackages() {
         }).then(res => {
             setBookingPackages(res.data)
         }).catch(function (error) {
-            console.log(error)
         })
-    },[])
+    },[authToken,merchantId])
 
     //match kiosk id to kiosk name
     function getKioskName(id) {
@@ -125,10 +109,8 @@ function BookingPackages() {
    
     // to use when viewing 
     function formatDate(d) {
-        //console.log(d)
         if (d === undefined){
             d = (new Date()).toISOString()
-            console.log(undefined)
         }
         let currDate = new Date(d);
         let year = currDate.getFullYear();

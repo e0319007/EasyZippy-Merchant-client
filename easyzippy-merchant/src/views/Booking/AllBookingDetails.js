@@ -26,12 +26,9 @@ function AllBookingDetails() {
 
     const history = useHistory()
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
-    console.log(authToken)
 
     const bookingId = JSON.parse(localStorage.getItem('bookingToView'))
     const [data, setData] = useState([])
-    const [customers, setCustomers] = useState([])
-    const [merchants, setMerchants] = useState([])
     const [bookingPackages, setBookingPackages] = useState([])
     const [lockerTypes, setLockerTypes] = useState([])
     const [kiosks, setKiosks] = useState([])
@@ -46,21 +43,6 @@ function AllBookingDetails() {
         }).then(res => {
             setData(res.data)
             
-            axios.get("/customers", {
-                headers: {
-                    AuthToken: authToken
-                }
-            }).then(res => {
-                setCustomers(res.data)
-            }).catch(err => console.error(err))
-
-            axios.get("/merchants", {
-                headers: {
-                    AuthToken: authToken
-                }
-            }).then(res => {
-                setMerchants(res.data)
-            }).catch(err => console.error(err))
 
             axios.get("/bookingPackageModels", 
             {
@@ -69,7 +51,7 @@ function AllBookingDetails() {
                 }
             }).then(res => {
                 setBookingPackages(res.data)
-            }).catch (err => console.error(err))
+            }).catch ()
 
             axios.get("/lockerTypes", 
             {
@@ -78,7 +60,7 @@ function AllBookingDetails() {
                 }
             }).then(res => {
                 setLockerTypes(res.data)
-            }).catch(err => console.error(err))
+            }).catch()
 
             axios.get("/kiosks", 
             {
@@ -87,34 +69,17 @@ function AllBookingDetails() {
                 }
             }).then(res => {
                 setKiosks(res.data)
-            }).catch(err => console.error(err))
+            }).catch()
 
         }).catch (function(error) {
-            console.log(error.response.data)
+           
         })
-    },[])
+    },[authToken,bookingId])
 
-    //match customer id to customer name 
-    function getCustomerName(id) {
-        for (var i in customers) {
-            if (customers[i].id === id) {
-                return customers[i].firstName + " " + customers[i].lastName
-            }
-        }
-    }
-
-    //match merchant id to merchant name 
-    function getMerchantName(id) {
-        for (var i in merchants) {
-            if (merchants[i].id === id) {
-                return merchants[i].name
-            }
-        }
-    }
+ 
 
     //match booking package id to booking package name
     function getBookingPackage(id) {
-        console.log("booking package id: " + id)
         for (var i in bookingPackages) {
             if (bookingPackages[i].id === id) {
                 return bookingPackages[i].name
@@ -144,10 +109,8 @@ function AllBookingDetails() {
     function formatDate(d) {
         if (d === undefined){
             d = (new Date()).toISOString()
-            console.log(undefined)
         }
         let currDate = new Date(d);
-        console.log("currDate: " + currDate)
         let year = currDate.getFullYear();
         let month = currDate.getMonth() + 1;
         let dt = currDate.getDate();

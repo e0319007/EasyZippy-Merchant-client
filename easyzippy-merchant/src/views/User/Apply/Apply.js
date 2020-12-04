@@ -38,7 +38,7 @@ function Apply() {
     const onChangeName = e => {
         const name = e.target.value;
         setName(name)
-        if (name.trim().length == 0) {
+        if (name.trim().length === 0) {
             setError("Name is a required field")
             isError(true)
         } else {
@@ -105,7 +105,7 @@ function Apply() {
     const onChangeMobileNumber = e => {
         const mobileNumber = e.target.value;
         
-        if (mobileNumber.trim().length == 0) {
+        if (mobileNumber.trim().length === 0) {
             setError("Mobile Number is a required field")
             isError(true)
         } else {
@@ -123,7 +123,7 @@ function Apply() {
     const onChangeEmail = e => {
         const email = e.target.value;
         setEmail(email.trim())
-        if (email.trim().length == 0) {
+        if (email.trim().length === 0) {
             setError("Email is a required field")
             isError(true)
         } else {
@@ -134,14 +134,14 @@ function Apply() {
     const onChangePassword = e => {
         const password = e.target.value;
         setPassword(password.trim())
-        if (password.trim().length == 0) {
+        if (password.trim().length === 0) {
             setError("Password is a required field")
             isError(true)
         } else {
             isError(false)
         }
 
-        var reg = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})")
+        var reg = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})")
         if (reg.test(password)) { //if valid
             isError(false)
         } else {
@@ -153,7 +153,7 @@ function Apply() {
     const onChangePassword2 = e => {
         const password2 = e.target.value;
         setPassword2(password2.trim())
-        if (password2.trim().length == 0) {
+        if (password2.trim().length === 0) {
             setError("Please re-enter password")
             isError(true)
         } else if (password2.trim() !== password.trim()) {
@@ -173,10 +173,9 @@ function Apply() {
 
     // apply without the tenancy agreement
     const postApply = e => {
-        console.log("in post apply function")
         e.preventDefault()
 
-        if (password.trim() != password2.trim()) {
+        if (password.trim() !== password2.trim()) {
             isError(true)
             setError("Passwords do not match")
             return;
@@ -184,8 +183,7 @@ function Apply() {
 
         let arr = fullUnitNum.split('-')
 
-        console.log("arr0: " + arr[0])
-        console.log("arr1: " + arr[1])
+        
 
         const fl = arr[0]
         const un = arr[1]
@@ -193,17 +191,12 @@ function Apply() {
         //need to post the image first
         let formData = new FormData();
         formData.append(image.name, image)
-        console.log('form data values: ')
-        for (var v of formData.values()) {
-            console.log(v)
-        }  
+       
 
         axios.post(`/merchantUploadLogoPreRegistration`, formData, {
 
         }).then(res => {
-            console.log("image upload axios call went through")
             var imgString = res.data
-            console.log("image string: " + imgString)
 
             // register merchant
             axios.post("/merchant", {
@@ -219,12 +212,10 @@ function Apply() {
                 password: password,
                 merchantLogoImage: imgString
             }).then( response => {
-                console.log("axios call went through")
                 Cookies.set('merchantUser', JSON.stringify(response.data.id));
                 isError(false)
                 history.push('/fileUpload')
             }).catch(function(error) {
-                console.log(error.response.data)
                 isError(true)
                 setError(error.response.data)
             })

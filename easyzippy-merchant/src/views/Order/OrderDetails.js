@@ -27,10 +27,8 @@ function OrderDetails() {
 
     const history = useHistory()
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
-    console.log(authToken)
 
     const orderId = JSON.parse(localStorage.getItem('orderToView'))
-    console.log("order id: " + orderId)
 
     const [order, setOrder] = useState([])
     const [items, setItems] = useState([])
@@ -69,16 +67,8 @@ function OrderDetails() {
                 setCanChangeOrderStatus(true)
             }
 
-            // console.log("items: ")
-            // console.log(res.data.items)
-            // console.log("order status: ")
-            // console.log(res.data.order.orderStatusEnum)
-            // console.log("data: ")
-            // console.log(res.data)
-            // console.log(res.data.order)
-            // console.log("id: ")
-            // console.log(res.data.order.id)
-        }).catch(err => console.error(err))
+          
+        }).catch()
 
         axios.get("/order/orderStatus", 
         {
@@ -87,9 +77,8 @@ function OrderDetails() {
             }
         }).then(res => {
             setOrderStatusesEnum(res.data)
-            console.log("axios get all order status: ")
-            console.log(res.data)
-        }).catch(err => console.log(err))
+      
+        }).catch()
 
         axios.get("/customers", 
         {
@@ -98,7 +87,7 @@ function OrderDetails() {
             }
         }).then(res => {
             setCustomers(res.data)
-        }).catch(err => console.log(err))
+        }).catch()
 
         axios.get("/promotions",
         {
@@ -107,14 +96,12 @@ function OrderDetails() {
             }
         }).then(res => {
             setPromotions(res.data)
-        }).catch(err => console.log(err))
-    },[])
+        }).catch()
+    },[authToken,orderId])
 
     const onChangeOrderStatusEnum = e => {
-        console.log("in onChangeOrderStatusEnum")
         const orderStatusEnum = e.target.value;
         setOrderStatusEnum(orderStatusEnum)
-        console.log("on change: " + orderStatusEnum)
     }
 
     const updateOrderStatus = e => {
@@ -133,7 +120,6 @@ function OrderDetails() {
             isSuccessful(true)
             setMsg("Order status updated successfully!")
         }).catch(function(error) {
-            console.log(error)
             isError(true)
             setError(error)
             isSuccessful(false)
@@ -142,7 +128,6 @@ function OrderDetails() {
 
     //match customer id to customer name
     function getCustomerName(id) {
-        console.log("customer id: " + id)
         for (var i in customers) {
             if (customers[i].id === id) {
                 return customers[i].firstName + " " + customers[i].lastName
@@ -151,7 +136,6 @@ function OrderDetails() {
     }
     //match promoIdUsed to promocode 
     function getPromoCode(id) {
-        console.log("promo code id: " + id)
         for (var i in promotions) {
             if (promotions[i].id === id) {
                 return promotions[i].promoCode
@@ -163,10 +147,8 @@ function OrderDetails() {
     function formatDate(d) {
         if (d === undefined){
             d = (new Date()).toISOString()
-            console.log(undefined)
         }
         let currDate = new Date(d);
-        console.log("currDate: " + currDate)
         let year = currDate.getFullYear();
         let month = currDate.getMonth() + 1;
         let dt = currDate.getDate();
@@ -180,7 +162,6 @@ function OrderDetails() {
         }
 
         return dt + "/" + month + "/" + year + " " + time ;
-        //return dt + "/" + month + "/" + year;
         
     }
 
@@ -271,7 +252,6 @@ function OrderDetails() {
                                             </thead>
                                             <tbody>
                                                 {items.length > 0 && items.map((item,i) => (
-                                                    // item.product ? console.log(item.product.name) : console.log(item.productVariation.name)
                                                     <tr>      
                                                         <td>{item.product ? item.product.name : item.productVariation.name}</td>
                                                         <td>{item.product ? item.product.unitPrice : item.productVariation.unitPrice}</td>
@@ -291,11 +271,7 @@ function OrderDetails() {
                                                             value={orderStatusEnum}
                                                             onChange={onChangeOrderStatusEnum}
                                                         >
-                                                            {/* {
-                                                                orderStatusesEnum.map(orderStatusEnum => (
-                                                                    <option key={orderStatusEnum.id}>{orderStatusEnum}</option>
-                                                                ))
-                                                            } */}
+                                                
                                                             <option>Processing</option>
                                                             <option>Ready For Collection</option>
                                                         </Input>

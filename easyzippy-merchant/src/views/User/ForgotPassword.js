@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import axios from 'axios';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import {
     FormGroup,
@@ -13,7 +13,6 @@ import {
     Row
 } from "reactstrap";
 
-const API_SERVER = "http://localhost:5000/merchant"
 
 function ForgotPassword() {
 
@@ -27,7 +26,7 @@ function ForgotPassword() {
     const onChangeEmail = e => {
         const email = e.target.value;
         setEmail(email.trim())
-        if (email.trim().length == 0) {
+        if (email.trim().length === 0) {
             setError("Please key in your email")
             isError(true)
         } else {
@@ -36,10 +35,9 @@ function ForgotPassword() {
     }
 
     const sendEmail = e => {
-        console.log("in send email function")
         e.preventDefault()
 
-        if (email.trim().length == 0) {
+        if (email.trim().length === 0) {
             isError(true)
             setError("Please key in your email")
             return;
@@ -48,7 +46,6 @@ function ForgotPassword() {
         axios.post("/merchant/forgotPassword", {
             email: email
         }).then(() => {
-            console.log("axios call went through")
             
             localStorage.setItem('email', email)
             

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Cookies from 'js-cookie';
-import { Line } from "react-chartjs-2";
-import ReactShadowScroll from 'react-shadow-scroll';
 
 
 // reactstrap components
@@ -16,14 +14,9 @@ import {
   Col,
   ListGroupItem,
   ListGroup,
-  DropdownMenu,
-  Dropdown,
-  DropdownItem
+ 
 } from "reactstrap";
-// core components
-import {
-  dashboard24HoursPerformanceChart,
-} from "variables/charts.js";
+
 
 function Dashboard() {
 
@@ -48,7 +41,6 @@ function Dashboard() {
         AuthToken: authToken
       }
     }).then(res => {
-      console.log("successfully retrieve products")
       setProductsLength(res.data.length)
 
       axios.get(`/orders/merchant/${merchantId}`, {
@@ -67,7 +59,6 @@ function Dashboard() {
         setAdsLength(res.data.length)
       })
     }).catch( function(error) {
-      console.log(error.response)
     })
 
     axios.get(`/promotion/merchant/${merchantId}`, {
@@ -94,20 +85,17 @@ function Dashboard() {
       setAnnouncements(res.data)
     })
 
-  },[])
+  },[authToken, merchantId])
 
 
   function formatDate(d) {
-    //console.log(d)
     if (d === undefined){
         d = (new Date()).toISOString()
-        console.log(undefined)
     }
     let currDate = new Date(d);
     let year = currDate.getFullYear();
     let month = currDate.getMonth() + 1;
     let dt = currDate.getDate();
-    //let time = currDate.toLocaleTimeString('en-SG')
 
     if (dt < 10) {
         dt = '0' + dt;

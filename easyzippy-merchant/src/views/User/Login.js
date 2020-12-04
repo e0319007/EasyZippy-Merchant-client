@@ -14,7 +14,6 @@ import {
     Nav,
     NavLink,
     NavItem,
-    NavbarText,
     NavbarToggler,
     Collapse,
     Card,
@@ -39,7 +38,6 @@ function Login() {
     const toggle = () => setIsOpen(!isOpen);
 
     const onChangeEmail = e => {
-        // console.log("inside on change email")
         const email = e.target.value;
         setEmail(email)
     }
@@ -73,7 +71,6 @@ function Login() {
     }
 
     const postLogin = e =>  {
-        console.log("in login function")
         e.preventDefault()
 
         if (email.length === 0 || password.length === 0) {
@@ -97,9 +94,7 @@ function Login() {
                     password: password
                 })
                 .then(response => {
-                    console.log("axios call went through")
                     isError(false)
-                    console.log(response.data.token)
                     Cookies.set('authToken', JSON.stringify(response.data.token));
                     Cookies.set('merchantUser', JSON.stringify(response.data.merchant.id));
         
@@ -109,31 +104,25 @@ function Login() {
                     merchant.pointOfContact = response.data.merchant.pointOfContact
                     merchant.blk = response.data.merchant.blk
                     merchant.street = response.data.merchant.street
-                    //merchant.fullUnitNum = response.data.merchant.fullUnitNum
                     merchant.floor = response.data.merchant.floor
                     merchant.unitNumber = response.data.merchant.unitNumber
                     merchant.postalCode = response.data.merchant.postalCode
                     merchant.creditBalance = response.data.merchant.creditBalance
-                    console.log(response.data.merchant.merchantLogoImage)
 
                     if (response.data.merchant.merchantLogoImage !== null) {
                         axios.get(`/assets/${response.data.merchant.merchantLogoImage}`, {
                             responseType: 'blob'
                         }).then(res => {
-                            console.log('axios images thru')
                             var file = new File([response.data], {type:"image/png"})
                             let image = URL.createObjectURL(file)
-                            console.log(image)
                             merchant.merchantLogoImage = image
     
-                            console.log(merchant)
             
                             localStorage.setItem('currentMerchant', JSON.stringify(merchant))
                             
                             history.push('/admin/dashboard')
                             document.location.reload()
                         }).catch(function (error) {
-                            console.log(error.response.data)
                         })
                     } else {
                         localStorage.setItem('currentMerchant', JSON.stringify(merchant))
@@ -148,7 +137,6 @@ function Login() {
                     } else {
                         setError(error.response.data)
                     }
-                    console.log(error.response.data)
                     // check below line again,, ideally dont want to refresh, want to show error caught from backend
                     history.push('/login') 
                     //add customised alerts according to errors
@@ -157,7 +145,6 @@ function Login() {
         }).catch (function(error) {
             isError(true)
             setError(error.response.data)
-            console.log(error.response.data)
         })
 
 
@@ -199,11 +186,7 @@ function Login() {
                                 Register
                             </NavLink>
                         </NavItem>
-                        {/* <NavItem>
-                            <NavbarText style={{color:"white"}}>
-                                |
-                            </NavbarText>
-                        </NavItem> */}
+                  
                         <NavItem>
                             <NavLink href="/applyAdvertisement">
                                 Apply for Advertisement

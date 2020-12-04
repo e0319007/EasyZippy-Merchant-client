@@ -1,9 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import Badge from '@material-ui/core/Badge';
-import { makeStyles } from '@material-ui/core/styles';
 import {
   Collapse,
   Navbar,
@@ -16,13 +14,12 @@ import {
   DropdownMenu,
   DropdownItem,
   Container,
-  NavLink, CardText, CardBody,
+  NavLink,
   NavbarText
 } from "reactstrap";
 
 import routes from "routes.js";
-import { Card } from "@material-ui/core";
-import { maxWidth } from "@material-ui/system";
+
 
 class Header extends React.Component {
   constructor(props) {
@@ -45,7 +42,6 @@ class Header extends React.Component {
     this.formatDate = this.formatDate.bind(this);
     this.sidebarToggle = React.createRef();
     this.logout = this.logout.bind(this);
-    // this.handleNotifVisibility = this.handleNotifVisibility.bind(this);
 
   }
 
@@ -65,10 +61,8 @@ class Header extends React.Component {
   }
   dropdownToggle(e) {
     //once dropdown, then mark all notifications as read 
-    console.log("inside notifications dropdown toggle")
     let n = this.state.notifications;
     for (var i in n) {
-      console.log("n index read: " + n[i].read)
       if (n[i].read === false) {
         n[i].read = true
         axios.put(`/readNotification/${n[i].id}`, {
@@ -79,9 +73,7 @@ class Header extends React.Component {
             AuthToken: this.state.authToken
           }
         }).then(res => {
-          console.log("notifications set to read // axios went through")
         }).catch (function (err){
-          console.log(err.response.data)
         })
       } else { //true
         continue;
@@ -129,8 +121,6 @@ class Header extends React.Component {
   }
   componentDidMount() {
     window.addEventListener("resize", this.updateColor.bind(this));
-    console.log(JSON.parse(Cookies.get('authToken')))
-    const merc = JSON.parse(localStorage.getItem('currentMerchant'))
     // GET NOTIFICATIONS
     axios.get(`/notification/merchant/${parseInt(Cookies.get('merchantUser'))}`, 
     {
@@ -150,7 +140,6 @@ class Header extends React.Component {
         break;
       }
     }).catch (function(error){
-      console.log(error.response.data)
     })
 
     // GET ANNOUNCEMENTS
@@ -163,7 +152,6 @@ class Header extends React.Component {
       const anncemts = res.data
       this.setState({announcements: anncemts})
     }).catch (function(error){
-      console.log(error)
     })
 
     
@@ -183,7 +171,7 @@ class Header extends React.Component {
 
   componentWillReceiveProps(e) {
     //if this isn't the first render, then keep updating when re-render
-    if (this.state.notifications.length != 0) {
+    if (this.state.notifications.length !== 0) {
       axios.get(`/notification/merchant/${parseInt(Cookies.get('merchantUser'))}`, 
       {
         headers: {
@@ -199,12 +187,11 @@ class Header extends React.Component {
         }
         this.setState({notifications: notifs})
       }).catch (function(error){
-        console.log(error.response.data)
       })
     }
 
     //just to keep fetching in case got new i suppose
-    if (this.state.announcements.length != 0) {
+    if (this.state.announcements.length !== 0) {
       axios.get("/announcements", 
       {
           headers: {
@@ -214,13 +201,11 @@ class Header extends React.Component {
         const anncemts = res.data
         this.setState({announcements: anncemts})
       }).catch (function(error){
-        console.log(error.response.data)
       })
     }
   }
 
   logout(e) {
-    console.log("in logout")
     Cookies.remove('authToken')
     Cookies.remove('merchantUser')
     localStorage.clear()

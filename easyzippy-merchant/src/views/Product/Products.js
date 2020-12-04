@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import { useHistory } from 'react-router-dom';
 import axios from "axios";
 import Cookies from 'js-cookie';
-import {MDBCol, MDBIcon} from "mdbreact";
+import { MDBIcon} from "mdbreact";
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 import Slider from "react-slick";
@@ -19,7 +19,6 @@ import {
     Button, 
     CardHeader, 
     CardImg,
-    Input,
     FormGroup,
     Label,
     Modal,
@@ -32,15 +31,9 @@ function Products() {
 
     const history = useHistory()
     const authToken = (JSON.parse(Cookies.get('authToken'))).toString()
-    console.log(authToken)
 
     const merchantId = (JSON.parse(Cookies.get('merchantUser'))).toString()
 
-    //const product = JSON.parse(localStorage.getItem('currentProduct'))
-
-    //const [name, setName] = useState(product.name)
-
-    //search by name
     const [searchTerm, setSearchTerm] = useState("")
     const [categories, setCategories] = useState([])
 
@@ -57,7 +50,6 @@ function Products() {
     //for delete confirmation
     const [modal, setModal] = useState(false)
     const toggleModal = id => {
-        console.log(id)
         localStorage.setItem('productId', id)
         setModal(!modal);
 
@@ -88,7 +80,6 @@ function Products() {
                         'Content-Type': 'application/json'
                     }
                 }).then(response => {
-                    console.log('axios images thru')
                     var file = new File([response.data], {type:"image/png"})
                     let image = URL.createObjectURL(file)
 
@@ -101,12 +92,10 @@ function Products() {
 
                     setImageArr(imageArr => [...imageArr, obj])
                 }).catch (function (error) {
-                    console.log(error.response.data)
                 })
             }
 
         }).catch (function(error) {
-            console.log(error.response.data)
         })
 
         setImageModal(!imageModal)
@@ -128,7 +117,6 @@ function Products() {
                 AuthToken: authToken
             }
         }).then(res => {
-            console.log("successfully retrieve products")
             setProducts(res.data)
 
             productArr = res.data
@@ -138,10 +126,9 @@ function Products() {
                     AuthToken: authToken
                 }
             }).then (response => {
-                console.log("successfully retrieve categories")
                 setCategories(response.data)
                 tempCat = response.data
-            }).catch(err => console.error(err))
+            }).catch()
 
             //set pictures to pictures array that also has the product id
             //right now only consider the first picture
@@ -150,7 +137,6 @@ function Products() {
                 let index = i
                 let imgarr = []
 
-                console.log(productArr[i])
                 axios.get(`/assets/${productArr[i].images[0]}`, {
                     responseType: 'blob'
                 },
@@ -160,7 +146,6 @@ function Products() {
                         'Content-Type': 'application/json'
                     }
                 }).then (r => {
-                    console.log("axios images thru: " + r.data)
                     var file = new File([r.data], {type:"image/png"})
                     let image = URL.createObjectURL(file)
 
@@ -186,7 +171,6 @@ function Products() {
                         quantityAvailable: productArr[index].quantityAvailable, 
                         merchantId: productArr[index].merchantId
                     }
-                    console.log(p.image)
                     setNewProdArr(newProdArr => [...newProdArr, p])
                     tempProdArr.push(p)
 
@@ -203,18 +187,14 @@ function Products() {
                     }
 
                     setSearchResults(resultArr)
-                }).catch (err => console.error(err))
+                }).catch ()
             }
-        }).catch(err => console.error(err))
+        }).catch()
 
     },[searchTerm, lowToHigh])
 
-    // function group(arr, key) {
-    //     return [...arr.reduce( (acc, o) => 
-    //         acc.set(o[key], (acc.get(o[key]) || []).concat(o))
-    //     , new Map).values()];
-    // }
 
+    
     const deleteProduct = e => {
         e.preventDefault()
 
@@ -230,10 +210,8 @@ function Products() {
             }
         }).then(res => {
             //later see
-            console.log("axios delete product went through")
             window.location.reload()
         }).catch(function (error) {
-            console.log(error.response.data)
         })
     }
 
@@ -270,15 +248,7 @@ function Products() {
                                             <Button className="btn-icon btn-neutral" onClick={sortByPrice}>
                                             <i className="fas fa-sort" />
                                             </Button>
-                                            {/* &nbsp; 
-                                            <div style={{float: "right"}}>
-                                            <Button color="info" size="sm" onClick={() => {
-                                                history.push('/admin/listProduct')
-                                            }}> <i className="nc-icon nc-simple-add"/> {''}
-                                                List a Product
-                                            </Button>
-
-                                            </div> */}
+                                
                                         </FormGroup>
                                         <FormGroup className="form-inline mt-4 mb-4 col-md-3">
                                         <div style={{float: "right"}}>
@@ -289,21 +259,7 @@ function Products() {
                                                 </Button>
                                         </div>
                                         </FormGroup>
-                                        {/* <Col className="mt-4 mb-4 col-md-6" > */}
-                                            {/* <Label>Sort by Price</Label>
-                                            <Button className="btn-icon btn-neutral" onClick={sortByPrice}>
-                                            <i className="fas fa-sort" />
-                                            </Button>
-                                            &nbsp; 
-                                            <div style={{float: "right"}}>
-                                            <Button color="info" size="sm" onClick={() => {
-                                                history.push('/admin/listProduct')
-                                            }}> <i className="nc-icon nc-simple-add"/> {''}
-                                                List a Product
-                                            </Button>
-
-                                            </div> */}
-                                        {/* </Col> */}
+                                
                                 </div>
                             </CardHeader>
                             <CardBody>
@@ -312,13 +268,11 @@ function Products() {
                                             searchResults.map(prod => (
                                                 <Card style={{width: '22rem', margin:'0.45rem'}} className="text-center" key={prod.id} >
                                                     <CardImg style={{height:'25rem'}} top src={prod.image} onClick={e => {toggleImageModal(e, prod.id)}}/>
-                                                    {/* <CardImg top src="../../easyzippylogo.jpg"/> */}
                                                     <CardBody>
                                                         <CardTitle className="h6">{prod.name}</CardTitle>
                                                         <CardText>${prod.unitPrice}</CardText>
                                                         <CardText>Category: {prod.category}</CardText>
                                                         <CardText>{prod.archived}</CardText>
-                                                        {/* product details page */}
                                                         <Button color="primary" onClick={() => {
                                                             history.push('/admin/productDetails')
                                                             localStorage.setItem('productToView', JSON.stringify(prod))
