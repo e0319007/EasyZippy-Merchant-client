@@ -26,6 +26,7 @@ import BookingPackageDetails from "views/BookingPackage/BookingPackageDetails..j
 import AllBookingDetails from "views/Booking/AllBookingDetails.js";
 import CurrentBookingDetails from "views/Booking/CurrentBookingDetails.js";
 import CreateBooking from "views/Booking/CreateBooking.js"
+import ErrorPage from "views/ErrorPage.js";
 
 const hist = createBrowserHistory();
 
@@ -43,7 +44,10 @@ function App(props) {
                 { document.cookie.indexOf('merchantUser') > -1 && document.cookie.indexOf('authToken') > -1 && 
                     <Route path="/admin" render={(props) => <AdminLayout {...props} />} />
                 }
-                <Route exact path="/error" component={Error} />
+                
+                <Route exact path="/" component={Login} />
+                
+                {/* <Route exact path="/error" component={Error} /> */}
                 <Route exact path="/apply" component={Apply}/>
                 <Route exact path="/fileUpload" component={FileUpload}/>
                 <Route exact path="/forgotPassword" component={ForgotPassword}/>
@@ -60,6 +64,7 @@ function App(props) {
                 <Route exact path="/admin/allBookingsDetails" component={AllBookingDetails}/>
                 <Route exact path="/admin/currentBookingsDetails" component={CurrentBookingDetails}/>
                 <Route exact path="/admin/createBooking" component={CreateBooking}/>
+                <Route component={ErrorPage}/>
                 {/* <Redirect to="/error" component={Error} /> */}
             </Switch>
         </Router>
