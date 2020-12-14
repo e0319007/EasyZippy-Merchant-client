@@ -369,7 +369,7 @@ function Profile() {
     const onChangeNewPassword = e => {
         const newPw = e.target.value;
 
-        var reg = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})")
+        var reg = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})")
         if (reg.test(newPw)) { //if valid
             isError(false)
             isSuccessful(false)

@@ -32,7 +32,7 @@ function ResetPassword() {
     const onChangePassword = e => {
         const password = e.target.value;
 
-        var reg = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})")
+        var reg = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})")
         if (reg.test(password)) { //if valid
             isError(false)
         } else {
