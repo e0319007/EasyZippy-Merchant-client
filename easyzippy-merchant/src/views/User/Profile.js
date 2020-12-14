@@ -199,7 +199,7 @@ function Profile() {
             })
         }).catch(function (error) {
         })
-    }, [authToken, merchantid, merchant])
+    }, [])
 
     const onChangeName = e => {
         const name = e.target.value;
